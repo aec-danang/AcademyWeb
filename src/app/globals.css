@@ -13,6 +13,8 @@
   --text-muted: #5f607a;
   --text-white: #ffffff;
   
+  --font-main: var(--font-montserrat), sans-serif;
+  
   --radius-sm: 8px;
   --radius-md: 16px;
   --radius-lg: 24px;
@@ -52,6 +54,7 @@ body {
   flex-direction: column;
   color: var(--text-main);
   background: var(--color-white);
+  font-family: var(--font-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
