@@ -1,4 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
+import { MapPin, Phone, Mail } from "lucide-react";
+import { FaFacebook, FaYoutube, FaInstagram } from "react-icons/fa";
 import styles from "./Footer.module.css";
 
 export default function Footer() {
@@ -8,21 +11,21 @@ export default function Footer() {
         <div className={styles.footerTop}>
           <div>
             <Link href="/" className={styles.logo}>
-              AEC<span>Academy</span>
+              <Image src="/logos/main/logo-reverse-horizontal-srgb.png" alt="AEC Academy Logo" width={180} height={48} style={{ objectFit: 'contain' }} />
             </Link>
             <p className={styles.aboutText}>
               Educating people through English so they become successful global citizens responsible toward themselves and the community.
             </p>
             <div className={styles.contactItem}>
-              <span className={styles.icon}>📍</span>
+              <span className={styles.icon}><MapPin size={18} /></span>
               <span>98 Le Dinh Ly St, Da Nang</span>
             </div>
             <div className={styles.contactItem}>
-              <span className={styles.icon}>📞</span>
+              <span className={styles.icon}><Phone size={18} /></span>
               <span>(0236) 123 4567</span>
             </div>
             <div className={styles.contactItem}>
-              <span className={styles.icon}>✉️</span>
+              <span className={styles.icon}><Mail size={18} /></span>
               <span>info@academy.edu.vn</span>
             </div>
           </div>
@@ -74,9 +77,9 @@ export default function Footer() {
         <div className={styles.footerBottom}>
           <p>&copy; {new Date().getFullYear()} Academy English Center. All rights reserved.</p>
           <div className={styles.socials}>
-            <a href="#" aria-label="Facebook">FB</a>
-            <a href="#" aria-label="YouTube">YT</a>
-            <a href="#" aria-label="Instagram">IG</a>
+            <a href="#" aria-label="Facebook"><FaFacebook size={18} /></a>
+            <a href="#" aria-label="YouTube"><FaYoutube size={18} /></a>
+            <a href="#" aria-label="Instagram"><FaInstagram size={18} /></a>
           </div>
         </div>
       </div>

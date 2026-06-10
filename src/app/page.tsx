@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import { Trophy, Baby, GraduationCap, Briefcase, Building } from "lucide-react";
 import styles from "./page.module.css";
 import Card from "@/components/ui/Card";
 
@@ -21,7 +23,7 @@ export default function Home() {
               [Hero Image Placeholder]<br/>Happy students learning
             </div>
             <div className={styles.badge}>
-              <span style={{ color: "var(--color-orange)", fontSize: "24px" }}>🏆</span>
+              <Trophy color="var(--color-orange)" size={24} />
               <div>
                 <div style={{ fontSize: "14px", color: "var(--text-muted)", fontWeight: "normal" }}>Founded in</div>
                 <div>2006</div>
@@ -40,25 +42,33 @@ export default function Home() {
           </div>
           <div className={styles.programsGrid}>
             <Card className={styles.programCard}>
-              <div className={styles.programIcon}>🧸</div>
+              <div className={styles.programIcon}><Baby size={48} strokeWidth={1.5} /></div>
               <h3>Kids & Teens</h3>
               <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Interactive learning for young minds.</p>
             </Card>
             <Card className={styles.programCard}>
-              <div className={styles.programIcon}>🎓</div>
+              <div className={styles.programIcon}><GraduationCap size={48} strokeWidth={1.5} /></div>
               <h3>IELTS & Test Prep</h3>
               <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Achieve your target score.</p>
             </Card>
             <Card className={styles.programCard}>
-              <div className={styles.programIcon}>💼</div>
+              <div className={styles.programIcon}><Briefcase size={48} strokeWidth={1.5} /></div>
               <h3>Adults & Comm</h3>
               <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Confidence in daily communication.</p>
             </Card>
             <Card className={styles.programCard}>
-              <div className={styles.programIcon}>🏢</div>
+              <div className={styles.programIcon}><Building size={48} strokeWidth={1.5} /></div>
               <h3>Corporate English</h3>
               <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Empower your workforce.</p>
             </Card>
+            <Link href="/addc" style={{ display: "block" }}>
+              <Card className={styles.programCard} style={{ height: "100%" }}>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "16px", height: "48px", alignItems: "center" }}>
+                  <Image src="/logos/addc/logo-debate.png" alt="ADDC Logo" width={120} height={48} style={{ objectFit: 'contain' }} />
+                </div>
+                <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Speaking & debating for kids and teenagers.</p>
+              </Card>
+            </Link>
           </div>
         </div>
       </section>

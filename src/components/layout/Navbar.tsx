@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
@@ -6,7 +7,7 @@ export default function Navbar() {
     <header className={styles.header}>
       <div className={`container ${styles.navContainer}`}>
         <Link href="/" className={styles.logo}>
-          AEC<span>Academy</span>
+          <Image src="/logos/main/logo-main-horizontal-srgb.png" alt="AEC Academy Logo" width={180} height={48} style={{ objectFit: 'contain' }} />
         </Link>
         <nav>
           <ul className={styles.navLinks}>
