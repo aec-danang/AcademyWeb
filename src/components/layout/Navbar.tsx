@@ -7,7 +7,7 @@ export default function Navbar() {
     <header className={styles.header}>
       <div className={`container ${styles.navContainer}`}>
         <Link href="/" className={styles.logo}>
-          <Image src="/logos/main/logo-main-horizontal-srgb.png" alt="AEC Academy Logo" width={180} height={48} style={{ objectFit: 'contain' }} />
+          <Image src="/logos/aec/aec-logo-horizontal.png" alt="AEC Academy Logo" width={180} height={48} style={{ objectFit: 'contain' }} />
         </Link>
         <nav>
           <ul className={styles.navLinks}>

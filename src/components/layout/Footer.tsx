@@ -11,7 +11,7 @@ export default function Footer() {
         <div className={styles.footerTop}>
           <div>
             <Link href="/" className={styles.logo}>
-              <Image src="/logos/main/logo-reverse-horizontal-srgb.png" alt="AEC Academy Logo" width={180} height={48} style={{ objectFit: 'contain' }} />
+              <Image src="/logos/aec/aec-logo-reverse-horizontal.png" alt="AEC Academy Logo" width={180} height={48} style={{ objectFit: 'contain' }} />
             </Link>
             <p className={styles.aboutText}>
               Educating people through English so they become successful global citizens responsible toward themselves and the community.
@@ -77,9 +77,9 @@ export default function Footer() {
         <div className={styles.footerBottom}>
           <p>&copy; {new Date().getFullYear()} Academy English Center. All rights reserved.</p>
           <div className={styles.socials}>
-            <a href="#" aria-label="Facebook"><FaFacebook size={18} /></a>
-            <a href="#" aria-label="YouTube"><FaYoutube size={18} /></a>
-            <a href="#" aria-label="Instagram"><FaInstagram size={18} /></a>
+            <a href="https://www.facebook.com/trungtam.anhngu.academy/" aria-label="Facebook" target="_blank" rel="noopener noreferrer"><FaFacebook size={18} /></a>
+            <a href="https://www.youtube.com/@academyenglishcenter4309/" aria-label="YouTube" target="_blank" rel="noopener noreferrer"><FaYoutube size={18} /></a>
+            <a href="https://www.instagram.com/academyaec.dn/" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><FaInstagram size={18} /></a>
           </div>
         </div>
       </div>

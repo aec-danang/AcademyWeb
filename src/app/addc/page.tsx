@@ -16,7 +16,7 @@ export default function ADDCPage() {
           <div className={styles.heroContent}>
             <div className={styles.logoContainer}>
               <Image 
-                src="/logos/addc/logo-debate.png" 
+                src="/logos/addc/addc-logo.png" 
                 alt="ADDC Logo" 
                 width={400} 
                 height={200} 
@@ -69,7 +69,7 @@ export default function ADDCPage() {
             </div>
             <div>
                <Image 
-                  src="/logos/addc/dolphin-logo-with-sky.png" 
+                  src="/logos/addc/addc-logo-second.png" 
                   alt="ADDC Dolphin" 
                   width={600} 
                   height={600} 
