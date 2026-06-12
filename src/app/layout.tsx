@@ -14,9 +14,6 @@ export const metadata: Metadata = {
   description: "Learn English. Build Confidence. Become a Global Citizen. Academy English Center provides high-quality English programs for kids, teens, IELTS learners, working adults, and corporate teams in Da Nang.",
 };
 
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,9 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={montserrat.variable} suppressHydrationWarning>
       <body className={montserrat.className} suppressHydrationWarning>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );
