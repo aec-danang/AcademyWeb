@@ -1,0 +1,220 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------
+// NEXT-AUTH MODELS
+// ---------------------------------------------
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ---------------------------------------------
+// E-LEARNING MODELS
+// ---------------------------------------------
+
+enum Role {
+  USER
+  TEACHER
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  courses       CourseEnrollment[]
+  quizResults   QuizResult[]
+  testResults   TestResult[]
+  orders        Order[]
+}
+
+model Course {
+  id          String    @id @default(cuid())
+  title       String
+  description String?   @db.Text
+  price       Float     @default(0)
+  imageUrl    String?
+  published   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  lessons     Lesson[]
+  enrollments CourseEnrollment[]
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  title       String
+  content     String?  @db.Text
+  videoUrl    String?
+  order       Int      @default(0)
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  quizzes     Quiz[]
+}
+
+model Quiz {
+  id          String   @id @default(cuid())
+  title       String
+  timeLimit   Int?     // Time limit in minutes
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  questions   Question[]
+  results     QuizResult[]
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  text        String   @db.Text
+  options     String   @db.Text // JSON string for options
+  answer      String
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model QuizResult {
+  id          String   @id @default(cuid())
+  score       Float
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model CourseEnrollment {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
+
+// ---------------------------------------------
+// POSTS & PAGES (Blog/Tin tức)
+// ---------------------------------------------
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  slug      String   @unique
+  type      String   @default("post")
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------
+// QUIZ MASTER TESTS
+// ---------------------------------------------
+
+model Test {
+  id        String   @id @default(cuid())
+  title     String
+  timeLimit Int?
+  questions TestQuestion[]
+  results   TestResult[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TestQuestion {
+  id        String   @id @default(cuid())
+  testId    String
+  question  String   @db.Text
+  options   String   @db.Text
+  answer    String
+  test      Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+}
+
+model TestResult {
+  id        String   @id @default(cuid())
+  testId    String
+  userId    String?
+  score     Float
+  createdAt DateTime @default(now())
+  test      Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+// ---------------------------------------------
+// KHÁCH HÀNG (Leads)
+// ---------------------------------------------
+
+model Lead {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  source    String   @default("wpforms")
+  createdAt DateTime @default(now())
+}
+
+// ---------------------------------------------
+// ĐƠN HÀNG (Orders)
+// ---------------------------------------------
+
+model Order {
+  id          String   @id @default(cuid())
+  userId      String?
+  totalAmount Float
+  status      String   @default("completed")
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { BookOpen, Users, ClipboardList, Award, LogOut, MessageSquare } from "lucide-react";
 import styles from "./elearning.module.css";
@@ -13,7 +14,9 @@ export default function ElearningLayout({ children }: { children: React.ReactNod
 
   const navItems = [
     { name: "Dashboard", path: "/elearning", icon: <BookOpen size={20} /> },
+    { name: "Courses", path: "/elearning/courses", icon: <BookOpen size={20} /> },
     { name: "Classrooms", path: "/elearning/classrooms", icon: <Users size={20} /> },
+    { name: "Exercises", path: "/elearning/exercises", icon: <ClipboardList size={20} /> },
     { name: "Assignments", path: "/elearning/assignments", icon: <ClipboardList size={20} /> },
     { name: "Scores", path: "/elearning/scores", icon: <Award size={20} /> },
   ];
@@ -21,7 +24,16 @@ export default function ElearningLayout({ children }: { children: React.ReactNod
   return (
     <div className={styles.elearningContainer}>
       <aside className={styles.sidebar}>
-        <h2>AEC E-Learning</h2>
+        <div style={{ paddingLeft: "1rem", marginTop: "-30px", marginBottom: "-30px", display: "flex", alignItems: "flex-start" }}>
+          <Image 
+            src="/logos/aec/cropped-Logo-main-vertical-sRGB.png" 
+            alt="AEC Logo" 
+            width={100} 
+            height={100} 
+            style={{ objectFit: 'contain', objectPosition: 'center' }}
+          />
+        </div>
+        <h2 style={{ marginTop: 0, paddingLeft: "1rem" }}>AEC E-Learning</h2>
         
         {/* Mock Role Switcher for Demo */}
         <div style={{ marginBottom: "1.5rem", padding: "0 1rem" }}>
