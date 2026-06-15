@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Trophy, Baby, GraduationCap, Briefcase, Building } from "lucide-react";
 import styles from "./page.module.css";
-import Card from "@/components/ui/Card";
+import Card from "@/lib/ui/Card";
 
 export default function Home() {
   return (
