@@ -1,12 +1,101 @@
+"use client";
+
+import React, { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Trophy, Baby, GraduationCap, Briefcase, Building } from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import styles from "./page.module.css";
 import Card from "@/lib/ui/Card";
 
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger, useGSAP);
+}
+
 export default function Home() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    // 1. Hero Section Animation (Runs on load)
+    const heroTl = gsap.timeline();
+    heroTl.from(`.${styles.heroContent} > *`, {
+      y: 40,
+      opacity: 0,
+      duration: 1.2,
+      stagger: 0.15,
+      ease: "power4.out",
+      delay: 0.1
+    })
+    .from(`.${styles.heroImage}`, {
+      x: 40,
+      opacity: 0,
+      duration: 1.2,
+      ease: "power4.out"
+    }, "-=0.8");
+
+    // 2. Programs Section (ScrollTrigger Batching)
+    ScrollTrigger.batch(`.${styles.programCard}`, {
+      onEnter: (batch) => gsap.fromTo(batch, 
+        { opacity: 0, y: 60 }, 
+        { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power4.out", overwrite: true }
+      ),
+      start: "top 85%"
+    });
+
+    // 3. Quick Links Section
+    gsap.from(".btn-secondary", {
+      scrollTrigger: {
+        trigger: `.${styles.programs} + section`,
+        start: "top 85%"
+      },
+      y: 20,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: "power4.out"
+    });
+
+    // 4. Why Choose AEC Section
+    ScrollTrigger.batch(`.${styles.whyGrid} > div`, {
+      onEnter: (batch) => gsap.fromTo(batch,
+        { opacity: 0, y: 60 },
+        { opacity: 1, y: 0, stagger: 0.15, duration: 1, ease: "power4.out", overwrite: true }
+      ),
+      start: "top 85%"
+    });
+
+    // 5. Mission/Vision Section
+    gsap.from(`.${styles.mvCard}`, {
+      scrollTrigger: {
+        trigger: `.${styles.missionVision}`,
+        start: "top 80%"
+      },
+      y: 50,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.2,
+      ease: "power4.out"
+    });
+
+    // 6. CTA Section
+    gsap.from(`.${styles.ctaSection} .container > *`, {
+      scrollTrigger: {
+        trigger: `.${styles.ctaSection}`,
+        start: "top 85%"
+      },
+      y: 40,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.15,
+      ease: "power4.out"
+    });
+
+  }, { scope: containerRef });
+
   return (
-    <>
+    <div ref={containerRef}>
       {/* Hero Section */}
       <section className={styles.hero}>
         <div className={`container ${styles.heroContainer}`}>
@@ -14,7 +103,7 @@ export default function Home() {
             <h1>Learn English. Build Confidence. Become a Global Citizen.</h1>
             <p>Academy English Center provides high-quality English programs for kids, teens, IELTS learners, working adults, and corporate teams in Da Nang.</p>
             <div className={styles.heroButtons}>
-              <Link href="/programs" className="btn-primary">Find Your Course</Link>
+              <Link href="#programs" className="btn-primary">Find Your Course</Link>
               <Link href="/contact#register" className="btn-secondary">Book Placement Test</Link>
             </div>
           </div>
@@ -173,6 +262,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
