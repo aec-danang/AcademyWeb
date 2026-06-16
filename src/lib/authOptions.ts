@@ -21,7 +21,12 @@ export const authOptions: NextAuthOptions = {
         
         if (user) {
           // You should add proper password checking here using bcrypt
-          return user;
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+          } as any;
         } else {
           // Create dummy user for test prep phase
           return { id: "test", name: "Test User", email: credentials.email, role: "USER" };

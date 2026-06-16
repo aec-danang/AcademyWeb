@@ -7,70 +7,17 @@ datasource db {
   schemas  = ["elearning", "public"]
 }
 
-
-
-// ---------------------------------------------
-// E-LEARNING MODELS
-// ---------------------------------------------
-
-enum Role {
-  USER
-  TEACHER
-  ADMIN
-
-  @@schema("elearning")
-}
-
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          Role      @default(USER)
-
-  // Merged Account fields
-  provider          String?
-  providerAccountId String?
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  // Merged Session fields
-  sessionToken      String?   @unique
-  sessionExpires    DateTime?
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  courses      CourseEnrollment[]
-  testResults  TestResult[]
-  orders       Order[]
-  posts        Post[]
-  testimonials Testimonial[]
-
-  @@unique([provider, providerAccountId])
-  @@schema("elearning")
-  @@map("users")
-}
-
 model Course {
-  id          String   @id @default(cuid())
+  id          String             @id @default(cuid())
   title       String
-  description String?  @db.Text
-  price       Float    @default(0)
+  description String?
+  price       Float              @default(0)
   imageUrl    String?
-  published   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  lessons     Lesson[]
+  published   Boolean            @default(false)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
   enrollments CourseEnrollment[]
+  lessons     Lesson[]
   orders      Order[]
 
   @@schema("elearning")
@@ -79,69 +26,58 @@ model Course {
 model Lesson {
   id        String   @id @default(cuid())
   title     String
-  content   String?  @db.Text
+  content   String?
   videoUrl  String?
   order     Int      @default(0)
   courseId  String
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   tests     Test[]
 
   @@schema("elearning")
 }
 
-
-
 model CourseEnrollment {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   courseId  String
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
   @@schema("elearning")
 }
 
-// ---------------------------------------------
-// POSTS & PAGES (Blog/Tin tức)
-// ---------------------------------------------
-
 model Post {
-  slug            String   @id
   title           String
-  content         String   @db.Text
-  excerpt         String?  @db.Text
-  featuredImage   String?
+  content         String
+  slug            String   @id
   type            String   @default("post")
   published       Boolean  @default(true)
-  metaTitle       String?
-  metaDescription String?  @db.Text
-  authorId        String?
-  author          User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  authorId        String?
+  excerpt         String?
+  featuredImage   String?
+  metaDescription String?
+  metaTitle       String?
+  author          User?    @relation(fields: [authorId], references: [id])
 
   @@schema("public")
 }
-
-// ---------------------------------------------
-// QUIZ MASTER TESTS
-// ---------------------------------------------
 
 model Test {
   id        String         @id @default(cuid())
   title     String
   timeLimit Int?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
   lessonId  String?
   lesson    Lesson?        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   questions TestQuestion[]
   results   TestResult[]
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
 
   @@schema("elearning")
 }
@@ -149,8 +85,8 @@ model Test {
 model TestQuestion {
   id      String @id @default(cuid())
   testId  String
-  text    String @db.Text
-  options String @db.Text
+  text    String
+  options String
   answer  String
   test    Test   @relation(fields: [testId], references: [id], onDelete: Cascade)
 
@@ -164,106 +100,149 @@ model TestResult {
   score     Float
   createdAt DateTime @default(now())
   test      Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user      User?    @relation(fields: [userId], references: [id])
 
   @@schema("elearning")
 }
-
-// ---------------------------------------------
-// KHÁCH HÀNG (Leads)
-// ---------------------------------------------
 
 model Lead {
   id        String   @id @default(cuid())
   name      String
   email     String?
   phone     String?
-  message   String?  @db.Text
-  status    String   @default("new")
   createdAt DateTime @default(now())
+  message   String?
+  status    String   @default("new")
 
   @@schema("public")
 }
-
-// ---------------------------------------------
-// ĐƠN HÀNG (Orders)
-// ---------------------------------------------
 
 model Order {
   id          String   @id @default(cuid())
   userId      String?
-  courseId    String?
   totalAmount Float
   status      String   @default("completed")
   createdAt   DateTime @default(now())
-  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  course      Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  courseId    String?
+  course      Course?  @relation(fields: [courseId], references: [id])
+  user        User?    @relation(fields: [userId], references: [id])
 
   @@schema("elearning")
 }
 
-// ---------------------------------------------
-// SITE SETTINGS (CMS)
-// ---------------------------------------------
-
 model SiteSetting {
   id        String   @id @default(cuid())
   key       String   @unique
-  value     String   @db.Text
+  value     String
   updatedAt DateTime @updatedAt
 
   @@schema("public")
 }
-
-// ---------------------------------------------
-// NAVIGATION (CMS)
-// ---------------------------------------------
 
 model MenuItem {
   id        String  @id @default(cuid())
   label     String
   url       String
   order     Int     @default(0)
-  position  String  @default("header") // e.g., "header", "footer"
+  position  String  @default("header")
   parentId  String?
   published Boolean @default(true)
 
   @@schema("public")
 }
 
-// ---------------------------------------------
-// TESTIMONIALS (CMS)
-// ---------------------------------------------
-
 model Testimonial {
   id         String   @id @default(cuid())
   authorName String
   authorRole String?
-  content    String   @db.Text
+  content    String
   avatarUrl  String?
   rating     Int      @default(5)
   published  Boolean  @default(true)
   order      Int      @default(0)
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
 
   @@schema("public")
 }
 
-// ---------------------------------------------
-// FAQS (CMS)
-// ---------------------------------------------
-
 model Faq {
   id        String   @id @default(cuid())
   question  String
-  answer    String   @db.Text
+  answer    String
   order     Int      @default(0)
   published Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@schema("public")
+}
+
+model User {
+  id            String             @id
+  name          String?
+  email         String?            @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role               @default(USER)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime
+  courses       CourseEnrollment[]
+  orders        Order[]
+  testResults   TestResult[]
+  Account       Account[]
+  posts         Post[]
+  Session       Session[]
+  testimonials  Testimonial[]
+
+  @@schema("elearning")
+}
+
+model Account {
+  id                String  @id
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@schema("public")
+}
+
+model Session {
+  id           String   @id
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@schema("public")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@schema("public")
+}
+
+enum Role {
+  USER
+  TEACHER
+  ADMIN
+
+  @@schema("elearning")
 }
