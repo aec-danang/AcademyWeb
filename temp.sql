@@ -1,2 +1,0 @@
-DROP DATABASE IF EXISTS academy;
-ALTER DATABASE railway RENAME TO academy;
