@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./elearning.module.css";
 import { BookOpen, Clock, AlertCircle } from "lucide-react";
 
@@ -12,35 +13,39 @@ export default function ElearningDashboard() {
       </div>
 
       <div className={styles.courseGrid}>
-        <div className={styles.courseCard}>
-          <div className={styles.courseImage}>IELTS Masterclass</div>
-          <div className={styles.courseContent}>
-            <h3>IELTS Intensive 7.0+</h3>
-            <p>Teacher: Mr. David Smith</p>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", fontSize: "0.875rem", fontWeight: 600 }}>
-              <span>Progress</span>
-              <span>65%</span>
-            </div>
-            <div className={styles.progressBar}>
-              <div className={styles.progressFill} style={{ width: "65%" }}></div>
+        <Link href="/elearning/courses/INT-704" style={{ textDecoration: "none", color: "inherit" }}>
+          <div className={styles.courseCard}>
+            <div className={styles.courseImage}>IELTS Masterclass</div>
+            <div className={styles.courseContent}>
+              <h3>IELTS Intensive 7.0+</h3>
+              <p>Teacher: Mr. David Smith</p>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", fontSize: "0.875rem", fontWeight: 600 }}>
+                <span>Progress</span>
+                <span>65%</span>
+              </div>
+              <div className={styles.progressBar}>
+                <div className={styles.progressFill} style={{ width: "65%" }}></div>
+              </div>
             </div>
           </div>
-        </div>
+        </Link>
         
-        <div className={styles.courseCard}>
-          <div className={styles.courseImage}>Speaking Fluency</div>
-          <div className={styles.courseContent}>
-            <h3>Advanced Communication</h3>
-            <p>Teacher: Ms. Sarah Jane</p>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", fontSize: "0.875rem", fontWeight: 600 }}>
-              <span>Progress</span>
-              <span>32%</span>
-            </div>
-            <div className={styles.progressBar}>
-              <div className={styles.progressFill} style={{ width: "32%" }}></div>
+        <Link href="/elearning/courses/ENG-COM" style={{ textDecoration: "none", color: "inherit" }}>
+          <div className={styles.courseCard}>
+            <div className={styles.courseImage}>Speaking Fluency</div>
+            <div className={styles.courseContent}>
+              <h3>Advanced Communication</h3>
+              <p>Teacher: Ms. Sarah Jane</p>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", fontSize: "0.875rem", fontWeight: 600 }}>
+                <span>Progress</span>
+                <span>32%</span>
+              </div>
+              <div className={styles.progressBar}>
+                <div className={styles.progressFill} style={{ width: "32%" }}></div>
+              </div>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
 
       <div className={styles.panel}>

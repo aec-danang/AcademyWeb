@@ -35,24 +35,26 @@ export default function ElearningLayout({ children }: { children: React.ReactNod
         </div>
         <h2 style={{ marginTop: 0, paddingLeft: "1rem" }}>AEC E-Learning</h2>
         
-        {/* Mock Role Switcher for Demo */}
+        {/* Role Display */}
         <div style={{ marginBottom: "1.5rem", padding: "0 1rem" }}>
-          <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "0.5rem" }}>VIEWING AS:</p>
-          <div className={styles.roleToggle}>
-            <button 
-              className={`${styles.roleBtn} ${role === "STUDENT" ? styles.roleBtnActive : ""}`}
-              onClick={() => setRole("STUDENT")}
-              style={{ flex: 1 }}
-            >
-              Student
-            </button>
-            <button 
-              className={`${styles.roleBtn} ${role === "TEACHER" ? styles.roleBtnActive : ""}`}
-              onClick={() => setRole("TEACHER")}
-              style={{ flex: 1 }}
-            >
-              Teacher
-            </button>
+          <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "0.5rem" }}>ĐANG ĐĂNG NHẬP LÀ:</p>
+          <div 
+            className={styles.roleDisplay}
+            onClick={() => setRole(role === "STUDENT" ? "TEACHER" : "STUDENT")}
+            style={{ cursor: "pointer" }}
+            title="Click to toggle role for testing"
+          >
+            <div className={`${styles.roleAvatar} ${role === "STUDENT" ? styles.roleAvatarStudent : ""}`}>
+              {role === "STUDENT" ? "H" : "G"}
+            </div>
+            <div className={styles.roleInfo}>
+              <span className={styles.roleName}>
+                {role === "STUDENT" ? "Học viên" : "Giáo viên"}
+              </span>
+              <span className={styles.roleLabel}>
+                {role === "STUDENT" ? "Student Account" : "Teacher Account"}
+              </span>
+            </div>
           </div>
         </div>
 

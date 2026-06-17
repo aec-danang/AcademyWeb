@@ -85,6 +85,58 @@
   color: white;
 }
 
+.roleDisplay {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: var(--radius-sm);
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.roleDisplay:hover {
+  background-color: #e2e8f0;
+}
+
+.roleAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--color-navy);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.roleAvatarStudent {
+  background-color: var(--color-orange);
+}
+
+.roleInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.roleName {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-navy);
+  margin: 0;
+}
+
+.roleLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
 /* Grids */
 .courseGrid {
   display: grid;
