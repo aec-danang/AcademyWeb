@@ -12,15 +12,17 @@ export default function Navbar() {
         <nav>
           <ul className={styles.navLinks}>
             <li><Link href="/programs" className={styles.navLink}>Programs</Link></li>
-            <li><Link href="/programs#ielts" className={styles.navLink}>IELTS</Link></li>
-            <li><Link href="/programs#kids" className={styles.navLink}>Kids & Teens</Link></li>
-            <li><Link href="/programs#corporate" className={styles.navLink}>Corporate</Link></li>
             <li><Link href="/about" className={styles.navLink}>About</Link></li>
-            <li><Link href="/#teachers" className={styles.navLink}>Teachers</Link></li>
+            <li><Link href="/teachers" className={styles.navLink}>Teachers</Link></li>
             <li><Link href="/contact" className={styles.navLink}>Contact</Link></li>
             <li>
-              <Link href="/contact#register" className="btn-primary">
-                Register
+              <Link href="/login" className="btn-secondary" style={{ padding: "8px 16px", marginRight: "8px", borderRadius: "8px" }}>
+                Đăng nhập
+              </Link>
+            </li>
+            <li>
+              <Link href="/login?mode=register" className="btn-primary" style={{ padding: "8px 16px", borderRadius: "8px" }}>
+                Đăng ký
               </Link>
             </li>
           </ul>

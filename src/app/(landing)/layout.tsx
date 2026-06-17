@@ -1,5 +1,5 @@
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import Navbar from "@/lib/layout/Navbar";
+import Footer from "@/lib/layout/Footer";
 
 export default function LandingLayout({
   children,

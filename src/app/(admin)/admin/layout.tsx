@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, FileText, Newspaper, Calendar, Settings, LogOut } from "lucide-react";
 import styles from "./admin.module.css";
@@ -19,7 +20,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className={styles.adminContainer}>
       <aside className={styles.sidebar}>
-        <h2>AEC Admin</h2>
+        <div style={{ marginBottom: "2rem", paddingLeft: "1rem" }}>
+          <Image 
+            src="/logos/aec/aec-logo-reverse-horizontal.png" 
+            alt="AEC Admin" 
+            width={160} 
+            height={45} 
+            style={{ objectFit: "contain" }}
+            priority
+          />
+        </div>
         <nav style={{ display: "flex", flexDirection: "column", gap: "0.5rem", flex: 1 }}>
           {navItems.map((item) => {
             const isActive = pathname === item.path;
