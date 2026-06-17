@@ -14,6 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Landing Page Content", path: "/admin/content", icon: <FileText size={20} /> },
     { name: "News & Articles", path: "/admin/news", icon: <Newspaper size={20} /> },
     { name: "Events", path: "/admin/events", icon: <Calendar size={20} /> },
+    { name: "Sponsors", path: "/admin/sponsors", icon: <FileText size={20} /> },
     { name: "Settings", path: "/admin/settings", icon: <Settings size={20} /> },
   ];
 

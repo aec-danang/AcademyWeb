@@ -6,44 +6,15 @@ import { MapPin, Phone, Mail } from "lucide-react";
 import { FaFacebook, FaYoutube, FaInstagram } from "react-icons/fa";
 import styles from "./Footer.module.css";
 
-export default function Footer() {
-  const partners = [
-    { name: "FPT", url: "https://logo.clearbit.com/fpt.com.vn" },
-    { name: "Bách Khoa", url: "https://logo.clearbit.com/dut.udn.vn" },
-    { name: "Kinh Tế", url: "https://logo.clearbit.com/due.udn.vn" },
-    { name: "VNPT", url: "https://logo.clearbit.com/vnpt.vn" },
-    { name: "Viettel", url: "https://logo.clearbit.com/viettel.com.vn" },
-    { name: "DOOSAN", url: "https://logo.clearbit.com/doosan.com" },
-    { name: "LIXIL", url: "https://logo.clearbit.com/lixil.com" },
-    { name: "mobifone", url: "https://logo.clearbit.com/mobifone.vn" },
-    { name: "ABBANK", url: "https://logo.clearbit.com/abbank.vn" },
-    { name: "Heineken", url: "https://logo.clearbit.com/heineken.com" },
-    { name: "EVN", url: "https://logo.clearbit.com/evn.com.vn" }
-  ];
+type Sponsor = {
+  name: string;
+  imageUrl: string;
+  website: string | null;
+};
+
+export default function Footer({ sponsors = [] }: { sponsors?: Sponsor[] }) {
 
   return (
-    <>
-      <section className={styles.partnersSection}>
-        <div className="container">
-          <h2 className={styles.partnersTitle}>ĐỐI TÁC ĐÀO TẠO VÀ KHẢO THÍ CỦA ACADEMY AEC</h2>
-          <div className={styles.partnersGrid}>
-            {partners.map((partner, index) => (
-              <div key={index} className={styles.partnerLogo} title={partner.name}>
-                <img 
-                  suppressHydrationWarning
-                  src={partner.url} 
-                  alt={`${partner.name} logo`}
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                  onError={(e) => {
-                    e.currentTarget.src = `https://placehold.co/120x60/ffffff/ff7a00?text=${encodeURIComponent(partner.name)}`;
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <footer className={styles.footer}>
       <div className="container">
         <div className={styles.footerTop}>
@@ -89,25 +60,35 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className={styles.title}>Newsletter</h4>
-            <p className={styles.aboutText} style={{ marginBottom: "16px" }}>
-              Subscribe to get the latest news and offers.
-            </p>
-            <div style={{ display: "flex", gap: "8px" }}>
-              <input 
-                type="email" 
-                placeholder="Your email" 
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: "999px",
-                  border: "none",
-                  width: "100%",
-                  outline: "none"
-                }}
-              />
-              <button className="btn-primary" style={{ padding: "10px 20px" }}>
-                Send
-              </button>
+            <h4 className={styles.title}>Our Partners</h4>
+            <div className={styles.partnersGridSmall}>
+              {sponsors.map((sponsor) => (
+                <div key={sponsor.name} className={styles.partnerLogoSmall} title={sponsor.name}>
+                  {sponsor.website ? (
+                    <a href={sponsor.website} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', height: '100%' }}>
+                      <img 
+                        suppressHydrationWarning
+                        src={sponsor.imageUrl} 
+                        alt={`${sponsor.name} logo`}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                        onError={(e) => {
+                          e.currentTarget.src = `https://placehold.co/120x60/ffffff/ff7a00?text=${encodeURIComponent(sponsor.name)}`;
+                        }}
+                      />
+                    </a>
+                  ) : (
+                    <img 
+                      suppressHydrationWarning
+                      src={sponsor.imageUrl} 
+                      alt={`${sponsor.name} logo`}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                      onError={(e) => {
+                        e.currentTarget.src = `https://placehold.co/120x60/ffffff/ff7a00?text=${encodeURIComponent(sponsor.name)}`;
+                      }}
+                    />
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -122,6 +103,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-    </>
   );
 }

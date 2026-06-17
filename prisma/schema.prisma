@@ -180,6 +180,19 @@ model Faq {
   @@schema("public")
 }
 
+model Sponsor {
+  id        String   @id @default(cuid())
+  name      String
+  imageUrl  String
+  website   String?
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@schema("public")
+}
+
 model User {
   id            String             @id
   name          String?
