@@ -85,34 +85,38 @@ export default function SponsorsClient({ initialSponsors }: { initialSponsors: S
         <div className={styles.cardPanel} style={{ marginBottom: "2rem" }}>
           <h3>{isCreating ? "Add New Sponsor" : "Edit Sponsor"}</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "1rem" }}>
-            <input 
-              type="text" 
-              placeholder="Name" 
-              value={formData.name} 
-              onChange={e => setFormData({...formData, name: e.target.value})} 
-              style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-            />
-            <input 
-              type="text" 
-              placeholder="Image URL" 
-              value={formData.imageUrl} 
-              onChange={e => setFormData({...formData, imageUrl: e.target.value})} 
-              style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-            />
-            <input 
-              type="text" 
-              placeholder="Website URL (optional)" 
-              value={formData.website} 
-              onChange={e => setFormData({...formData, website: e.target.value})} 
-              style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-            />
-            <input 
-              type="number" 
-              placeholder="Order" 
-              value={formData.order} 
-              onChange={e => setFormData({...formData, order: parseInt(e.target.value) || 0})} 
-              style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-            />
+            <div className={styles.formGroup} style={{ marginBottom: 0 }}>
+              <input 
+                type="text" 
+                placeholder="Name" 
+                value={formData.name} 
+                onChange={e => setFormData({...formData, name: e.target.value})} 
+              />
+            </div>
+            <div className={styles.formGroup} style={{ marginBottom: 0 }}>
+              <input 
+                type="text" 
+                placeholder="Image URL" 
+                value={formData.imageUrl} 
+                onChange={e => setFormData({...formData, imageUrl: e.target.value})} 
+              />
+            </div>
+            <div className={styles.formGroup} style={{ marginBottom: 0 }}>
+              <input 
+                type="text" 
+                placeholder="Website URL (optional)" 
+                value={formData.website} 
+                onChange={e => setFormData({...formData, website: e.target.value})} 
+              />
+            </div>
+            <div className={styles.formGroup} style={{ marginBottom: 0 }}>
+              <input 
+                type="number" 
+                placeholder="Order" 
+                value={formData.order} 
+                onChange={e => setFormData({...formData, order: parseInt(e.target.value) || 0})} 
+              />
+            </div>
             <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <input 
                 type="checkbox" 

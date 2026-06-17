@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Newspaper, Calendar, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, FileText, Newspaper, Calendar, Settings, LogOut, Bell, Search } from "lucide-react";
 import styles from "./admin.module.css";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -21,7 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className={styles.adminContainer}>
       <aside className={styles.sidebar}>
-        <div style={{ marginBottom: "2rem", paddingLeft: "1rem" }}>
+        <div style={{ marginBottom: "2.5rem", paddingLeft: "1rem", marginTop: "0.5rem" }}>
           <Image 
             src="/logos/aec/aec-logo-reverse-horizontal.png" 
             alt="AEC Admin" 
@@ -46,7 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             );
           })}
         </nav>
-        <button className={styles.navLink} style={{ background: "transparent", border: "none", cursor: "pointer", marginTop: "auto" }}>
+        <button className={styles.navLink} style={{ background: "transparent", border: "none", cursor: "pointer", marginTop: "auto", fontFamily: "inherit", fontSize: "0.95rem" }}>
           <LogOut size={20} />
           Logout
         </button>
@@ -54,12 +54,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <header className={styles.header}>
-          <h1>Admin Portal</h1>
-          <div className={styles.userProfile}>
-            <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "var(--color-orange)", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
-              A
+          <h1>Overview</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem", color: "#64748b" }}>
+              <Search size={20} style={{ cursor: "pointer" }} />
+              <div style={{ position: "relative", cursor: "pointer" }}>
+                <Bell size={20} />
+                <span style={{ position: "absolute", top: -2, right: -2, width: 8, height: 8, backgroundColor: "var(--color-orange)", borderRadius: "50%" }}></span>
+              </div>
             </div>
-            Admin User
+            <div style={{ width: "1px", height: "24px", backgroundColor: "#e2e8f0" }}></div>
+            <div className={styles.userProfile}>
+              <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "linear-gradient(135deg, var(--color-orange), #ff6b4a)", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
+                A
+              </div>
+              Admin User
+            </div>
           </div>
         </header>
         <main className={styles.mainContent}>

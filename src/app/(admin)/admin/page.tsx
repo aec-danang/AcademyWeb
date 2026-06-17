@@ -29,39 +29,47 @@ export default async function AdminDashboard() {
 
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3>Total Students</h3>
-            <Users size={20} color="var(--color-orange)" />
+            <div style={{ padding: "0.5rem", background: "rgba(239, 68, 68, 0.1)", borderRadius: "10px" }}>
+              <Users size={20} color="var(--color-orange)" />
+            </div>
           </div>
           <div className={styles.statValue}>{totalStudents}</div>
-          <p style={{ color: "#10b981", fontSize: "0.875rem", margin: 0 }}>Registered users</p>
+          <p style={{ color: "#10b981", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>+12% this month</p>
         </div>
         
         <div className={styles.statCard}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3>Total Leads</h3>
-            <TrendingUp size={20} color="var(--color-navy)" />
+            <div style={{ padding: "0.5rem", background: "rgba(30, 58, 138, 0.1)", borderRadius: "10px" }}>
+              <TrendingUp size={20} color="var(--color-navy)" />
+            </div>
           </div>
           <div className={styles.statValue}>{totalLeads}</div>
-          <p style={{ color: "#10b981", fontSize: "0.875rem", margin: 0 }}>Collected from forms</p>
+          <p style={{ color: "#10b981", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>+5% this week</p>
         </div>
         
         <div className={styles.statCard}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3>Total Courses</h3>
-            <FileText size={20} color="#8b5cf6" />
+            <div style={{ padding: "0.5rem", background: "rgba(139, 92, 246, 0.1)", borderRadius: "10px" }}>
+              <FileText size={20} color="#8b5cf6" />
+            </div>
           </div>
           <div className={styles.statValue}>{totalCourses}</div>
-          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", margin: 0 }}>Available programs</p>
+          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Active programs</p>
         </div>
         
         <div className={styles.statCard}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3>News Published</h3>
-            <Newspaper size={20} color="#ec4899" />
+            <div style={{ padding: "0.5rem", background: "rgba(236, 72, 153, 0.1)", borderRadius: "10px" }}>
+              <Newspaper size={20} color="#ec4899" />
+            </div>
           </div>
           <div className={styles.statValue}>{newsPublished}</div>
-          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", margin: 0 }}>Live articles</p>
+          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Live articles</p>
         </div>
       </div>
 
