@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Phone, Mail } from "lucide-react";
@@ -5,8 +7,44 @@ import { FaFacebook, FaYoutube, FaInstagram } from "react-icons/fa";
 import styles from "./Footer.module.css";
 
 export default function Footer() {
+  const partners = [
+    { name: "FPT", url: "https://logo.clearbit.com/fpt.com.vn" },
+    { name: "Bách Khoa", url: "https://logo.clearbit.com/dut.udn.vn" },
+    { name: "Kinh Tế", url: "https://logo.clearbit.com/due.udn.vn" },
+    { name: "VNPT", url: "https://logo.clearbit.com/vnpt.vn" },
+    { name: "Viettel", url: "https://logo.clearbit.com/viettel.com.vn" },
+    { name: "DOOSAN", url: "https://logo.clearbit.com/doosan.com" },
+    { name: "LIXIL", url: "https://logo.clearbit.com/lixil.com" },
+    { name: "mobifone", url: "https://logo.clearbit.com/mobifone.vn" },
+    { name: "ABBANK", url: "https://logo.clearbit.com/abbank.vn" },
+    { name: "Heineken", url: "https://logo.clearbit.com/heineken.com" },
+    { name: "EVN", url: "https://logo.clearbit.com/evn.com.vn" }
+  ];
+
   return (
-    <footer className={styles.footer}>
+    <>
+      <section className={styles.partnersSection}>
+        <div className="container">
+          <h2 className={styles.partnersTitle}>ĐỐI TÁC ĐÀO TẠO VÀ KHẢO THÍ CỦA ACADEMY AEC</h2>
+          <div className={styles.partnersGrid}>
+            {partners.map((partner, index) => (
+              <div key={index} className={styles.partnerLogo} title={partner.name}>
+                <img 
+                  suppressHydrationWarning
+                  src={partner.url} 
+                  alt={`${partner.name} logo`}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  onError={(e) => {
+                    e.currentTarget.src = `https://placehold.co/120x60/ffffff/ff7a00?text=${encodeURIComponent(partner.name)}`;
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className={styles.footer}>
       <div className="container">
         <div className={styles.footerTop}>
           <div>
@@ -84,5 +122,6 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+    </>
   );
 }
