@@ -204,6 +204,25 @@
   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
 }
 
+.tableField {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+.tableField:focus {
+  outline: none;
+  border-color: var(--color-orange);
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
 .cardPanel {
   background: white;
   padding: 2.5rem;

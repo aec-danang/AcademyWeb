@@ -21,8 +21,8 @@ export default function Navbar() {
               </Link>
             </li>
             <li>
-              <Link href="/login?mode=register" className="btn-primary" style={{ padding: "8px 16px", borderRadius: "8px" }}>
-                Đăng ký
+              <Link href="/contact#register" className="btn-primary" style={{ padding: "8px 16px", borderRadius: "8px" }}>
+                Liên hệ
               </Link>
             </li>
           </ul>

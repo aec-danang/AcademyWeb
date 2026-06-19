@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Newspaper, Calendar, Settings, LogOut, Bell, Search } from "lucide-react";
+import { LayoutDashboard, FileText, Newspaper, Calendar, Settings, LogOut, Bell, Search, Users } from "lucide-react";
 import styles from "./admin.module.css";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -11,6 +11,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     { name: "Dashboard", path: "/admin", icon: <LayoutDashboard size={20} /> },
+    { name: "Accounts", path: "/admin/accounts", icon: <Users size={20} /> },
     { name: "Landing Page Content", path: "/admin/content", icon: <FileText size={20} /> },
     { name: "News & Articles", path: "/admin/news", icon: <Newspaper size={20} /> },
     { name: "Events", path: "/admin/events", icon: <Calendar size={20} /> },
