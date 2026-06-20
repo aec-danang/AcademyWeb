@@ -63,15 +63,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <h1>Overview</h1>
           <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", color: "#64748b" }}>
-              <Search size={20} style={{ cursor: "pointer" }} />
+              <Search size={18} strokeWidth={1.5} style={{ cursor: "pointer" }} />
               <div style={{ position: "relative", cursor: "pointer" }}>
-                <Bell size={20} />
-                <span style={{ position: "absolute", top: -2, right: -2, width: 8, height: 8, backgroundColor: "var(--color-orange)", borderRadius: "50%" }}></span>
+                <Bell size={18} strokeWidth={1.5} />
+                <span style={{ position: "absolute", top: -2, right: -2, width: 8, height: 8, backgroundColor: "var(--color-orange)", borderRadius: "50%", border: "1.5px solid white" }}></span>
               </div>
             </div>
             <div style={{ width: "1px", height: "24px", backgroundColor: "#e2e8f0" }}></div>
             <div className={styles.userProfile}>
-              <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "linear-gradient(135deg, var(--color-orange), #ff6b4a)", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
+              <div className={styles.userAvatar}>
                 A
               </div>
               Admin User
