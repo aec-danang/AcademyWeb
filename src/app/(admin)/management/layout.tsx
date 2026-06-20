@@ -5,18 +5,19 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, FileText, Newspaper, Calendar, Settings, LogOut, Bell, Search, Users } from "lucide-react";
 import styles from "./admin.module.css";
+import { signOut } from "next-auth/react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const navItems = [
-    { name: "Dashboard", path: "/admin", icon: <LayoutDashboard size={20} /> },
-    { name: "Accounts", path: "/admin/accounts", icon: <Users size={20} /> },
-    { name: "Landing Page Content", path: "/admin/content", icon: <FileText size={20} /> },
-    { name: "News & Articles", path: "/admin/news", icon: <Newspaper size={20} /> },
-    { name: "Events", path: "/admin/events", icon: <Calendar size={20} /> },
-    { name: "Sponsors", path: "/admin/sponsors", icon: <FileText size={20} /> },
-    { name: "Settings", path: "/admin/settings", icon: <Settings size={20} /> },
+    { name: "Dashboard", path: "/management", icon: <LayoutDashboard size={20} /> },
+    { name: "Accounts", path: "/management/accounts", icon: <Users size={20} /> },
+    { name: "Landing Page Content", path: "/management/content", icon: <FileText size={20} /> },
+    { name: "News & Articles", path: "/management/news", icon: <Newspaper size={20} /> },
+    { name: "Events", path: "/management/events", icon: <Calendar size={20} /> },
+    { name: "Sponsors", path: "/management/sponsors", icon: <FileText size={20} /> },
+    { name: "Settings", path: "/management/settings", icon: <Settings size={20} /> },
   ];
 
   return (
@@ -47,7 +48,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             );
           })}
         </nav>
-        <button className={styles.navLink} style={{ background: "transparent", border: "none", cursor: "pointer", marginTop: "auto", fontFamily: "inherit", fontSize: "0.95rem" }}>
+        <button 
+          className={styles.navLink} 
+          style={{ background: "transparent", border: "none", cursor: "pointer", marginTop: "auto", fontFamily: "inherit", fontSize: "0.95rem" }}
+          onClick={() => signOut({ callbackUrl: "/login" })}
+        >
           <LogOut size={20} />
           Logout
         </button>

@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 type AccountRole = "USER" | "TEACHER" | "ADMIN";
 
@@ -15,7 +16,8 @@ type SessionUser = {
 type AccountInput = {
   id?: string;
   name: string;
-  email: string;
+  username?: string;
+  email?: string;
   role: AccountRole;
   password?: string;
 };
@@ -38,17 +40,19 @@ function normalizeRole(role: string): AccountRole {
 }
 
 function normalizeAccount(input: AccountInput) {
-  const email = input.email.trim().toLowerCase();
+  const email = input.email?.trim().toLowerCase() || null;
+  const username = input.username?.trim() || null;
   const name = input.name.trim() || null;
   const password = input.password?.trim() || null;
 
-  if (!email) {
-    throw new Error("Email is required for every account row.");
+  if (!email && !username) {
+    throw new Error("Email or username is required for every account row.");
   }
 
   return {
     id: input.id?.trim() || undefined,
     email,
+    username,
     name,
     role: normalizeRole(input.role),
     password,
@@ -61,23 +65,37 @@ export async function saveAccounts(accounts: AccountInput[]) {
   const normalizedAccounts = accounts.map(normalizeAccount);
 
   for (const account of normalizedAccounts) {
+    let hashedPassword = null;
+    if (account.password) {
+      hashedPassword = await bcrypt.hash(account.password, 10);
+    }
+
     if (account.id) {
       await prisma.user.update({
         where: { id: account.id },
         data: {
           name: account.name,
           email: account.email,
+          username: account.username,
           role: account.role,
-          ...(account.password ? { password: account.password } : {}),
+          ...(hashedPassword ? { password: hashedPassword } : {}),
           updatedAt: new Date(),
         },
       });
       continue;
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email: account.email },
-    });
+    let existingUser = null;
+    if (account.username) {
+      existingUser = await prisma.user.findUnique({
+        where: { username: account.username },
+      });
+    }
+    if (!existingUser && account.email) {
+      existingUser = await prisma.user.findUnique({
+        where: { email: account.email },
+      });
+    }
 
     if (existingUser) {
       await prisma.user.update({
@@ -85,7 +103,9 @@ export async function saveAccounts(accounts: AccountInput[]) {
         data: {
           name: account.name,
           role: account.role,
-          ...(account.password ? { password: account.password } : {}),
+          username: account.username || existingUser.username,
+          email: account.email || existingUser.email,
+          ...(hashedPassword ? { password: hashedPassword } : {}),
           updatedAt: new Date(),
         },
       });
@@ -97,15 +117,16 @@ export async function saveAccounts(accounts: AccountInput[]) {
         id: randomUUID(),
         name: account.name,
         email: account.email,
+        username: account.username,
         role: account.role,
-        password: account.password,
+        password: hashedPassword,
         updatedAt: new Date(),
       },
     });
   }
 
-  revalidatePath("/admin/accounts");
-  revalidatePath("/admin");
+  revalidatePath("/management/accounts");
+  revalidatePath("/management");
 }
 
 export async function deleteAccount(id: string) {
@@ -115,6 +136,6 @@ export async function deleteAccount(id: string) {
     where: { id },
   });
 
-  revalidatePath("/admin/accounts");
-  revalidatePath("/admin");
+  revalidatePath("/management/accounts");
+  revalidatePath("/management");
 }

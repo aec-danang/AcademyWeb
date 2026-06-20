@@ -15,6 +15,7 @@ export default async function AdminDashboard() {
       select: {
         id: true,
         name: true,
+        username: true,
         email: true,
         createdAt: true,
       },
@@ -80,7 +81,7 @@ export default async function AdminDashboard() {
             <tr>
               <th>Action</th>
               <th>User</th>
-              <th>Email</th>
+              <th>Username / Email</th>
               <th>Date</th>
               <th>Status</th>
             </tr>
@@ -90,7 +91,12 @@ export default async function AdminDashboard() {
               <tr key={user.id}>
                 <td>New User Registered</td>
                 <td>{user.name || "Unknown"}</td>
-                <td>{user.email || "N/A"}</td>
+                <td>
+                  {user.username && <span style={{ fontWeight: 500 }}>@{user.username}</span>}
+                  {user.username && user.email && <br />}
+                  {user.email && <span style={{ color: "#64748b", fontSize: "0.9em" }}>{user.email}</span>}
+                  {!user.username && !user.email && "N/A"}
+                </td>
                 <td>
                   {new Intl.DateTimeFormat("en-US", {
                     month: "short",

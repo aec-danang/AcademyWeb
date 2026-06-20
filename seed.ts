@@ -1,4 +1,7 @@
-import { prisma } from './src/lib/prisma';
+import { loadEnvConfig } from '@next/env';
+loadEnvConfig(process.cwd());
+
+import bcrypt from 'bcryptjs';
 
 const sponsorLogos = [
   { name: 'FPT', imageUrl: 'https://fpt.com/-/media/project/fpt-corporation/fpt/common/images/navigation/logo/fpt-logo.svg', website: 'https://fpt.com.vn', order: 1 },
@@ -15,14 +18,64 @@ const sponsorLogos = [
 ];
 
 async function main() {
-  const count = await prisma.sponsor.count();
+  const { prisma } = await import('./src/lib/prisma');
+
+  try {
+    const count = await prisma.sponsor.count();
   if (count === 0) {
     await prisma.sponsor.createMany({
       data: sponsorLogos
     });
-    console.log('Seeded');
+    console.log('Seeded sponsors');
   } else {
-    console.log('Already seeded');
+    console.log('Sponsors already seeded');
+  }
+
+  const adminUsername = 'admin';
+  const existingAdmin = await prisma.user.findUnique({
+    where: { username: adminUsername }
+  });
+
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    await prisma.user.create({
+      data: {
+        id: 'admin-id',
+        name: 'System Admin',
+        username: adminUsername,
+        role: 'ADMIN',
+        password: hashedPassword,
+        updatedAt: new Date(),
+      }
+    });
+    console.log(`Created initial admin user: ${adminUsername} / admin123`);
+  } else {
+    console.log('Admin user already exists');
+  }
+
+  const academyUsername = 'academy';
+  const existingAcademy = await prisma.user.findUnique({
+    where: { username: academyUsername }
+  });
+
+  if (!existingAcademy) {
+    const hashedPassword = await bcrypt.hash('123456789', 10);
+    await prisma.user.create({
+      data: {
+        id: 'academy-id',
+        name: 'Academy Admin',
+        username: academyUsername,
+        role: 'ADMIN',
+        password: hashedPassword,
+        updatedAt: new Date(),
+      }
+    });
+    console.log(`Created academy admin user: ${academyUsername} / 123456789`);
+  } else {
+    console.log('Academy admin user already exists');
+  }
+  } finally {
+    await prisma.$disconnect();
   }
 }
-main().catch(console.error).finally(() => prisma.$disconnect());
+main().catch(console.error);

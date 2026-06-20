@@ -10,6 +10,7 @@ type AccountRole = "USER" | "TEACHER" | "ADMIN";
 type AccountRow = {
   id?: string;
   name: string;
+  username: string;
   email: string;
   role: AccountRole;
   password: string;
@@ -43,10 +44,11 @@ function parseBulkImport(text: string): AccountRow[] {
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) => {
-      const [name = "", email = "", role = "USER", password = ""] = line.split(/[;,\t]/).map((segment) => segment.trim());
+      const [name = "", username = "", email = "", role = "USER", password = ""] = line.split(/[;,\t]/).map((segment) => segment.trim());
 
       return {
         name,
+        username,
         email,
         role: normalizeRole(role),
         password,
@@ -54,7 +56,7 @@ function parseBulkImport(text: string): AccountRow[] {
         updatedAt: "",
       };
     })
-    .filter((row) => row.email.length > 0);
+    .filter((row) => row.email.length > 0 || row.username.length > 0);
 }
 
 export default function AccountManagerClient({ initialUsers }: { initialUsers: AccountRow[] }) {
@@ -76,6 +78,7 @@ export default function AccountManagerClient({ initialUsers }: { initialUsers: A
       ...currentRows,
       {
         name: "",
+        username: "",
         email: "",
         role: "USER",
         password: "",
@@ -93,7 +96,7 @@ export default function AccountManagerClient({ initialUsers }: { initialUsers: A
     const importedRows = parseBulkImport(bulkText);
 
     if (importedRows.length === 0) {
-      setError("Paste at least one line in the format: name,email,role,password");
+      setError("Paste at least one line in the format: name,username,email,role,password");
       return;
     }
 
@@ -122,7 +125,7 @@ export default function AccountManagerClient({ initialUsers }: { initialUsers: A
       return;
     }
 
-    if (!window.confirm(`Delete ${row.email}?`)) {
+    if (!window.confirm(`Delete ${row.username || row.email}?`)) {
       return;
     }
 
@@ -205,13 +208,13 @@ export default function AccountManagerClient({ initialUsers }: { initialUsers: A
 
       <div className={styles.cardPanel} style={{ marginBottom: "2rem" }}>
         <h3>Bulk Import</h3>
-        <p style={{ marginTop: 0, color: "#64748b" }}>Paste one account per line using: name,email,role,password. Role accepts student, teacher, or admin.</p>
+        <p style={{ marginTop: 0, color: "#64748b" }}>Paste one account per line using: name,username,email,role,password. Role accepts student, teacher, or admin.</p>
         <div className={styles.formGroup}>
           <textarea
             rows={6}
             value={bulkText}
             onChange={(event) => setBulkText(event.target.value)}
-            placeholder="Nguyen Van A,nva@example.com,student,Temp1234\nTran Thi B,ttb@example.com,teacher,Temp1234"
+            placeholder="Nguyen Van A,nva123,nva@example.com,student,Temp1234\nTran Thi B,ttb123,ttb@example.com,teacher,Temp1234"
           />
         </div>
         <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
@@ -231,6 +234,7 @@ export default function AccountManagerClient({ initialUsers }: { initialUsers: A
           <thead>
             <tr>
               <th>Name</th>
+              <th>Username</th>
               <th>Email</th>
               <th>Role</th>
               <th>Password</th>
@@ -247,13 +251,22 @@ export default function AccountManagerClient({ initialUsers }: { initialUsers: A
               </tr>
             )}
             {rows.map((row, index) => (
-              <tr key={row.id || `${row.email || "new"}-${index}`}>
+              <tr key={row.id || `${row.username || row.email || "new"}-${index}`}>
                 <td>
                   <input
                     type="text"
                     value={row.name}
                     onChange={(event) => updateRow(index, { name: event.target.value })}
                     placeholder="Full name"
+                    className={styles.tableField}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={row.username}
+                    onChange={(event) => updateRow(index, { username: event.target.value })}
+                    placeholder="Username"
                     className={styles.tableField}
                   />
                 </td>

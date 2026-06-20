@@ -7,7 +7,7 @@ export async function createSponsor(data: { name: string; imageUrl: string; webs
   await prisma.sponsor.create({
     data,
   });
-  revalidatePath("/admin/sponsors");
+  revalidatePath("/management/sponsors");
   revalidatePath("/");
 }
 
@@ -16,7 +16,7 @@ export async function updateSponsor(id: string, data: { name: string; imageUrl: 
     where: { id },
     data,
   });
-  revalidatePath("/admin/sponsors");
+  revalidatePath("/management/sponsors");
   revalidatePath("/");
 }
 
@@ -24,7 +24,7 @@ export async function deleteSponsor(id: string) {
   await prisma.sponsor.delete({
     where: { id },
   });
-  revalidatePath("/admin/sponsors");
+  revalidatePath("/management/sponsors");
   revalidatePath("/");
 }
 
@@ -33,6 +33,6 @@ export async function togglePublishSponsor(id: string, published: boolean) {
     where: { id },
     data: { published },
   });
-  revalidatePath("/admin/sponsors");
+  revalidatePath("/management/sponsors");
   revalidatePath("/");
 }

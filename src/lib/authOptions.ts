@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
 type AuthUser = {
   id: string;
@@ -20,19 +21,27 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "test@example.com" },
+        identifier: { label: "Email / Username", type: "text", placeholder: "Email or Username" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email) return null;
+        if (!credentials?.identifier || !credentials?.password) return null;
         
         // Find user from database
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
+        const user = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { email: credentials.identifier },
+              { username: credentials.identifier }
+            ]
+          }
         });
         
-        if (user) {
-          // You should add proper password checking here using bcrypt
+        if (user && user.password) {
+          const isValidPassword = await bcrypt.compare(credentials.password, user.password);
+          if (!isValidPassword) {
+            return null;
+          }
           return {
             id: user.id,
             name: user.name,
@@ -40,14 +49,14 @@ export const authOptions: NextAuthOptions = {
             role: user.role
           } as AuthUser;
         } else {
-          // Create dummy user for test prep phase
-          return { id: "test", name: "Test User", email: credentials.email, role: "USER" } as AuthUser;
+          return null;
         }
       }
     })
   ],
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 Days
   },
   callbacks: {
     async session({ session, token }) {

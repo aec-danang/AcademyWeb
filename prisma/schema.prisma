@@ -196,6 +196,7 @@ model Sponsor {
 model User {
   id            String             @id
   name          String?
+  username      String?            @unique
   email         String?            @unique
   emailVerified DateTime?
   image         String?

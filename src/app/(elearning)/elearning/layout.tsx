@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { BookOpen, Users, ClipboardList, Award, LogOut, MessageSquare } from "lucide-react";
 import styles from "./elearning.module.css";
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 
 export default function ElearningLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -73,7 +74,11 @@ export default function ElearningLayout({ children }: { children: React.ReactNod
             );
           })}
         </nav>
-        <button className={styles.navLink} style={{ background: "transparent", border: "none", cursor: "pointer", marginTop: "auto" }}>
+        <button 
+          className={styles.navLink} 
+          style={{ background: "transparent", border: "none", cursor: "pointer", marginTop: "auto" }}
+          onClick={() => signOut({ callbackUrl: "/login" })}
+        >
           <LogOut size={20} />
           Logout
         </button>

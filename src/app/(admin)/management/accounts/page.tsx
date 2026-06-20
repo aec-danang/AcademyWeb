@@ -21,6 +21,7 @@ export default async function AccountsPage() {
     select: {
       id: true,
       name: true,
+      username: true,
       email: true,
       role: true,
       createdAt: true,
@@ -33,6 +34,7 @@ export default async function AccountsPage() {
       initialUsers={users.map((user) => ({
         ...user,
         name: user.name ?? "",
+        username: user.username ?? "",
         email: user.email ?? "",
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
