@@ -121,6 +121,7 @@ section {
   align-items: center;
   justify-content: center;
   text-align: center;
+  font-family: inherit;
 }
 .btn-secondary:hover {
   background: var(--color-navy-light);

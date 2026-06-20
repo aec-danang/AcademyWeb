@@ -3,13 +3,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { BookOpen, Users, ClipboardList, Award, LogOut, MessageSquare } from "lucide-react";
+import { BookOpen, Users, ClipboardList, Award, LogOut, MessageSquare, Moon, Sun } from "lucide-react";
 import styles from "./elearning.module.css";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
+import { useTheme } from "@/lib/contexts/ThemeProvider";
 
 export default function ElearningLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { theme, toggleTheme } = useTheme();
   // Mock role toggle for UI demonstration
   const [role, setRole] = useState<"STUDENT" | "TEACHER">("STUDENT");
 
@@ -74,14 +76,24 @@ export default function ElearningLayout({ children }: { children: React.ReactNod
             );
           })}
         </nav>
-        <button 
-          className={styles.navLink} 
-          style={{ background: "transparent", border: "none", cursor: "pointer", marginTop: "auto" }}
-          onClick={() => signOut({ callbackUrl: "/login" })}
-        >
-          <LogOut size={20} />
-          Logout
-        </button>
+        <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+          <button 
+            className={styles.navLink} 
+            style={{ background: "transparent", border: "none", cursor: "pointer", width: "100%", textAlign: "left", fontFamily: "inherit", fontSize: "1rem" }}
+            onClick={toggleTheme}
+          >
+            {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+            Toggle Theme
+          </button>
+          <button 
+            className={styles.navLink} 
+            style={{ background: "transparent", border: "none", cursor: "pointer", width: "100%", textAlign: "left", fontFamily: "inherit", fontSize: "1rem" }}
+            onClick={() => signOut({ callbackUrl: "/login" })}
+          >
+            <LogOut size={20} />
+            Logout
+          </button>
+        </div>
       </aside>
       
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>

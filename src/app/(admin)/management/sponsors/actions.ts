@@ -36,3 +36,16 @@ export async function togglePublishSponsor(id: string, published: boolean) {
   revalidatePath("/management/sponsors");
   revalidatePath("/");
 }
+
+export async function reorderSponsors(updates: { id: string; order: number }[]) {
+  await prisma.$transaction(
+    updates.map((update) =>
+      prisma.sponsor.update({
+        where: { id: update.id },
+        data: { order: update.order },
+      })
+    )
+  );
+  revalidatePath("/management/sponsors");
+  revalidatePath("/");
+}
