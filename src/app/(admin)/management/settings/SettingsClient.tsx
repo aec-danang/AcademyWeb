@@ -28,6 +28,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: S
   );
 
   const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState<"standard" | "landing" | "custom">("standard");
 
   const handleStandardChange = (key: string, value: string) => {
     setSettingsMap(prev => ({ ...prev, [key]: value }));
@@ -80,7 +81,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: S
   return (
     <div>
       <div className={styles.flexBetween} style={{ alignItems: "center", marginBottom: "1.5rem" }}>
-        <h2 style={{ margin: 0 }}>Global Settings</h2>
+        <h2 style={{ margin: 0 }}>Page Settings</h2>
         <button 
           className="btn-primary" 
           onClick={handleSave}
@@ -92,82 +93,148 @@ export default function SettingsClient({ initialSettings }: { initialSettings: S
         </button>
       </div>
 
-      <div className={styles.cardPanel} style={{ marginBottom: "2rem" }}>
-        <h3>Standard Settings</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginTop: "1.5rem" }}>
-          {DEFAULT_KEYS.map((item) => (
-            <div key={item.key} className={styles.formGroup} style={{ marginBottom: 0 }}>
-              <label>{item.label} <span style={{ color: "#94a3b8", fontWeight: "normal", fontSize: "0.85rem", marginLeft: "0.5rem" }}>({item.key})</span></label>
-              {item.key === "footer_text" || item.key === "address" ? (
-                <textarea 
-                  placeholder={item.placeholder}
-                  value={settingsMap[item.key] || ""}
-                  onChange={e => handleStandardChange(item.key, e.target.value)}
-                  rows={2}
-                />
-              ) : (
-                <input 
-                  type="text" 
-                  placeholder={item.placeholder}
-                  value={settingsMap[item.key] || ""}
-                  onChange={e => handleStandardChange(item.key, e.target.value)}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: "1rem", borderBottom: "1px solid var(--border-color, #e2e8f0)", marginBottom: "2rem" }}>
+        <button 
+          onClick={() => setActiveTab("standard")}
+          style={{ padding: "0.75rem 1rem", background: "none", border: "none", borderBottom: activeTab === "standard" ? "2px solid var(--primary-color, #2563eb)" : "2px solid transparent", color: activeTab === "standard" ? "var(--primary-color, #2563eb)" : "inherit", fontWeight: activeTab === "standard" ? 600 : 400, cursor: "pointer", transition: "all 0.2s" }}
+        >
+          Standard Settings
+        </button>
+        <button 
+          onClick={() => setActiveTab("landing")}
+          style={{ padding: "0.75rem 1rem", background: "none", border: "none", borderBottom: activeTab === "landing" ? "2px solid var(--primary-color, #2563eb)" : "2px solid transparent", color: activeTab === "landing" ? "var(--primary-color, #2563eb)" : "inherit", fontWeight: activeTab === "landing" ? 600 : 400, cursor: "pointer", transition: "all 0.2s" }}
+        >
+          Landing Page
+        </button>
+        <button 
+          onClick={() => setActiveTab("custom")}
+          style={{ padding: "0.75rem 1rem", background: "none", border: "none", borderBottom: activeTab === "custom" ? "2px solid var(--primary-color, #2563eb)" : "2px solid transparent", color: activeTab === "custom" ? "var(--primary-color, #2563eb)" : "inherit", fontWeight: activeTab === "custom" ? 600 : 400, cursor: "pointer", transition: "all 0.2s" }}
+        >
+          Custom Variables
+        </button>
       </div>
 
-      <div className={styles.cardPanel}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-          <h3 style={{ margin: 0 }}>Custom Settings</h3>
-          <button 
-            className="btn-secondary" 
-            onClick={addCustomSetting}
-            style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.5rem 1rem", fontSize: "0.85rem" }}
-          >
-            <Plus size={16} />
-            Add Variable
-          </button>
-        </div>
-        
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {customSettings.length === 0 ? (
-            <div style={{ color: "#94a3b8", textAlign: "center", padding: "2rem", border: "1px dashed #cbd5e1", borderRadius: "12px" }}>
-              No custom settings defined. Click "Add Variable" to create one.
-            </div>
-          ) : (
-            customSettings.map((item, index) => (
-              <div key={index} style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
-                <div className={styles.formGroup} style={{ flex: 1, marginBottom: 0 }}>
+      {activeTab === "standard" && (
+        <div className={styles.cardPanel} style={{ animation: "fadeIn 0.3s ease-in-out" }}>
+          <h3>Standard Settings</h3>
+          <p style={{ color: "#94a3b8", fontSize: "0.85rem", marginBottom: "1.5rem" }}>Core contact info and basic site details.</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            {DEFAULT_KEYS.map((item) => (
+              <div key={item.key} className={styles.formGroup} style={{ marginBottom: 0 }}>
+                <label>{item.label} <span style={{ color: "#94a3b8", fontWeight: "normal", fontSize: "0.85rem", marginLeft: "0.5rem" }}>({item.key})</span></label>
+                {item.key === "footer_text" || item.key === "address" ? (
+                  <textarea 
+                    placeholder={item.placeholder}
+                    value={settingsMap[item.key] || ""}
+                    onChange={e => handleStandardChange(item.key, e.target.value)}
+                    rows={2}
+                  />
+                ) : (
                   <input 
                     type="text" 
-                    placeholder="custom_key"
-                    value={item.key}
-                    onChange={e => handleCustomChange(index, "key", e.target.value)}
-                    style={{ fontFamily: "monospace" }}
+                    placeholder={item.placeholder}
+                    value={settingsMap[item.key] || ""}
+                    onChange={e => handleStandardChange(item.key, e.target.value)}
                   />
-                </div>
-                <div className={styles.formGroup} style={{ flex: 2, marginBottom: 0 }}>
-                  <input 
-                    type="text" 
-                    placeholder="Value..."
-                    value={item.value}
-                    onChange={e => handleCustomChange(index, "value", e.target.value)}
-                  />
-                </div>
-                <button 
-                  onClick={() => removeCustomSetting(index)}
-                  style={{ background: "#fef2f2", color: "#ef4444", border: "none", borderRadius: "12px", width: "46px", height: "46px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
-                  title="Remove"
-                >
-                  <Trash2 size={18} />
-                </button>
+                )}
               </div>
-            ))
-          )}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {activeTab === "landing" && (
+        <div className={styles.cardPanel} style={{ animation: "fadeIn 0.3s ease-in-out" }}>
+          <h3>Landing Page Content</h3>
+          <p style={{ color: "#94a3b8", fontSize: "0.85rem", marginBottom: "1rem" }}>Configure text and imagery for the public site's homepage.</p>
+          
+          <form style={{ marginTop: "1.5rem" }} onSubmit={(e) => e.preventDefault()}>
+            <h4 style={{ marginBottom: "1rem", color: "#334155" }}>Hero Section</h4>
+            <div className={styles.formGroup}>
+              <label>Hero Headline</label>
+              <input type="text" defaultValue="Learn English. Build Confidence. Become a Global Citizen." />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Hero Subheadline</label>
+              <textarea rows={3} defaultValue="Join AEC Da Nang to unlock your potential with our expert teachers and proven methodology."></textarea>
+            </div>
+            <div className={styles.formGroup}>
+              <label>Hero Background Image URL</label>
+              <input type="text" defaultValue="/images/hero-bg.jpg" />
+            </div>
+
+            <h4 style={{ margin: "2rem 0 1rem", color: "#334155" }}>About Us Section</h4>
+            <div className={styles.formGroup}>
+              <label>About Heading</label>
+              <input type="text" defaultValue="Why Choose Academy English Center?" />
+            </div>
+            <div className={styles.formGroup}>
+              <label>About Description</label>
+              <textarea rows={5} defaultValue="At AEC, we believe that learning English is more than just passing exams; it's about connecting with the world..."></textarea>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {activeTab === "custom" && (
+        <div className={styles.cardPanel} style={{ animation: "fadeIn 0.3s ease-in-out" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+            <div>
+              <h3 style={{ margin: 0, marginBottom: "0.5rem" }}>Custom Settings</h3>
+              <p style={{ color: "#94a3b8", fontSize: "0.85rem", margin: 0 }}>Add custom variables not covered by standard settings.</p>
+            </div>
+            <button 
+              className="btn-secondary" 
+              onClick={addCustomSetting}
+              style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.5rem 1rem", fontSize: "0.85rem" }}
+            >
+              <Plus size={16} />
+              Add Variable
+            </button>
+          </div>
+          
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            {customSettings.length === 0 ? (
+              <div style={{ color: "#94a3b8", textAlign: "center", padding: "2rem", border: "1px dashed #cbd5e1", borderRadius: "12px", background: "#f8fafc" }}>
+                No custom settings defined. Click "Add Variable" to create one.
+              </div>
+            ) : (
+              customSettings.map((item, index) => (
+                <div key={index} style={{ display: "flex", gap: "1rem", alignItems: "flex-start", background: "#f8fafc", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                  <div className={styles.formGroup} style={{ flex: 1, marginBottom: 0 }}>
+                    <label style={{ fontSize: "0.8rem", marginBottom: "0.25rem", display: "block" }}>Key</label>
+                    <input 
+                      type="text" 
+                      placeholder="custom_key"
+                      value={item.key}
+                      onChange={e => handleCustomChange(index, "key", e.target.value)}
+                      style={{ fontFamily: "monospace", background: "#fff" }}
+                    />
+                  </div>
+                  <div className={styles.formGroup} style={{ flex: 2, marginBottom: 0 }}>
+                    <label style={{ fontSize: "0.8rem", marginBottom: "0.25rem", display: "block" }}>Value</label>
+                    <input 
+                      type="text" 
+                      placeholder="Value..."
+                      value={item.value}
+                      onChange={e => handleCustomChange(index, "value", e.target.value)}
+                      style={{ background: "#fff" }}
+                    />
+                  </div>
+                  <button 
+                    onClick={() => removeCustomSetting(index)}
+                    style={{ background: "#fef2f2", color: "#ef4444", border: "1px solid #fca5a5", borderRadius: "8px", width: "42px", height: "42px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, marginTop: "1.4rem", transition: "all 0.2s" }}
+                    title="Remove"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

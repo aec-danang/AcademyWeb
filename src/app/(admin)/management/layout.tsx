@@ -16,11 +16,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const navItems = [
     { name: "Dashboard", path: "/management", icon: <LayoutDashboard size={20} /> },
     { name: "Accounts", path: "/management/accounts", icon: <Users size={20} /> },
-    { name: "Landing Page", path: "/management/content", icon: <FileText size={20} /> },
     { name: "Posts", path: "/management/posts", icon: <Newspaper size={20} /> },
     { name: "Sponsors", path: "/management/sponsors", icon: <FileText size={20} /> },
     { name: "Notifications", path: "/management/notifications", icon: <Bell size={20} /> },
-    { name: "Settings", path: "/management/settings", icon: <Settings size={20} /> },
+    { name: "Page Settings", path: "/management/settings", icon: <Settings size={20} /> },
   ];
 
   return (
