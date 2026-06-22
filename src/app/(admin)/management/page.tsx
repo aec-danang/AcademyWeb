@@ -1,14 +1,13 @@
 import styles from "./admin.module.css";
-import { Users, FileText, Newspaper, TrendingUp } from "lucide-react";
+import { Users, FileText, Newspaper, TrendingUp, UserRound, GraduationCap, ShieldCheck } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminDashboard() {
-  // Fetch real data in parallel
-  const [totalStudents, totalCourses, totalLeads, newsPublished, recentUsers] = await Promise.all([
+  const [totalAccounts, totalStudents, totalTeachers, totalAdmins, recentUsers] = await Promise.all([
+    prisma.user.count(),
     prisma.user.count({ where: { role: "USER" } }),
-    prisma.course.count(),
-    prisma.lead.count(),
-    prisma.post.count({ where: { type: "post" } }),
+    prisma.user.count({ where: { role: "TEACHER" } }),
+    prisma.user.count({ where: { role: "ADMIN" } }),
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
       take: 5,
@@ -31,46 +30,46 @@ export default async function AdminDashboard() {
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Total Students</h3>
+            <h3>Total Accounts</h3>
             <div style={{ padding: "0.5rem", background: "rgba(239, 68, 68, 0.1)", borderRadius: "10px" }}>
               <Users size={20} color="var(--color-orange)" />
             </div>
           </div>
-          <div className={styles.statValue}>{totalStudents}</div>
-          <p style={{ color: "#10b981", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>+12% this month</p>
+          <div className={styles.statValue}>{totalAccounts}</div>
+          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Editable roster</p>
         </div>
         
         <div className={styles.statCard}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Total Leads</h3>
+            <h3>Students</h3>
             <div style={{ padding: "0.5rem", background: "rgba(30, 58, 138, 0.1)", borderRadius: "10px" }}>
-              <TrendingUp size={20} color="var(--color-navy)" />
+              <GraduationCap size={20} color="var(--color-navy)" />
             </div>
           </div>
-          <div className={styles.statValue}>{totalLeads}</div>
-          <p style={{ color: "#10b981", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>+5% this week</p>
+          <div className={styles.statValue}>{totalStudents}</div>
+          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Role USER</p>
         </div>
         
         <div className={styles.statCard}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Total Courses</h3>
+            <h3>Teachers</h3>
             <div style={{ padding: "0.5rem", background: "rgba(139, 92, 246, 0.1)", borderRadius: "10px" }}>
-              <FileText size={20} color="#8b5cf6" />
+              <UserRound size={20} color="#8b5cf6" />
             </div>
           </div>
-          <div className={styles.statValue}>{totalCourses}</div>
-          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Active programs</p>
+          <div className={styles.statValue}>{totalTeachers}</div>
+          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Role TEACHER</p>
         </div>
         
         <div className={styles.statCard}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>News Published</h3>
+            <h3>Admin Accounts</h3>
             <div style={{ padding: "0.5rem", background: "rgba(236, 72, 153, 0.1)", borderRadius: "10px" }}>
-              <Newspaper size={20} color="#ec4899" />
+              <ShieldCheck size={20} color="#ec4899" />
             </div>
           </div>
-          <div className={styles.statValue}>{newsPublished}</div>
-          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Live articles</p>
+          <div className={styles.statValue}>{totalAdmins}</div>
+          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Role ADMIN</p>
         </div>
       </div>
 

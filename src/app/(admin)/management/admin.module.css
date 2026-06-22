@@ -137,14 +137,14 @@
 
 .statCard {
   background: white;
-  padding: 1.75rem;
-  border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(0,0,0,0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e2e8f0;
   position: relative;
   overflow: hidden;
 }
@@ -220,6 +220,36 @@
   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
 }
 
+.searchInput,
+.filterSelect {
+  width: 100%;
+  padding: 0.6rem 1rem 0.6rem 2.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+.searchInput:focus,
+.filterSelect:focus {
+  outline: none;
+  border-color: var(--color-orange);
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(246, 141, 46, 0.1);
+}
+
+.filterSelect {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
 .tableField {
   width: 100%;
   padding: 0.85rem 1rem;
@@ -239,13 +269,50 @@
   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
 }
 
+.cleanInput,
+.cleanSelect {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background-color: transparent;
+  color: #1e293b;
+}
+
+.cleanInput:hover,
+.cleanSelect:hover {
+  background-color: rgba(241, 245, 249, 0.5);
+  border-color: #e2e8f0;
+}
+
+.cleanInput:focus,
+.cleanSelect:focus {
+  outline: none;
+  border-color: var(--color-orange);
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(246, 141, 46, 0.1);
+}
+
+.cleanSelect {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1em;
+  padding-right: 2rem;
+}
+
+
 .cardPanel {
   background: white;
-  padding: 2.5rem;
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-  margin-bottom: 2.5rem;
-  border: 1px solid rgba(0,0,0,0.02);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  margin-bottom: 2rem;
+  border: 1px solid #e2e8f0;
 }
 
 .cardPanel h3 {
@@ -273,19 +340,27 @@
   font-weight: 600;
   color: #64748b;
   background-color: #f8fafc;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  font-size: 0.8rem;
   letter-spacing: 0.05em;
+  padding: 1rem 1.25rem;
+}
+
+.table td {
+  padding: 1rem 1.25rem;
+  color: #334155;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .table th:first-child {
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 12px;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
 }
 
 .table th:last-child {
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
 .table tbody tr {
@@ -402,13 +477,21 @@
 :global(.dark) .formGroup label {
   color: #cbd5e1;
 }
-:global(.dark) .formGroup input, :global(.dark) .formGroup textarea, :global(.dark) .formGroup select, :global(.dark) .tableField {
+:global(.dark) .formGroup input, :global(.dark) .formGroup textarea, :global(.dark) .formGroup select, :global(.dark) .tableField, :global(.dark) .cleanInput, :global(.dark) .cleanSelect, :global(.dark) .searchInput, :global(.dark) .filterSelect {
   background-color: #0f172a;
   border-color: #334155;
   color: #f8fafc;
 }
-:global(.dark) .formGroup input:focus, :global(.dark) .formGroup textarea:focus, :global(.dark) .formGroup select:focus, :global(.dark) .tableField:focus {
+:global(.dark) .formGroup input:focus, :global(.dark) .formGroup textarea:focus, :global(.dark) .formGroup select:focus, :global(.dark) .tableField:focus, :global(.dark) .cleanInput:focus, :global(.dark) .cleanSelect:focus, :global(.dark) .searchInput:focus, :global(.dark) .filterSelect:focus {
   background-color: #1e293b;
+}
+:global(.dark) .cleanInput, :global(.dark) .cleanSelect {
+  background-color: transparent;
+  border-color: transparent;
+}
+:global(.dark) .cleanInput:hover, :global(.dark) .cleanSelect:hover {
+  background-color: rgba(30, 41, 59, 0.5);
+  border-color: #475569;
 }
 :global(.dark) .btnEdit {
   background-color: #1e3a8a;
@@ -602,6 +685,15 @@
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* --- Editor Styles --- */

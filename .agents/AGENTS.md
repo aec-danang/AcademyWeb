@@ -12,6 +12,7 @@
 - Use Prisma for data access and server actions for mutations
 - Keep the public site aligned to the AEC brand system
 - Preserve existing component patterns unless a task explicitly asks for a redesign
+- **UI/UX Guidelines**: Management pages must have a modern, premium design (e.g., clear container boxes, sleek inputs, good spacing) while strictly retaining the exact original AEC brand fonts and colors.
 
 ## Important Paths
 

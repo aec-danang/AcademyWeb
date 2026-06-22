@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Upload, Trash2, Save, Users, UserRound, GraduationCap, ShieldCheck } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Plus, Upload, Trash2, X, Search, Filter, Loader2 } from "lucide-react";
 import styles from "../admin.module.css";
 import { deleteAccount, saveAccounts } from "./actions";
 
@@ -26,15 +26,8 @@ const roleLabels: Record<AccountRole, string> = {
 
 function normalizeRole(value: string): AccountRole {
   const normalizedValue = value.trim().toUpperCase();
-
-  if (normalizedValue === "TEACHER") {
-    return "TEACHER";
-  }
-
-  if (normalizedValue === "ADMIN") {
-    return "ADMIN";
-  }
-
+  if (normalizedValue === "TEACHER") return "TEACHER";
+  if (normalizedValue === "ADMIN") return "ADMIN";
   return "USER";
 }
 
@@ -45,7 +38,6 @@ function parseBulkImport(text: string): AccountRow[] {
     .filter(Boolean)
     .map((line) => {
       const [name = "", username = "", email = "", role = "USER", password = ""] = line.split(/[;,\t]/).map((segment) => segment.trim());
-
       return {
         name,
         username,
@@ -64,76 +56,93 @@ export default function AccountManagerClient({ initialUsers }: { initialUsers: A
   const [bulkText, setBulkText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("ALL");
 
-  const studentCount = rows.filter((row) => row.role === "USER").length;
-  const teacherCount = rows.filter((row) => row.role === "TEACHER").length;
-  const adminCount = rows.filter((row) => row.role === "ADMIN").length;
+  const [newAccount, setNewAccount] = useState<AccountRow>({
+    name: "",
+    username: "",
+    email: "",
+    role: "USER",
+    password: "",
+    createdAt: "",
+    updatedAt: "",
+  });
 
-  const updateRow = (index: number, patch: Partial<AccountRow>) => {
-    setRows((currentRows) => currentRows.map((row, rowIndex) => (rowIndex === index ? { ...row, ...patch } : row)));
+  const isInitialMount = useRef(true);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    
+    const timer = setTimeout(() => {
+      setIsSaving(true);
+      setError(null);
+      saveAccounts(rows)
+        .then(() => setIsSaving(false))
+        .catch((saveError) => {
+          setError(saveError instanceof Error ? saveError.message : "Unable to save accounts right now.");
+          setIsSaving(false);
+        });
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, [rows]);
+
+  const updateRow = (rowToUpdate: AccountRow, patch: Partial<AccountRow>) => {
+    setRows((currentRows) => currentRows.map((r) => (r === rowToUpdate ? { ...r, ...patch } : r)));
   };
 
-  const addRow = () => {
-    setRows((currentRows) => [
-      ...currentRows,
-      {
-        name: "",
-        username: "",
-        email: "",
-        role: "USER",
-        password: "",
-        createdAt: "",
-        updatedAt: "",
-      },
-    ]);
-  };
-
-  const removeLocalRow = (index: number) => {
-    setRows((currentRows) => currentRows.filter((_, rowIndex) => rowIndex !== index));
+  const handleAddAccount = () => {
+    if (!newAccount.username && !newAccount.email) {
+      setError("Username or Email is required.");
+      return;
+    }
+    setRows((currentRows) => [...currentRows, { ...newAccount }]);
+    setIsAddModalOpen(false);
+    setNewAccount({
+      name: "",
+      username: "",
+      email: "",
+      role: "USER",
+      password: "",
+      createdAt: "",
+      updatedAt: "",
+    });
+    setError(null);
   };
 
   const handleImportRows = () => {
     const importedRows = parseBulkImport(bulkText);
-
     if (importedRows.length === 0) {
       setError("Paste at least one line in the format: name,username,email,role,password");
       return;
     }
-
     setRows((currentRows) => [...currentRows, ...importedRows]);
     setBulkText("");
     setError(null);
+    setIsImportModalOpen(false);
   };
 
-  const handleSaveAll = async () => {
-    setIsSaving(true);
-    setError(null);
-
-    try {
-      await saveAccounts(rows);
-      window.location.reload();
-    } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : "Unable to save accounts right now.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleDelete = async (row: AccountRow, index: number) => {
-    if (!row.id) {
-      removeLocalRow(index);
+  const handleDelete = async (rowToUpdate: AccountRow) => {
+    if (!rowToUpdate.id) {
+      setRows((currentRows) => currentRows.filter((r) => r !== rowToUpdate));
       return;
     }
 
-    if (!window.confirm(`Delete ${row.username || row.email}?`)) {
+    if (!window.confirm(`Delete ${rowToUpdate.username || rowToUpdate.email}?`)) {
       return;
     }
 
     setIsSaving(true);
-
     try {
-      await deleteAccount(row.id);
-      window.location.reload();
+      await deleteAccount(rowToUpdate.id);
+      setRows((currentRows) => currentRows.filter((r) => r !== rowToUpdate));
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : "Unable to delete this account.");
     } finally {
@@ -141,177 +150,245 @@ export default function AccountManagerClient({ initialUsers }: { initialUsers: A
     }
   };
 
+  const filteredRows = rows.filter((row) => {
+    if (roleFilter !== "ALL" && row.role !== roleFilter) return false;
+    if (search) {
+      const term = search.toLowerCase();
+      return (
+        row.name.toLowerCase().includes(term) ||
+        row.username.toLowerCase().includes(term) ||
+        row.email.toLowerCase().includes(term)
+      );
+    }
+    return true;
+  });
+
   return (
     <div>
-      <div className={styles.flexBetween}>
-        <div>
-          <h2>Bulk Account Manager</h2>
-          <p style={{ margin: "0.5rem 0 0", color: "#64748b" }}>Create, update, and remove student and teacher accounts in one pass.</p>
+      <div className={styles.flexBetween} style={{ marginBottom: "1.5rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <h2 style={{ margin: 0 }}>Account Manager</h2>
+          {isSaving && <Loader2 size={18} color="#64748b" className={styles.spin} />}
         </div>
-        <button className="btn-primary" style={{ display: "flex", gap: "0.5rem", alignItems: "center" }} onClick={handleSaveAll} disabled={isSaving}>
-          <Save size={18} />
-          {isSaving ? "Saving..." : "Save All Changes"}
-        </button>
-      </div>
-
-      <div className={styles.statsGrid}>
-        <div className={styles.statCard}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Total Accounts</h3>
-            <div style={{ padding: "0.5rem", background: "rgba(239, 68, 68, 0.1)", borderRadius: "10px" }}>
-              <Users size={20} color="var(--color-orange)" />
-            </div>
-          </div>
-          <div className={styles.statValue}>{rows.length}</div>
-          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Editable roster</p>
-        </div>
-
-        <div className={styles.statCard}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Students</h3>
-            <div style={{ padding: "0.5rem", background: "rgba(30, 58, 138, 0.1)", borderRadius: "10px" }}>
-              <GraduationCap size={20} color="var(--color-navy)" />
-            </div>
-          </div>
-          <div className={styles.statValue}>{studentCount}</div>
-          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Role USER</p>
-        </div>
-
-        <div className={styles.statCard}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Teachers</h3>
-            <div style={{ padding: "0.5rem", background: "rgba(139, 92, 246, 0.1)", borderRadius: "10px" }}>
-              <UserRound size={20} color="#8b5cf6" />
-            </div>
-          </div>
-          <div className={styles.statValue}>{teacherCount}</div>
-          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Role TEACHER</p>
-        </div>
-
-        <div className={styles.statCard}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Admin Accounts</h3>
-            <div style={{ padding: "0.5rem", background: "rgba(236, 72, 153, 0.1)", borderRadius: "10px" }}>
-              <ShieldCheck size={20} color="#ec4899" />
-            </div>
-          </div>
-          <div className={styles.statValue}>{adminCount}</div>
-          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Role ADMIN</p>
+        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+          <button className="btn-secondary" style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "10px 16px", fontSize: "0.9rem" }} onClick={() => setIsImportModalOpen(true)}>
+            <Upload size={16} />
+            Bulk Import
+          </button>
+          <button className="btn-primary" style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "10px 16px", fontSize: "0.9rem" }} onClick={() => setIsAddModalOpen(true)}>
+            <Plus size={16} />
+            Add Account
+          </button>
         </div>
       </div>
 
       {error && (
-        <div className={styles.cardPanel} style={{ marginBottom: "2rem", border: "1px solid #fecaca", background: "#fff1f2" }}>
+        <div className={styles.cardPanel} style={{ marginBottom: "2rem", border: "1px solid #fecaca", background: "#fff1f2", padding: "1.5rem" }}>
           <strong style={{ color: "#b91c1c" }}>Action needed:</strong> <span style={{ color: "#991b1b" }}>{error}</span>
         </div>
       )}
 
-      <div className={styles.cardPanel} style={{ marginBottom: "2rem" }}>
-        <h3>Bulk Import</h3>
-        <p style={{ marginTop: 0, color: "#64748b" }}>Paste one account per line using: name,username,email,role,password. Role accepts student, teacher, or admin.</p>
-        <div className={styles.formGroup}>
-          <textarea
-            rows={6}
-            value={bulkText}
-            onChange={(event) => setBulkText(event.target.value)}
-            placeholder="Nguyen Van A,nva123,nva@example.com,student,Temp1234\nTran Thi B,ttb123,ttb@example.com,teacher,Temp1234"
-          />
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1, minWidth: "250px", maxWidth: "600px" }}>
+            <div style={{ position: "relative", flex: 1 }}>
+              <Search size={18} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+              <input
+                type="text"
+                placeholder="Search accounts..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className={styles.searchInput}
+              />
+            </div>
+            <div style={{ position: "relative" }}>
+              <Filter size={18} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className={styles.filterSelect}
+              >
+                <option value="ALL">All Roles</option>
+                <option value="USER">Student</option>
+                <option value="TEACHER">Teacher</option>
+                <option value="ADMIN">Admin</option>
+              </select>
+            </div>
+          </div>
         </div>
-        <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-          <button className="btn-secondary" style={{ display: "flex", gap: "0.5rem", alignItems: "center" }} onClick={handleImportRows}>
-            <Upload size={18} />
-            Import Rows
-          </button>
-          <button className="btn-secondary" style={{ display: "flex", gap: "0.5rem", alignItems: "center" }} onClick={addRow}>
-            <Plus size={18} />
-            Add Blank Row
-          </button>
+
+        <div style={{ overflowX: "auto" }}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Password</th>
+                <th>Created</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredRows.length === 0 && (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: "center", padding: "3rem 1rem", color: "#64748b" }}>
+                    No accounts found matching your criteria.
+                  </td>
+                </tr>
+              )}
+              {filteredRows.map((row, index) => (
+                <tr key={row.id || `${row.username || row.email || "new"}-${index}`}>
+                  <td>
+                    <input
+                      type="text"
+                      value={row.name}
+                      onChange={(event) => updateRow(row, { name: event.target.value })}
+                      placeholder="Full name"
+                      className={styles.cleanInput}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      value={row.username}
+                      onChange={(event) => updateRow(row, { username: event.target.value })}
+                      placeholder="Username"
+                      className={styles.cleanInput}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="email"
+                      value={row.email}
+                      onChange={(event) => updateRow(row, { email: event.target.value })}
+                      placeholder="name@example.com"
+                      className={styles.cleanInput}
+                    />
+                  </td>
+                  <td>
+                    <select value={row.role} onChange={(event) => updateRow(row, { role: normalizeRole(event.target.value) })} className={styles.cleanSelect}>
+                      <option value="USER">{roleLabels.USER}</option>
+                      <option value="TEACHER">{roleLabels.TEACHER}</option>
+                      <option value="ADMIN">{roleLabels.ADMIN}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      value={row.password}
+                      onChange={(event) => updateRow(row, { password: event.target.value })}
+                      placeholder={row.id ? "••••••••" : "New Password"}
+                      className={styles.cleanInput}
+                    />
+                  </td>
+                  <td>
+                    <div style={{ fontSize: "0.85rem", color: "#64748b", paddingLeft: "0.5rem", whiteSpace: "nowrap" }}>
+                      {row.createdAt ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(row.createdAt)) : "New row"}
+                    </div>
+                  </td>
+                  <td>
+                    <div className={styles.actionButtons} style={{ justifyContent: "flex-end" }}>
+                      <button className={styles.btnDelete} title="Remove row" onClick={() => handleDelete(row)}>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        <div style={{ marginTop: "1rem", fontSize: "0.9rem", color: "#64748b", display: "flex", justifyContent: "flex-end" }}>
+          Showing {filteredRows.length} {filteredRows.length === 1 ? 'account' : 'accounts'}
         </div>
       </div>
 
-      <div className={styles.cardPanel}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Password</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={6} style={{ textAlign: "center", padding: "1.5rem" }}>
-                  No accounts loaded yet.
-                </td>
-              </tr>
-            )}
-            {rows.map((row, index) => (
-              <tr key={row.id || `${row.username || row.email || "new"}-${index}`}>
-                <td>
-                  <input
-                    type="text"
-                    value={row.name}
-                    onChange={(event) => updateRow(index, { name: event.target.value })}
-                    placeholder="Full name"
-                    className={styles.tableField}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={row.username}
-                    onChange={(event) => updateRow(index, { username: event.target.value })}
-                    placeholder="Username"
-                    className={styles.tableField}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="email"
-                    value={row.email}
-                    onChange={(event) => updateRow(index, { email: event.target.value })}
-                    placeholder="name@example.com"
-                    className={styles.tableField}
-                  />
-                </td>
-                <td>
-                  <select value={row.role} onChange={(event) => updateRow(index, { role: normalizeRole(event.target.value) })} className={styles.tableField}>
-                    <option value="USER">{roleLabels.USER}</option>
-                    <option value="TEACHER">{roleLabels.TEACHER}</option>
-                    <option value="ADMIN">{roleLabels.ADMIN}</option>
-                  </select>
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={row.password}
-                    onChange={(event) => updateRow(index, { password: event.target.value })}
-                    placeholder="Optional"
-                    className={styles.tableField}
-                  />
-                </td>
-                <td>
-                  <div style={{ fontSize: "0.85rem", color: "#64748b" }}>
-                    {row.createdAt ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(row.createdAt)) : "New row"}
-                  </div>
-                </td>
-                <td>
-                  <div className={styles.actionButtons}>
-                    <button className={styles.btnDelete} title="Remove row" onClick={() => handleDelete(row, index)}>
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {isAddModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h3>Add New Account</h3>
+              <button className={styles.btnClose} onClick={() => setIsAddModalOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className={styles.formGroup}>
+              <label>Full Name</label>
+              <input type="text" value={newAccount.name} onChange={(e) => setNewAccount({...newAccount, name: e.target.value})} placeholder="e.g. John Doe" />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Username</label>
+              <input type="text" value={newAccount.username} onChange={(e) => setNewAccount({...newAccount, username: e.target.value})} placeholder="e.g. johndoe" />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Email</label>
+              <input type="email" value={newAccount.email} onChange={(e) => setNewAccount({...newAccount, email: e.target.value})} placeholder="name@example.com" />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Role</label>
+              <select value={newAccount.role} onChange={(e) => setNewAccount({...newAccount, role: normalizeRole(e.target.value)})}>
+                <option value="USER">Student</option>
+                <option value="TEACHER">Teacher</option>
+                <option value="ADMIN">Admin</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <label>Password</label>
+              <input type="text" value={newAccount.password} onChange={(e) => setNewAccount({...newAccount, password: e.target.value})} placeholder="Optional password" />
+            </div>
+            
+            <div style={{ display: "flex", gap: "1rem", justifyContent: "flex-end", marginTop: "1.5rem" }}>
+              <button className="btn-secondary" onClick={() => setIsAddModalOpen(false)} style={{ padding: "10px 20px" }}>Cancel</button>
+              <button className="btn-primary" onClick={handleAddAccount} style={{ padding: "10px 20px" }}>Add Account</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isImportModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h3>Bulk Import Accounts</h3>
+              <button className={styles.btnClose} onClick={() => setIsImportModalOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <p style={{ marginTop: 0, marginBottom: "1.5rem", color: "#64748b", fontSize: "0.95rem" }}>
+              Paste one account per line using comma, semicolon, or tab separators. 
+              <br />
+              Format: <strong>name,username,email,role,password</strong>
+              <br />
+              <small>Role accepts student, teacher, or admin.</small>
+            </p>
+            
+            <div className={styles.formGroup}>
+              <textarea
+                rows={8}
+                value={bulkText}
+                onChange={(event) => setBulkText(event.target.value)}
+                placeholder="Nguyen Van A,nva123,nva@example.com,student,Temp1234&#10;Tran Thi B,ttb123,ttb@example.com,teacher,Temp1234"
+                style={{ fontFamily: "monospace", fontSize: "0.85rem", whiteSpace: "pre" }}
+              />
+            </div>
+            
+            <div style={{ display: "flex", gap: "1rem", justifyContent: "flex-end", marginTop: "1rem" }}>
+              <button className="btn-secondary" onClick={() => setIsImportModalOpen(false)} style={{ padding: "10px 20px" }}>
+                Cancel
+              </button>
+              <button className="btn-primary" onClick={handleImportRows} style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "10px 20px" }}>
+                <Upload size={18} />
+                Import Rows
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
