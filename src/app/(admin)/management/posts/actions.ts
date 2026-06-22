@@ -24,3 +24,18 @@ export async function deletePost(slug: string) {
   });
   revalidatePath("/management/posts");
 }
+
+export async function batchDeletePosts(slugs: string[]) {
+  await prisma.post.deleteMany({
+    where: { slug: { in: slugs } },
+  });
+  revalidatePath("/management/posts");
+}
+
+export async function batchUpdatePosts(slugs: string[], data: any) {
+  await prisma.post.updateMany({
+    where: { slug: { in: slugs } },
+    data,
+  });
+  revalidatePath("/management/posts");
+}

@@ -603,3 +603,175 @@
   from { opacity: 0; transform: translateY(20px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* --- Editor Styles --- */
+.editorInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  font-family: inherit;
+  color: #1e293b;
+  transition: color 0.2s;
+}
+
+:global(.dark) .editorInput {
+  color: #f8fafc;
+}
+
+.editorTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  padding: 0;
+}
+
+.editorContent {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  min-height: 50vh;
+  resize: none;
+  padding: 1rem 0;
+}
+
+/* --- ProseMirror Styles --- */
+.ProseMirror {
+  outline: none;
+}
+.ProseMirror p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+.ProseMirror h1, .ProseMirror h2 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  color: inherit;
+}
+.ProseMirror h1 { font-size: 2rem; }
+.ProseMirror h2 { font-size: 1.5rem; }
+.ProseMirror ul, .ProseMirror ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+.ProseMirror li p { margin: 0; }
+.ProseMirror a {
+  color: var(--color-orange);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+}
+
+/* --- Editor Box Styles --- */
+.editorBox {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+:global(.dark) .editorBox {
+  background-color: #0f172a;
+  border-color: #334155;
+}
+
+.editorToolbar {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border-bottom: 1.5px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #475569;
+}
+
+:global(.dark) .editorToolbar {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+.editorContentBox {
+  padding: 1.5rem;
+  min-height: 400px;
+  color: #1e293b;
+  background-color: transparent;
+}
+
+:global(.dark) .editorContentBox {
+  color: #f8fafc;
+}
+
+/* --- Action Buttons --- */
+.topActionButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.topActionButton:hover {
+  color: #1e293b;
+}
+
+:global(.dark) .topActionButton {
+  color: #94a3b8;
+}
+
+:global(.dark) .topActionButton:hover {
+  color: #f8fafc;
+}
+
+.topActionButton.active {
+  color: var(--color-orange);
+}
+
+/* --- Modal Dialog Styles --- */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modalContent {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  position: relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+:global(.dark) .modalContent {
+  background-color: #1e293b;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  color: #f8fafc;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
