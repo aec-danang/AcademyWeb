@@ -1,6 +1,8 @@
-import styles from "./admin.module.css";
-import { Users, FileText, Newspaper, TrendingUp, UserRound, GraduationCap, ShieldCheck } from "lucide-react";
+import { Users, UserRound, GraduationCap, ShieldCheck, Activity } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 export default async function AdminDashboard() {
   const [totalAccounts, totalStudents, totalTeachers, totalAdmins, recentUsers] = await Promise.all([
@@ -22,101 +24,125 @@ export default async function AdminDashboard() {
   ]);
 
   return (
-    <div>
-      <div className={styles.flexBetween}>
-        <h2>Overview</h2>
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight text-navy dark:text-white">Overview</h2>
+        <p className="text-muted-foreground mt-2">Manage your platform and view quick statistics.</p>
       </div>
 
-      <div className={styles.statsGrid}>
-        <div className={styles.statCard}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Total Accounts</h3>
-            <div style={{ padding: "0.5rem", background: "rgba(239, 68, 68, 0.1)", borderRadius: "10px" }}>
-              <Users size={20} color="var(--color-orange)" />
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Accounts</CardTitle>
+            <div className="p-2 bg-orange/10 rounded-md">
+              <Users className="h-4 w-4 text-orange" />
             </div>
-          </div>
-          <div className={styles.statValue}>{totalAccounts}</div>
-          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Editable roster</p>
-        </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-navy dark:text-white">{totalAccounts}</div>
+            <p className="text-xs text-muted-foreground mt-1">Editable roster</p>
+          </CardContent>
+        </Card>
         
-        <div className={styles.statCard}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Students</h3>
-            <div style={{ padding: "0.5rem", background: "rgba(30, 58, 138, 0.1)", borderRadius: "10px" }}>
-              <GraduationCap size={20} color="var(--color-navy)" />
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Students</CardTitle>
+            <div className="p-2 bg-blue-500/10 rounded-md">
+              <GraduationCap className="h-4 w-4 text-blue-500" />
             </div>
-          </div>
-          <div className={styles.statValue}>{totalStudents}</div>
-          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Role USER</p>
-        </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-navy dark:text-white">{totalStudents}</div>
+            <p className="text-xs text-muted-foreground mt-1">Role USER</p>
+          </CardContent>
+        </Card>
         
-        <div className={styles.statCard}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Teachers</h3>
-            <div style={{ padding: "0.5rem", background: "rgba(139, 92, 246, 0.1)", borderRadius: "10px" }}>
-              <UserRound size={20} color="#8b5cf6" />
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Teachers</CardTitle>
+            <div className="p-2 bg-purple-500/10 rounded-md">
+              <UserRound className="h-4 w-4 text-purple-500" />
             </div>
-          </div>
-          <div className={styles.statValue}>{totalTeachers}</div>
-          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Role TEACHER</p>
-        </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-navy dark:text-white">{totalTeachers}</div>
+            <p className="text-xs text-muted-foreground mt-1">Role TEACHER</p>
+          </CardContent>
+        </Card>
         
-        <div className={styles.statCard}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Admin Accounts</h3>
-            <div style={{ padding: "0.5rem", background: "rgba(236, 72, 153, 0.1)", borderRadius: "10px" }}>
-              <ShieldCheck size={20} color="#ec4899" />
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Admin Accounts</CardTitle>
+            <div className="p-2 bg-pink-500/10 rounded-md">
+              <ShieldCheck className="h-4 w-4 text-pink-500" />
             </div>
-          </div>
-          <div className={styles.statValue}>{totalAdmins}</div>
-          <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0, fontWeight: 500 }}>Role ADMIN</p>
-        </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-navy dark:text-white">{totalAdmins}</div>
+            <p className="text-xs text-muted-foreground mt-1">Role ADMIN</p>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className={styles.cardPanel}>
-        <h3>Recent Registrations</h3>
-        <table className={styles.table} style={{ marginTop: "1rem" }}>
-          <thead>
-            <tr>
-              <th>Action</th>
-              <th>User</th>
-              <th>Username / Email</th>
-              <th>Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentUsers.map((user) => (
-              <tr key={user.id}>
-                <td>New User Registered</td>
-                <td>{user.name || "Unknown"}</td>
-                <td>
-                  {user.username && <span style={{ fontWeight: 500 }}>@{user.username}</span>}
-                  {user.username && user.email && <br />}
-                  {user.email && <span style={{ color: "#64748b", fontSize: "0.9em" }}>{user.email}</span>}
-                  {!user.username && !user.email && "N/A"}
-                </td>
-                <td>
-                  {new Intl.DateTimeFormat("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "numeric",
-                  }).format(new Date(user.createdAt))}
-                </td>
-                <td><span className={`${styles.badge} ${styles.badgeSuccess}`}>Completed</span></td>
-              </tr>
-            ))}
-            {recentUsers.length === 0 && (
-              <tr>
-                <td colSpan={5} style={{ textAlign: "center", padding: "1rem" }}>
-                  No recent registrations found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle>Recent Registrations</CardTitle>
+          <CardDescription>The latest users to join the platform.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border border-slate-200 dark:border-slate-800">
+            <Table>
+              <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
+                <TableRow>
+                  <TableHead className="w-[200px]">Action</TableHead>
+                  <TableHead>User</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {recentUsers.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="font-medium flex items-center gap-2">
+                      <Activity className="h-4 w-4 text-slate-400" />
+                      New User Registered
+                    </TableCell>
+                    <TableCell>{user.name || "Unknown"}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        {user.username && <span className="font-medium">@{user.username}</span>}
+                        {user.email && <span className="text-xs text-muted-foreground">{user.email}</span>}
+                        {!user.username && !user.email && <span className="text-muted-foreground">N/A</span>}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {new Intl.DateTimeFormat("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "numeric",
+                      }).format(new Date(user.createdAt))}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-800">
+                        Completed
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {recentUsers.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                      No recent registrations found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

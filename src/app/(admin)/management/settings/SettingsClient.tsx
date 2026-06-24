@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { saveSettings, updateAdminAccount } from "./actions";
-import styles from "../admin.module.css";
 import { Plus, Trash2, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 
 type Setting = {
   key: string;
@@ -111,76 +114,82 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
   };
 
   return (
-    <div>
-      <div className={styles.flexBetween} style={{ alignItems: "center", marginBottom: "2rem" }}>
-        <h2 style={{ margin: 0 }}>Settings</h2>
-        <button 
-          className="btn-primary" 
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 className="text-3xl font-bold tracking-tight text-navy dark:text-white">Settings</h2>
+        <Button 
+          className="bg-orange hover:bg-orange-hover text-white" 
           onClick={handleSave}
           disabled={isSaving}
-          style={{ display: "flex", gap: "0.5rem", alignItems: "center", opacity: isSaving ? 0.7 : 1 }}
         >
-          <Save size={18} />
+          <Save className="mr-2 h-4 w-4" />
           {isSaving ? "Saving..." : "Save All Settings"}
-        </button>
+        </Button>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
+      <div className="grid gap-6">
         
         {/* Account Settings */}
         {user && (
-          <div className={styles.cardPanel}>
-            <h3 style={{ marginBottom: "0.5rem" }}>Account Information</h3>
-            <p style={{ color: "#94a3b8", fontSize: "0.85rem", marginBottom: "1.5rem" }}>Manage your admin profile. Leave password blank to keep it unchanged.</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-              <div className={styles.formGroup} style={{ marginBottom: 0 }}>
-                <label>Name</label>
-                <input 
+          <Card>
+            <CardHeader>
+              <CardTitle>Account Information</CardTitle>
+              <CardDescription>Manage your admin profile. Leave password blank to keep it unchanged.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Name</label>
+                <Input 
                   type="text" 
                   placeholder="Admin Name"
                   value={accountData.name}
                   onChange={e => setAccountData(prev => ({ ...prev, name: e.target.value }))}
                 />
               </div>
-              <div className={styles.formGroup} style={{ marginBottom: 0 }}>
-                <label>Email</label>
-                <input 
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Email</label>
+                <Input 
                   type="email" 
                   placeholder="admin@example.com"
                   value={accountData.email}
                   onChange={e => setAccountData(prev => ({ ...prev, email: e.target.value }))}
                 />
               </div>
-              <div className={styles.formGroup} style={{ marginBottom: 0 }}>
-                <label>New Password</label>
-                <input 
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">New Password</label>
+                <Input 
                   type="password" 
                   placeholder="Enter new password..."
                   value={accountData.password}
                   onChange={e => setAccountData(prev => ({ ...prev, password: e.target.value }))}
                 />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Standard Settings */}
-        <div className={styles.cardPanel}>
-          <h3 style={{ marginBottom: "0.5rem" }}>Standard Settings</h3>
-          <p style={{ color: "#94a3b8", fontSize: "0.85rem", marginBottom: "1.5rem" }}>Core contact info and basic site details.</p>
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <Card>
+          <CardHeader>
+            <CardTitle>Standard Settings</CardTitle>
+            <CardDescription>Core contact info and basic site details.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
             {DEFAULT_KEYS.map((item) => (
-              <div key={item.key} className={styles.formGroup} style={{ marginBottom: 0 }}>
-                <label>{item.label} <span style={{ color: "#94a3b8", fontWeight: "normal", fontSize: "0.85rem", marginLeft: "0.5rem" }}>({item.key})</span></label>
+              <div key={item.key} className="grid gap-2">
+                <label className="text-sm font-medium flex items-center">
+                  {item.label} 
+                  <span className="text-xs text-muted-foreground ml-2 font-normal">({item.key})</span>
+                </label>
                 {item.key === "footer_text" || item.key === "address" ? (
-                  <textarea 
+                  <Textarea 
                     placeholder={item.placeholder}
                     value={settingsMap[item.key] || ""}
                     onChange={e => handleStandardChange(item.key, e.target.value)}
                     rows={2}
                   />
                 ) : (
-                  <input 
+                  <Input 
                     type="text" 
                     placeholder={item.placeholder}
                     value={settingsMap[item.key] || ""}
@@ -189,98 +198,102 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
                 )}
               </div>
             ))}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Landing Page Content */}
-        <div className={styles.cardPanel}>
-          <h3 style={{ marginBottom: "0.5rem" }}>Landing Page Content</h3>
-          <p style={{ color: "#94a3b8", fontSize: "0.85rem", marginBottom: "1rem" }}>Configure text and imagery for the public site's homepage.</p>
-          
-          <form style={{ marginTop: "1.5rem" }} onSubmit={(e) => e.preventDefault()}>
-            <h4 style={{ marginBottom: "1rem", color: "#334155" }}>Hero Section</h4>
-            <div className={styles.formGroup}>
-              <label>Hero Headline</label>
-              <input type="text" defaultValue="Learn English. Build Confidence. Become a Global Citizen." />
-            </div>
-            <div className={styles.formGroup}>
-              <label>Hero Subheadline</label>
-              <textarea rows={3} defaultValue="Join AEC Da Nang to unlock your potential with our expert teachers and proven methodology."></textarea>
-            </div>
-            <div className={styles.formGroup}>
-              <label>Hero Background Image URL</label>
-              <input type="text" defaultValue="/images/hero-bg.jpg" />
+        <Card>
+          <CardHeader>
+            <CardTitle>Landing Page Content</CardTitle>
+            <CardDescription>Configure text and imagery for the public site's homepage.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <h4 className="font-semibold text-slate-800 dark:text-slate-200">Hero Section</h4>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Hero Headline</label>
+                <Input type="text" defaultValue="Learn English. Build Confidence. Become a Global Citizen." />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Hero Subheadline</label>
+                <Textarea rows={3} defaultValue="Join AEC Da Nang to unlock your potential with our expert teachers and proven methodology." />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Hero Background Image URL</label>
+                <Input type="text" defaultValue="/images/hero-bg.jpg" />
+              </div>
             </div>
 
-            <h4 style={{ margin: "2rem 0 1rem", color: "#334155" }}>About Us Section</h4>
-            <div className={styles.formGroup}>
-              <label>About Heading</label>
-              <input type="text" defaultValue="Why Choose Academy English Center?" />
+            <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <h4 className="font-semibold text-slate-800 dark:text-slate-200">About Us Section</h4>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">About Heading</label>
+                <Input type="text" defaultValue="Why Choose Academy English Center?" />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">About Description</label>
+                <Textarea rows={5} defaultValue="At AEC, we believe that learning English is more than just passing exams; it's about connecting with the world..." />
+              </div>
             </div>
-            <div className={styles.formGroup}>
-              <label>About Description</label>
-              <textarea rows={5} defaultValue="At AEC, we believe that learning English is more than just passing exams; it's about connecting with the world..."></textarea>
-            </div>
-          </form>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Custom Variables */}
-        <div className={styles.cardPanel}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+        <Card>
+          <CardHeader className="flex flex-row items-start justify-between space-y-0">
             <div>
-              <h3 style={{ margin: 0, marginBottom: "0.5rem" }}>Custom Settings</h3>
-              <p style={{ color: "#94a3b8", fontSize: "0.85rem", margin: 0 }}>Add custom variables not covered by standard settings.</p>
+              <CardTitle>Custom Settings</CardTitle>
+              <CardDescription>Add custom variables not covered by standard settings.</CardDescription>
             </div>
-            <button 
-              className="btn-secondary" 
-              onClick={addCustomSetting}
-              style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.5rem 1rem", fontSize: "0.85rem" }}
-            >
-              <Plus size={16} />
+            <Button variant="outline" size="sm" onClick={addCustomSetting}>
+              <Plus className="mr-2 h-4 w-4" />
               Add Variable
-            </button>
-          </div>
-          
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            {customSettings.length === 0 ? (
-              <div style={{ color: "#94a3b8", textAlign: "center", padding: "2rem", border: "1px dashed #cbd5e1", borderRadius: "12px", background: "#f8fafc" }}>
-                No custom settings defined. Click "Add Variable" to create one.
-              </div>
-            ) : (
-              customSettings.map((item, index) => (
-                <div key={index} style={{ display: "flex", gap: "1rem", alignItems: "flex-start", background: "#f8fafc", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-                  <div className={styles.formGroup} style={{ flex: 1, marginBottom: 0 }}>
-                    <label style={{ fontSize: "0.8rem", marginBottom: "0.25rem", display: "block" }}>Key</label>
-                    <input 
-                      type="text" 
-                      placeholder="custom_key"
-                      value={item.key}
-                      onChange={e => handleCustomChange(index, "key", e.target.value)}
-                      style={{ fontFamily: "monospace", background: "#fff" }}
-                    />
-                  </div>
-                  <div className={styles.formGroup} style={{ flex: 2, marginBottom: 0 }}>
-                    <label style={{ fontSize: "0.8rem", marginBottom: "0.25rem", display: "block" }}>Value</label>
-                    <input 
-                      type="text" 
-                      placeholder="Value..."
-                      value={item.value}
-                      onChange={e => handleCustomChange(index, "value", e.target.value)}
-                      style={{ background: "#fff" }}
-                    />
-                  </div>
-                  <button 
-                    onClick={() => removeCustomSetting(index)}
-                    style={{ background: "#fef2f2", color: "#ef4444", border: "1px solid #fca5a5", borderRadius: "8px", width: "42px", height: "42px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, marginTop: "1.4rem", transition: "all 0.2s" }}
-                    title="Remove"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {customSettings.length === 0 ? (
+                <div className="text-center py-8 border border-dashed rounded-lg text-muted-foreground bg-slate-50 dark:bg-slate-900/50">
+                  No custom settings defined. Click "Add Variable" to create one.
                 </div>
-              ))
-            )}
-          </div>
-        </div>
+              ) : (
+                customSettings.map((item, index) => (
+                  <div key={index} className="flex gap-4 items-start bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+                    <div className="grid gap-2 flex-1">
+                      <label className="text-xs font-medium">Key</label>
+                      <Input 
+                        type="text" 
+                        placeholder="custom_key"
+                        value={item.key}
+                        onChange={e => handleCustomChange(index, "key", e.target.value)}
+                        className="font-mono bg-white dark:bg-slate-950"
+                      />
+                    </div>
+                    <div className="grid gap-2 flex-[2]">
+                      <label className="text-xs font-medium">Value</label>
+                      <Input 
+                        type="text" 
+                        placeholder="Value..."
+                        value={item.value}
+                        onChange={e => handleCustomChange(index, "value", e.target.value)}
+                        className="bg-white dark:bg-slate-950"
+                      />
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="mt-6 text-destructive hover:bg-destructive/10 hover:text-destructive shrink-0"
+                      onClick={() => removeCustomSetting(index)}
+                      title="Remove"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
       </div>
     </div>

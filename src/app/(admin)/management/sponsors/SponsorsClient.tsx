@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { createSponsor, updateSponsor, deleteSponsor, reorderSponsors } from "./actions";
-import styles from "../admin.module.css";
-import { Plus, Edit2, Trash2, GripVertical, Search, X } from "lucide-react";
+import { Plus, Edit2, Trash2, GripVertical, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 type Sponsor = {
   id: string;
@@ -99,172 +102,179 @@ export default function SponsorsClient({ initialSponsors }: { initialSponsors: S
   };
 
   return (
-    <div>
-      <div className={styles.flexBetween} style={{ alignItems: "center", marginBottom: "1.5rem" }}>
-        <h2 style={{ margin: 0 }}>Manage Sponsors</h2>
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <div className={styles.formGroup} style={{ marginBottom: 0, position: "relative" }}>
-            <Search size={18} style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
-            <input 
-              type="text" 
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 className="text-3xl font-bold tracking-tight text-navy dark:text-white">Manage Sponsors</h2>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input 
               placeholder="Search sponsors..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ paddingLeft: "2.75rem", width: "250px" }}
+              className="pl-9 w-[250px] bg-white dark:bg-slate-900"
             />
           </div>
-          <button 
-            className="btn-primary" 
-            style={{ display: "flex", gap: "0.5rem", alignItems: "center", whiteSpace: "nowrap" }}
+          <Button 
+            className="bg-orange hover:bg-orange-hover text-white" 
             onClick={() => {
               setIsCreating(true);
               setFormData({ name: "", imageUrl: "", website: "" });
             }}
           >
-            <Plus size={18} />
+            <Plus className="mr-2 h-4 w-4" />
             Add Sponsor
-          </button>
+          </Button>
         </div>
       </div>
 
-      {(isCreating || isEditing) && (
-        <div className={styles.modalOverlay} onClick={cancelEdit}>
-          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h3>{isCreating ? "Add New Sponsor" : "Edit Sponsor"}</h3>
-              <button className={styles.btnClose} onClick={cancelEdit}>
-                <X size={20} />
-              </button>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-              <div style={{ display: "flex", gap: "1.5rem", alignItems: "flex-start" }}>
-                <div style={{ width: "120px", flexShrink: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                  <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--color-navy)" }}>Logo Preview</label>
-                  <div style={{ width: "100%", height: "80px", borderRadius: "12px", border: "1px dashed #cbd5e1", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", overflow: "hidden" }}>
-                    {formData.imageUrl ? (
-                      <img src={formData.imageUrl} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "contain", padding: "0.5rem" }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                    ) : (
-                      <div style={{ color: "#94a3b8", fontSize: "0.75rem", textAlign: "center", padding: "0.5rem" }}>No Image</div>
-                    )}
-                  </div>
-                </div>
+      <div className="rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
+            <TableRow>
+              <TableHead className="w-[40px]"></TableHead>
+              <TableHead className="w-[120px]">Logo</TableHead>
+              <TableHead>Sponsor Name</TableHead>
+              <TableHead>Website</TableHead>
+              <TableHead className="w-[100px] text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredSponsors.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                  No sponsors found matching your search.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredSponsors.map((item) => {
+                const isSearching = searchQuery.length > 0;
+                const globalIndex = sponsors.findIndex(s => s.id === item.id);
+                
+                return (
+                  <TableRow 
+                    key={item.id} 
+                    draggable={!isSearching}
+                    onDragStart={() => !isSearching && handleDragStart(globalIndex)}
+                    onDragEnter={(e) => {
+                      e.preventDefault();
+                      if (!isSearching) handleDragEnter(globalIndex);
+                    }}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDragEnd={handleDragEnd}
+                    className={`
+                      ${!isSearching ? "cursor-grab active:cursor-grabbing" : ""}
+                      ${draggedIndex === globalIndex ? "opacity-50 bg-slate-50 dark:bg-slate-800/50" : ""}
+                      ${dragOverIndex === globalIndex && draggedIndex !== globalIndex ? (
+                        draggedIndex! < dragOverIndex ? "border-b-2 border-b-orange" : "border-t-2 border-t-orange"
+                      ) : ""}
+                    `}
+                  >
+                    <TableCell>
+                      <GripVertical className={`h-5 w-5 text-slate-400 ${isSearching ? 'opacity-30 cursor-not-allowed' : 'hover:text-slate-600 dark:hover:text-slate-300'}`} />
+                    </TableCell>
+                    <TableCell>
+                      <div className="w-[70px] h-[35px] flex items-center justify-center bg-white border border-slate-100 rounded p-1 dark:bg-slate-800 dark:border-slate-700">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                          src={item.imageUrl} 
+                          alt={item.name} 
+                          className="max-w-full max-h-full object-contain"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium text-navy dark:text-slate-200">
+                      {item.name}
+                    </TableCell>
+                    <TableCell>
+                      {item.website ? (
+                        <a href={item.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                          {item.website}
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => startEdit(item)}>
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleDelete(item.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
-                  <div className={styles.formGroup} style={{ marginBottom: 0 }}>
-                    <label>Sponsor Name</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. FPT Software" 
-                      value={formData.name} 
-                      onChange={e => setFormData({...formData, name: e.target.value})} 
-                    />
-                  </div>
-                  <div className={styles.formGroup} style={{ marginBottom: 0 }}>
-                    <label>Logo URL</label>
-                    <input 
-                      type="text" 
-                      placeholder="https://example.com/logo.png" 
-                      value={formData.imageUrl} 
-                      onChange={e => setFormData({...formData, imageUrl: e.target.value})} 
-                    />
-                  </div>
-                </div>
+      <Dialog open={isCreating || isEditing !== null} onOpenChange={(open) => !open && cancelEdit()}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle>{isCreating ? "Add New Sponsor" : "Edit Sponsor"}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-6 py-4 md:grid-cols-[120px_1fr]">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Logo Preview</label>
+              <div className="w-full h-[80px] rounded-lg border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center bg-slate-50 dark:bg-slate-900 overflow-hidden">
+                {formData.imageUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img 
+                    src={formData.imageUrl} 
+                    alt="Preview" 
+                    className="w-full h-full object-contain p-2" 
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} 
+                  />
+                ) : (
+                  <span className="text-xs text-muted-foreground">No Image</span>
+                )}
               </div>
-              
-              <div className={styles.formGroup} style={{ marginBottom: 0 }}>
-                <label>Website URL <span style={{ color: "#94a3b8", fontWeight: "normal" }}>(Optional)</span></label>
-                <input 
-                  type="text" 
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Sponsor Name</label>
+                <Input 
+                  placeholder="e.g. FPT Software" 
+                  value={formData.name} 
+                  onChange={e => setFormData({...formData, name: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Logo URL</label>
+                <Input 
+                  placeholder="https://example.com/logo.png" 
+                  value={formData.imageUrl} 
+                  onChange={e => setFormData({...formData, imageUrl: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium flex items-center justify-between">
+                  Website URL
+                  <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+                </label>
+                <Input 
                   placeholder="https://example.com" 
                   value={formData.website} 
                   onChange={e => setFormData({...formData, website: e.target.value})} 
                 />
               </div>
-
-              <div style={{ display: "flex", gap: "1rem", marginTop: "1rem", justifyContent: "flex-end", borderTop: "1px solid #f1f5f9", paddingTop: "1.5rem" }}>
-                <button className="btn-secondary" onClick={cancelEdit}>Cancel</button>
-                <button className="btn-primary" onClick={isCreating ? handleCreate : handleUpdate}>{isCreating ? "Add Sponsor" : "Save Changes"}</button>
-              </div>
             </div>
           </div>
-        </div>
-      )}
-
-      <div>
-        <div className={styles.listContainer}>
-
-          {/* List Items */}
-          {filteredSponsors.length === 0 ? (
-            <div style={{ padding: "2rem", textAlign: "center", color: "#64748b" }}>
-              No sponsors found matching your search.
-            </div>
-          ) : (
-            filteredSponsors.map((item, index) => {
-              // We need the true index in the main `sponsors` array for DND to work correctly
-              // when filtered, but DND shouldn't usually happen while searching.
-              // To be safe, disable DND when searching.
-              const isSearching = searchQuery.length > 0;
-              const globalIndex = sponsors.findIndex(s => s.id === item.id);
-              
-              return (
-                <div 
-                  key={item.id} 
-                  className={styles.listItem}
-                  draggable={!isSearching}
-                  onDragStart={() => !isSearching && handleDragStart(globalIndex)}
-                  onDragEnter={(e) => {
-                    e.preventDefault();
-                    if (!isSearching) handleDragEnter(globalIndex);
-                  }}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDragEnd={handleDragEnd}
-                  style={{
-                    opacity: draggedIndex === globalIndex ? 0.5 : 1,
-                    transform: dragOverIndex === globalIndex && draggedIndex !== globalIndex 
-                      ? (draggedIndex! < dragOverIndex ? "translateY(-4px)" : "translateY(4px)") 
-                      : "none",
-                    borderTop: dragOverIndex === globalIndex && draggedIndex !== globalIndex && draggedIndex! > dragOverIndex ? "2px solid var(--color-orange)" : undefined,
-                    borderBottom: dragOverIndex === globalIndex && draggedIndex !== globalIndex && draggedIndex! < dragOverIndex ? "2px solid var(--color-orange)" : undefined,
-                  }}
-                >
-                  <div className={styles.dragHandle} title={isSearching ? "Clear search to reorder" : "Drag to reorder"}>
-                    <GripVertical size={18} opacity={isSearching ? 0.3 : 1} />
-                  </div>
-                  
-                  <div className={styles.listColLogo}>
-                    <img src={item.imageUrl} alt={item.name} style={{ width: "70px", height: "35px", objectFit: "contain" }} />
-                  </div>
-                  
-                  <div className={styles.listColName}>
-                    {item.name}
-                  </div>
-                  
-                  <div className={styles.listColUrl}>
-                    {item.website ? (
-                      <a href={item.website} target="_blank" rel="noopener noreferrer" style={{ color: "#3b82f6", textDecoration: "none" }}>
-                        {item.website}
-                      </a>
-                    ) : (
-                      <span style={{ opacity: 0.5 }}>-</span>
-                    )}
-                  </div>
-                  
-                  <div className={styles.listColActions}>
-                    <div className={styles.actionButtons}>
-                      <button className={styles.btnEdit} title="Edit" onClick={() => startEdit(item)}>
-                        <Edit2 size={16} />
-                      </button>
-                      <button className={styles.btnDelete} title="Delete" onClick={() => handleDelete(item.id)}>
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={cancelEdit}>Cancel</Button>
+            <Button className="bg-orange hover:bg-orange-hover text-white" onClick={isCreating ? handleCreate : handleUpdate}>
+              {isCreating ? "Add Sponsor" : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { createPost, updatePost } from "../actions";
 import { ArrowLeft, Save, Image as ImageIcon, Settings, X } from "lucide-react";
 import SimpleEditor from "./SimpleEditor";
-import styles from "../../admin.module.css";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type Post = {
   title: string;
@@ -58,50 +63,45 @@ export default function PostEditorClient({ initialData }: { initialData?: Post }
   };
 
   return (
-    <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "1rem 0", display: "flex", flexDirection: "column", flex: 1 }}>
+    <div className="max-w-5xl mx-auto py-4 flex flex-col flex-1 w-full space-y-6">
       {/* Top Bar */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem" }}>
-        <button 
+      <div className="flex justify-between items-center pb-4 border-b border-slate-200 dark:border-slate-800">
+        <Button 
+          variant="ghost"
           onClick={() => router.push("/management/posts")}
-          className={styles.topActionButton}
+          className="text-slate-600 dark:text-slate-400 hover:text-navy dark:hover:text-white"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Posts
-        </button>
+        </Button>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <button 
+        <div className="flex items-center gap-4">
+          <Button 
+            variant={showSettings ? "secondary" : "ghost"}
             onClick={() => setShowSettings(!showSettings)}
-            className={`${styles.topActionButton} ${showSettings ? styles.active : ''}`}
           >
-            <Settings size={18} />
+            <Settings className="mr-2 h-4 w-4" />
             Settings
-          </button>
-          <button 
+          </Button>
+          <Button 
             onClick={handleSave}
             disabled={isSaving}
-            style={{ 
-              display: "flex", alignItems: "center", gap: "0.5rem", 
-              background: "var(--color-orange)", color: "white", 
-              border: "none", borderRadius: "20px", padding: "0.5rem 1.25rem", 
-              cursor: isSaving ? "not-allowed" : "pointer", fontSize: "0.9rem",
-              opacity: isSaving ? 0.7 : 1
-            }}
+            className="bg-orange hover:bg-orange-hover text-white rounded-full px-6"
           >
-            <Save size={18} />
+            <Save className="mr-2 h-4 w-4" />
             {isSaving ? "Saving..." : (formData.published ? "Publish" : "Save Draft")}
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Main Editor */}
-      <div style={{ display: "flex", gap: "3rem", flex: 1 }}>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <input
+      <div className="flex flex-col gap-6 flex-1 min-h-[500px]">
+        <div className="flex flex-col gap-4">
+          <Input
             type="text"
-            placeholder="Title"
+            placeholder="Post Title"
             value={formData.title}
-            className={`${styles.editorInput} ${styles.editorTitle}`}
+            className="text-3xl font-bold border-none bg-transparent shadow-none focus-visible:ring-0 px-0 h-14"
             onChange={(e) => {
               const newTitle = e.target.value;
               if (!isEditing) {
@@ -119,45 +119,41 @@ export default function PostEditorClient({ initialData }: { initialData?: Post }
         </div>
 
         {/* Settings Modal */}
-        {showSettings && (
-          <div className={styles.modalOverlay} onClick={() => setShowSettings(false)}>
-            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-              <button 
-                className={styles.modalClose} 
-                onClick={() => setShowSettings(false)}
-                aria-label="Close"
-              >
-                <X size={20} />
-              </button>
-              
-              <h3 style={{ fontSize: "1.25rem", marginBottom: "1.5rem", marginTop: 0 }}>Post Settings</h3>
-              
-              <div className={styles.formGroup}>
-                <label>Slug</label>
-                <input 
+        <Dialog open={showSettings} onOpenChange={setShowSettings}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Post Settings</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-6 py-4">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Slug</label>
+                <Input 
                   type="text" 
                   value={formData.slug} 
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  placeholder="post-slug"
                 />
               </div>
 
-              <div className={styles.formGroup}>
-                <label>Type</label>
-                <select 
-                  value={formData.type} 
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                >
-                  <option value="post">Post</option>
-                  <option value="news">News</option>
-                  <option value="event">Event</option>
-                  <option value="article">Article</option>
-                  <option value="page">Page</option>
-                </select>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Type</label>
+                <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="post">Post</SelectItem>
+                    <SelectItem value="news">News</SelectItem>
+                    <SelectItem value="event">Event</SelectItem>
+                    <SelectItem value="article">Article</SelectItem>
+                    <SelectItem value="page">Page</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div className={styles.formGroup}>
-                <label>Featured Image URL</label>
-                <input 
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Featured Image URL</label>
+                <Input 
                   type="text" 
                   placeholder="https://..."
                   value={formData.featuredImage} 
@@ -165,30 +161,33 @@ export default function PostEditorClient({ initialData }: { initialData?: Post }
                 />
               </div>
 
-              <div className={styles.formGroup}>
-                <label>Excerpt</label>
-                <textarea 
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Excerpt</label>
+                <Textarea 
                   rows={4}
+                  placeholder="Brief summary of the post..."
                   value={formData.excerpt} 
                   onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                  style={{ resize: "vertical" }}
+                  className="resize-y"
                 />
               </div>
 
-              <div className={styles.formGroup} style={{ marginBottom: 0 }}>
-                <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer", margin: 0 }}>
-                  <input 
-                    type="checkbox" 
-                    checked={formData.published} 
-                    onChange={e => setFormData({...formData, published: e.target.checked})} 
-                    style={{ width: "auto" }}
-                  />
-                  <span style={{ fontWeight: 400 }}>Published</span>
+              <div className="flex items-center space-x-2 pt-2">
+                <Checkbox 
+                  id="published" 
+                  checked={formData.published} 
+                  onCheckedChange={(checked) => setFormData({...formData, published: checked === true})} 
+                />
+                <label 
+                  htmlFor="published" 
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Published
                 </label>
               </div>
             </div>
-          </div>
-        )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

@@ -9,7 +9,6 @@ import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough, 
   Heading1, Heading2, List, ListOrdered, Link as LinkIcon, ImageIcon 
 } from 'lucide-react';
-import styles from "../../admin.module.css";
 import { useCallback } from 'react';
 
 type SimpleEditorProps = {
@@ -27,7 +26,7 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: styles.editorLink || 'editor-link',
+          class: 'text-blue-500 hover:text-blue-700 underline underline-offset-2',
         },
       }),
       Image.configure({
@@ -40,7 +39,7 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
     },
     editorProps: {
       attributes: {
-        class: styles.editorContentBox || 'editor-content',
+        class: 'min-h-[500px] p-6 focus:outline-none prose prose-slate dark:prose-invert max-w-none',
         style: 'outline: none;'
       },
     },
@@ -76,29 +75,21 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
       onClick={(e) => { e.preventDefault(); onClick(); }}
       disabled={disabled}
       title={title}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '0.4rem',
-        borderRadius: '8px',
-        border: 'none',
-        background: isActive ? 'var(--color-orange)' : 'transparent',
-        color: isActive ? 'white' : 'inherit',
-        opacity: disabled ? 0.5 : (isActive ? 1 : 0.7),
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        transition: 'all 0.2s'
-      }}
+      className={`
+        flex items-center justify-center p-1.5 rounded-md border-none transition-colors
+        ${isActive ? 'bg-orange text-white' : 'bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}
+        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+      `}
     >
       {children}
     </button>
   );
 
   return (
-    <div className={styles.editorBox}>
+    <div className="flex flex-col border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
       {/* Toolbar */}
-      <div className={styles.editorToolbar}>
-        <div style={{ display: 'flex', gap: '0.25rem', paddingRight: '1rem', borderRight: '1px solid rgba(100,116,139,0.2)' }}>
+      <div className="flex flex-wrap items-center gap-2 p-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+        <div className="flex gap-1 pr-4 border-r border-slate-200 dark:border-slate-700">
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             isActive={editor.isActive('bold')}
@@ -129,7 +120,7 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
           </ToolbarButton>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.25rem', padding: '0 1rem', borderRight: '1px solid rgba(100,116,139,0.2)' }}>
+        <div className="flex gap-1 px-4 border-r border-slate-200 dark:border-slate-700">
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
             isActive={editor.isActive('heading', { level: 1 })}
@@ -146,7 +137,7 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
           </ToolbarButton>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.25rem', padding: '0 1rem', borderRight: '1px solid rgba(100,116,139,0.2)' }}>
+        <div className="flex gap-1 px-4 border-r border-slate-200 dark:border-slate-700">
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             isActive={editor.isActive('bulletList')}
@@ -163,7 +154,7 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
           </ToolbarButton>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.25rem', paddingLeft: '1rem' }}>
+        <div className="flex gap-1 pl-4">
           <ToolbarButton
             onClick={setLink}
             isActive={editor.isActive('link')}
@@ -181,7 +172,7 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
       </div>
 
       {/* Editor Content Area */}
-      <div>
+      <div className="flex-1 overflow-y-auto">
         <EditorContent editor={editor} />
       </div>
     </div>

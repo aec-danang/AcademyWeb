@@ -3,8 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deletePost, batchDeletePosts, batchUpdatePosts } from "./actions";
-import styles from "../admin.module.css";
-import { Plus, Edit2, Trash2, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 type Post = {
   title: string;
@@ -113,196 +119,160 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
   };
 
   return (
-    <div>
-      <div className={styles.flexBetween} style={{ alignItems: "center", marginBottom: "1.5rem" }}>
-        <h2 style={{ margin: 0 }}>Manage Posts</h2>
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "0.5rem 0.75rem" }}>
-            <input 
-              type="checkbox" 
-              checked={isAllSelected}
-              onChange={handleSelectAllToggle}
-              style={{ cursor: "pointer", width: "18px", height: "18px", accentColor: "var(--color-orange)" }}
-              title="Select All (Current Page)"
-            />
-          </div>
-
-          <div className={styles.formGroup} style={{ marginBottom: 0, position: "relative" }}>
-            <Search size={18} style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
-            <input 
-              type="text" 
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 className="text-3xl font-bold tracking-tight text-navy dark:text-white">Manage Posts</h2>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input 
               placeholder="Search posts..." 
               value={searchQuery}
               onChange={handleSearchChange}
-              style={{ paddingLeft: "2.75rem", width: "250px" }}
+              className="pl-9 w-[250px] bg-white dark:bg-slate-900"
             />
           </div>
-          <button 
-            className="btn-primary" 
-            style={{ display: "flex", gap: "0.5rem", alignItems: "center", whiteSpace: "nowrap" }}
-            onClick={() => router.push("/management/posts/new")}
-          >
-            <Plus size={18} />
+          <Button className="bg-orange hover:bg-orange-hover text-white" onClick={() => router.push("/management/posts/new")}>
+            <Plus className="mr-2 h-4 w-4" />
             Create Post
-          </button>
+          </Button>
         </div>
       </div>
 
-      {/* Batch Actions Toolbar */}
       {selectedSlugs.length > 0 && (
-        <div className={styles.cardPanel} style={{ padding: "0.75rem 1rem", marginBottom: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontSize: "0.9rem", fontWeight: 600 }}>
+        <div className="flex items-center justify-between p-3 px-4 bg-orange/10 border border-orange/20 rounded-md">
+          <div className="text-sm font-medium text-orange">
             {selectedSlugs.length} item{selectedSlugs.length !== 1 ? 's' : ''} selected
           </div>
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <button className="btn-secondary" onClick={handleBatchDelete} style={{ color: "#ef4444", borderColor: "#fca5a5", fontSize: "0.85rem", padding: "0.4rem 0.75rem" }}>Delete</button>
-            <button className="btn-secondary" onClick={() => handleBatchStatus(true)} style={{ fontSize: "0.85rem", padding: "0.4rem 0.75rem" }}>Publish</button>
-            <button className="btn-secondary" onClick={() => handleBatchStatus(false)} style={{ fontSize: "0.85rem", padding: "0.4rem 0.75rem" }}>Unpublish</button>
-            <select 
-              className="btn-secondary" 
-              style={{ fontSize: "0.85rem", padding: "0.4rem 0.75rem", outline: "none", cursor: "pointer" }}
-              onChange={(e) => {
-                if (e.target.value) handleBatchType(e.target.value);
-                e.target.value = "";
-              }}
-              defaultValue=""
-            >
-              <option value="" disabled>Change Type...</option>
-              <option value="post">Post</option>
-              <option value="news">News</option>
-              <option value="event">Event</option>
-              <option value="article">Article</option>
-              <option value="page">Page</option>
-            </select>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleBatchDelete} className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive">
+              Delete
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => handleBatchStatus(true)}>
+              Publish
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => handleBatchStatus(false)}>
+              Unpublish
+            </Button>
+            <Select onValueChange={handleBatchType}>
+              <SelectTrigger className="w-[140px] h-9">
+                <SelectValue placeholder="Change Type..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="post">Post</SelectItem>
+                <SelectItem value="news">News</SelectItem>
+                <SelectItem value="event">Event</SelectItem>
+                <SelectItem value="article">Article</SelectItem>
+                <SelectItem value="page">Page</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       )}
 
-      {/* List Layout */}
-      <div className={styles.listContainer}>
-        {paginatedPosts.length === 0 ? (
-          <div className={styles.listItem} style={{ justifyContent: "center", padding: "3rem" }}>
-            <span style={{ color: "#64748b" }}>No posts found.</span>
-          </div>
-        ) : (
-          paginatedPosts.map((item) => (
-            <div 
-              key={item.slug} 
-              className={styles.listItem} 
-              style={{ 
-                gap: "1.5rem", 
-                paddingLeft: "1.5rem",
-              }}
-            >
-              <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
-                <input 
-                  type="checkbox" 
-                  checked={selectedSlugs.includes(item.slug)}
-                  onChange={() => toggleSelection(item.slug)}
-                  style={{ cursor: "pointer", width: "18px", height: "18px", accentColor: "var(--color-orange)" }}
+      <div className="rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+        <Table>
+          <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
+            <TableRow>
+              <TableHead className="w-[40px] text-center">
+                <Checkbox 
+                  checked={isAllSelected && paginatedPosts.length > 0} 
+                  onCheckedChange={handleSelectAllToggle} 
+                  aria-label="Select all on page"
                 />
-              </div>
-              
-              <div style={{ flex: "1 1 auto", minWidth: 0, display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                <div className={styles.listColName} style={{ padding: 0, flex: "0 0 auto", whiteSpace: "normal" }}>
-                  {item.title}
-                </div>
-                <div className={styles.listColUrl} style={{ padding: 0, flex: "0 0 auto", whiteSpace: "normal" }}>
-                  {item.slug}
-                </div>
-              </div>
-              
-              <div className={styles.listColUrl} style={{ width: "100px", flexShrink: 0, textAlign: "center", flex: "0 0 auto", whiteSpace: "normal", textTransform: "capitalize", fontWeight: 500 }}>
-                {item.type}
-              </div>
-              
-              <div className={styles.listColUrl} style={{ width: "110px", flexShrink: 0, textAlign: "center", fontSize: "0.85rem", flex: "0 0 auto", whiteSpace: "normal" }}>
-                {formatDate(item.createdAt)}
-              </div>
-              
-              <div style={{ width: "100px", flexShrink: 0, textAlign: "center" }}>
-                <span className={`${styles.badge} ${item.published ? styles.badgeSuccess : styles.badgeWarning}`}>
-                  {item.published ? "Published" : "Draft"}
-                </span>
-              </div>
-              
-              <div className={styles.actionButtons} style={{ width: "80px", justifyContent: "flex-end", flexShrink: 0 }}>
-                <button className={styles.btnEdit} title="Edit" onClick={() => router.push(`/management/posts/${item.slug}/edit`)}>
-                  <Edit2 size={16} />
-                </button>
-                <button className={styles.btnDelete} title="Delete" onClick={() => handleDelete(item.slug)}>
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </div>
-          ))
-        )}
+              </TableHead>
+              <TableHead>Title & Slug</TableHead>
+              <TableHead className="w-[120px] text-center">Type</TableHead>
+              <TableHead className="w-[120px] text-center">Date</TableHead>
+              <TableHead className="w-[100px] text-center">Status</TableHead>
+              <TableHead className="w-[100px] text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginatedPosts.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                  No posts found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              paginatedPosts.map((item) => (
+                <TableRow key={item.slug}>
+                  <TableCell className="text-center">
+                    <Checkbox 
+                      checked={selectedSlugs.includes(item.slug)} 
+                      onCheckedChange={() => toggleSelection(item.slug)} 
+                      aria-label={`Select ${item.title}`}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col gap-1">
+                      <span className="font-medium text-navy dark:text-slate-200">{item.title}</span>
+                      <span className="text-xs text-muted-foreground">{item.slug}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center capitalize font-medium text-sm">
+                    {item.type}
+                  </TableCell>
+                  <TableCell className="text-center text-sm text-muted-foreground">
+                    {formatDate(item.createdAt)}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="outline" className={item.published ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-800" : "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-400 dark:border-amber-800"}>
+                      {item.published ? "Published" : "Draft"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => router.push(`/management/posts/${item.slug}/edit`)}>
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleDelete(item.slug)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
 
-      {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "2rem", padding: "1rem 0" }}>
-          <div style={{ color: "#64748b", fontSize: "0.9rem" }}>
+        <div className="flex items-center justify-between pt-4">
+          <div className="text-sm text-muted-foreground">
             Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filteredPosts.length)} of {filteredPosts.length} entries
           </div>
-          
-          <div style={{ display: "flex", gap: "0.25rem", alignItems: "center" }}>
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              style={{ 
-                padding: "0.5rem", 
-                background: "transparent", 
-                border: "none", 
-                color: currentPage === 1 ? "#cbd5e1" : "#475569",
-                cursor: currentPage === 1 ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center"
-              }}
-            >
-              <ChevronLeft size={20} />
-            </button>
-            
-            {getPageNumbers().map(num => (
-              <button
-                key={num}
-                onClick={() => setCurrentPage(num)}
-                style={{
-                  width: "36px",
-                  height: "36px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: "50%",
-                  border: "none",
-                  background: currentPage === num ? "var(--color-orange)" : "transparent",
-                  color: currentPage === num ? "white" : "#475569",
-                  fontWeight: currentPage === num ? 600 : 400,
-                  cursor: "pointer",
-                  transition: "all 0.2s"
-                }}
-              >
-                {num}
-              </button>
-            ))}
-            
-            <button 
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              style={{ 
-                padding: "0.5rem", 
-                background: "transparent", 
-                border: "none", 
-                color: currentPage === totalPages ? "#cbd5e1" : "#475569",
-                cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center"
-              }}
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
+          <Pagination className="w-auto mx-0">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+              
+              {getPageNumbers().map(num => (
+                <PaginationItem key={num}>
+                  <PaginationLink 
+                    isActive={currentPage === num}
+                    onClick={() => setCurrentPage(num)}
+                    className="cursor-pointer"
+                  >
+                    {num}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       )}
     </div>
