@@ -1,13 +1,17 @@
 import Link from "next/link";
 import {
   BookOpen,
+  CheckCircle2,
   ClipboardList,
   Clock,
+  FileText,
+  Headphones,
   Layers3,
   PlayCircle,
   RotateCcw,
   Search,
   SlidersHorizontal,
+  Timer,
   Trophy,
 } from "lucide-react";
 import styles from "../elearning.module.css";
@@ -20,7 +24,7 @@ type Props = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-type QuizStatus = "not_started" | "in_progress" | "completed";
+type TestStatus = "not_started" | "in_progress" | "completed";
 
 const programOrder = ["IEPREP", "PREIE", "IE4.0", "IE5.0", "IE5.5", "IE6.0", "IE6.5", "IE7.0"];
 
@@ -49,13 +53,13 @@ function programRank(code: string | null) {
   return rank === -1 ? Number.MAX_SAFE_INTEGER : rank;
 }
 
-function statusLabel(status: QuizStatus) {
+function statusLabel(status: TestStatus) {
   if (status === "completed") return "Completed";
   if (status === "in_progress") return "In progress";
   return "Not started";
 }
 
-function statusClassName(status: QuizStatus) {
+function statusClassName(status: TestStatus) {
   if (status === "completed") return styles.quizStatusCompleted;
   if (status === "in_progress") return styles.quizStatusProgress;
   return styles.quizStatusNew;
@@ -66,35 +70,50 @@ function scoreLabel(score: number | null) {
   return score.toFixed(score % 1 === 0 ? 0 : 1);
 }
 
-export default async function ExercisesHubPage({ searchParams }: Props) {
+function availabilityLabel(openAt: Date | null, closeAt: Date | null, now: Date) {
+  if (openAt && openAt > now) return "Not open yet";
+  if (closeAt && closeAt < now) return "Closed";
+  return "Open now";
+}
+
+function isAvailable(openAt: Date | null, closeAt: Date | null, now: Date) {
+  return (!openAt || openAt <= now) && (!closeAt || closeAt >= now);
+}
+
+function skillIcon(skill: string) {
+  if (skill === "LISTENING") return <Headphones size={22} />;
+  if (skill === "READING" || skill === "WRITING") return <FileText size={22} />;
+  return <ClipboardList size={22} />;
+}
+
+export default async function PracticeTestsPage({ searchParams }: Props) {
   const user = await requireUser();
   const resolvedSearchParams = await searchParams;
   const selectedProgram = searchValue(resolvedSearchParams?.program);
   const selectedCourse = searchValue(resolvedSearchParams?.course);
   const selectedUnit = searchValue(resolvedSearchParams?.unit);
-  const selectedStatus = searchValue(resolvedSearchParams?.status) as QuizStatus | "";
+  const selectedStatus = searchValue(resolvedSearchParams?.status) as TestStatus | "";
   const selectedSort = searchValue(resolvedSearchParams?.sort) || "newest";
   const searchTerm = searchValue(resolvedSearchParams?.q);
   const normalizedSearch = searchTerm.trim().toLowerCase();
+  const now = new Date();
 
-  const quizzes = await prisma.quiz.findMany({
+  const tests = await prisma.quiz.findMany({
     where: user.role === "STUDENT"
       ? {
-          isPracticeTest: false,
+          isPracticeTest: true,
           published: true,
-          OR: [
-            { isOpenQuiz: true },
-            { classSection: { enrollments: { some: { userId: user.id, status: "ACTIVE" } } } },
-          ],
+          classSection: { enrollments: { some: { userId: user.id, status: "ACTIVE" } } },
         }
       : user.role === "TEACHER"
-        ? { isPracticeTest: false, OR: [{ isOpenQuiz: true }, { classSection: { teacherId: user.id } }] }
-        : { isPracticeTest: false },
+        ? { isPracticeTest: true, classSection: { teacherId: user.id } }
+        : { isPracticeTest: true },
     orderBy: { createdAt: "desc" },
     include: {
       program: true,
       classSection: { include: { course: true } },
       questions: true,
+      sections: true,
       attempts: {
         where: user.role === "STUDENT" ? { studentId: user.id } : {},
         orderBy: { startedAt: "desc" },
@@ -103,49 +122,58 @@ export default async function ExercisesHubPage({ searchParams }: Props) {
     },
   });
 
-  const cards = quizzes.map((quiz) => {
-    const inProgressAttempt = quiz.attempts.find((attempt) => attempt.status === "IN_PROGRESS") || null;
-    const completedAttempts = quiz.attempts.filter((attempt) => attempt.status !== "IN_PROGRESS");
+  const cards = tests.map((test) => {
+    const inProgressAttempt = test.attempts.find((attempt) => attempt.status === "IN_PROGRESS") || null;
+    const completedAttempts = test.attempts.filter((attempt) => attempt.status !== "IN_PROGRESS");
     const bestScore = completedAttempts.reduce<number | null>((best, attempt) => {
       if (attempt.score === null) return best;
       return best === null ? attempt.score : Math.max(best, attempt.score);
     }, null);
-    const lastAttempt = quiz.attempts[0] || null;
-    const status: QuizStatus = inProgressAttempt ? "in_progress" : completedAttempts.length > 0 ? "completed" : "not_started";
+    const lastAttempt = test.attempts[0] || null;
+    const status: TestStatus = inProgressAttempt ? "in_progress" : completedAttempts.length > 0 ? "completed" : "not_started";
     const progress = status === "completed"
       ? 100
-      : inProgressAttempt && quiz.questions.length > 0
-        ? Math.min(100, Math.round((inProgressAttempt.answers.length / quiz.questions.length) * 100))
+      : inProgressAttempt && test.questions.length > 0
+        ? Math.min(100, Math.round((inProgressAttempt.answers.length / test.questions.length) * 100))
         : 0;
+    const available = isAvailable(test.openAt, test.closeAt, now);
+    const limitReached = user.role === "STUDENT" && test.attempts.length >= test.attemptLimit && !inProgressAttempt;
 
     return {
-      id: quiz.id,
-      title: quiz.title,
-      description: quiz.description,
-      unit: quiz.unit || "",
-      programCode: quiz.program?.code || "General",
-      programName: quiz.program?.name || "General",
-      courseId: quiz.classSection.course.id,
-      courseTitle: quiz.classSection.course.title,
-      classCode: quiz.classSection.code,
-      questionCount: quiz.questions.length,
-      timeLimit: quiz.timeLimit,
-      attemptCount: quiz.attempts.length,
-      attemptLimit: quiz.attemptLimit,
+      id: test.id,
+      title: test.title,
+      description: test.description,
+      unit: test.unit || "",
+      programCode: test.program?.code || "General",
+      programName: test.program?.name || "General",
+      courseId: test.classSection.course.id,
+      courseTitle: test.classSection.course.title,
+      classCode: test.classSection.code,
+      questionCount: test.questions.length,
+      sectionCount: test.sections.length || 1,
+      timeLimit: test.timeLimit,
+      attemptCount: test.attempts.length,
+      attemptLimit: test.attemptLimit,
       bestScore,
       lastAttemptAt: lastAttempt?.submittedAt || lastAttempt?.startedAt || null,
       status,
       progress,
-      isOpenQuiz: quiz.isOpenQuiz,
-      createdAt: quiz.createdAt,
+      examType: test.examType,
+      skill: test.skill,
+      availability: availabilityLabel(test.openAt, test.closeAt, now),
+      available,
+      limitReached,
+      createdAt: test.createdAt,
       searchText: [
-        quiz.title,
-        quiz.description,
-        quiz.program?.code,
-        quiz.program?.name,
-        quiz.unit,
-        quiz.classSection.code,
-        quiz.classSection.course.title,
+        test.title,
+        test.description,
+        test.program?.code,
+        test.program?.name,
+        test.unit,
+        test.examType,
+        test.skill,
+        test.classSection.code,
+        test.classSection.course.title,
       ].filter(Boolean).join(" ").toLowerCase(),
     };
   });
@@ -179,7 +207,7 @@ export default async function ExercisesHubPage({ searchParams }: Props) {
       return (b.bestScore ?? -1) - (a.bestScore ?? -1) || b.createdAt.getTime() - a.createdAt.getTime();
     }
     if (selectedSort === "not_started") {
-      const rank: Record<QuizStatus, number> = { not_started: 0, in_progress: 1, completed: 2 };
+      const rank: Record<TestStatus, number> = { not_started: 0, in_progress: 1, completed: 2 };
       return rank[a.status] - rank[b.status] || b.createdAt.getTime() - a.createdAt.getTime();
     }
     if (selectedSort === "program_unit") {
@@ -196,28 +224,29 @@ export default async function ExercisesHubPage({ searchParams }: Props) {
   const averageBestScore = bestScores.length
     ? bestScores.reduce((sum, score) => sum + score, 0) / bestScores.length
     : null;
+
   return (
     <div className={styles.quizPageShell}>
       <section className={styles.quizHero}>
         <div>
-          <span className={styles.cockpitEyebrow}><ClipboardList size={16} /> Student quizzes</span>
-          <h1>Quizzes built from real classroom data.</h1>
+          <span className={styles.cockpitEyebrow}><Timer size={16} /> Practice tests</span>
+          <h1>Practice Tests with progress and results.</h1>
           <p>
-            Filter by program, course, unit, and completion status. Your best score and latest attempt are pulled from PostgreSQL attempts.
+            TOEIC, IELTS, grammar, reading, and listening tests are shown only when assigned to your active class.
           </p>
         </div>
         <div className={styles.quizHeroStats}>
-          <div><strong>{cards.length}</strong><span>Total quizzes</span></div>
+          <div><strong>{cards.length}</strong><span>Total tests</span></div>
           <div><strong>{completedCount}</strong><span>Completed</span></div>
           <div><strong>{averageBestScore === null ? "-" : averageBestScore.toFixed(1)}</strong><span>Avg best score</span></div>
         </div>
       </section>
 
-      <form className={styles.quizFilterPanel} action="/elearning/exercises">
+      <form className={styles.quizFilterPanel} action="/elearning/tests">
         <div className={styles.quizFilterHeader}>
           <div>
             <span className={styles.cockpitEyebrow}><SlidersHorizontal size={16} /> Filter library</span>
-            <h2>Find the right quiz</h2>
+            <h2>Find a practice test</h2>
           </div>
           <div className={styles.quizFilterSummary}>
             <span>{notStartedCount} not started</span>
@@ -231,7 +260,7 @@ export default async function ExercisesHubPage({ searchParams }: Props) {
             <span>Search</span>
             <div>
               <Search size={16} />
-              <input name="q" defaultValue={searchTerm} placeholder="Search quiz title, class, unit..." />
+              <input name="q" defaultValue={searchTerm} placeholder="Search title, exam type, class..." />
             </div>
           </label>
           <label>
@@ -283,67 +312,69 @@ export default async function ExercisesHubPage({ searchParams }: Props) {
 
         <div className={styles.quizFilterActions}>
           <button className="btn-primary" type="submit">Apply filters</button>
-          <Link href="/elearning/exercises" className="btn-secondary">Clear filters</Link>
+          <Link href="/elearning/tests" className="btn-secondary">Clear filters</Link>
         </div>
       </form>
 
       {cards.length === 0 ? (
         <section className={styles.quizEmptyState}>
           <BookOpen size={42} />
-          <h2>No quizzes available yet</h2>
-          <p>When your teacher publishes class quizzes, they will appear here automatically.</p>
+          <h2>No practice tests available yet</h2>
+          <p>Practice tests assigned to your active class will appear here automatically.</p>
         </section>
       ) : sortedCards.length === 0 ? (
         <section className={styles.quizEmptyState}>
           <Search size={42} />
           <h2>No results for this filter</h2>
-          <p>Try a wider search or clear the filters to see all available quizzes.</p>
-          <Link href="/elearning/exercises" className="btn-primary">Clear filters</Link>
+          <p>Try a wider search or clear the filters to see every assigned practice test.</p>
+          <Link href="/elearning/tests" className="btn-primary">Clear filters</Link>
         </section>
       ) : (
-        <section className={styles.quizCardGrid} aria-label="Quiz list">
-          {sortedCards.map((quiz) => (
-            <Link href={`/elearning/exercises/${quiz.id}`} key={quiz.id} className={styles.quizCard}>
+        <section className={styles.quizCardGrid} aria-label="Practice test list">
+          {sortedCards.map((test) => (
+            <Link href={`/elearning/tests/${test.id}`} key={test.id} className={styles.quizCard}>
               <div className={styles.quizCardTop}>
-                <div className={styles.quizTypeIcon}><ClipboardList size={22} /></div>
-                <span className={`${styles.quizStatusBadge} ${statusClassName(quiz.status)}`}>
-                  {statusLabel(quiz.status)}
+                <div className={styles.quizTypeIcon}>{skillIcon(test.skill)}</div>
+                <span className={`${styles.quizStatusBadge} ${statusClassName(test.status)}`}>
+                  {statusLabel(test.status)}
                 </span>
               </div>
 
               <div className={styles.quizBadgeRow}>
-                <span>{quiz.programCode}</span>
-                <span>{quiz.unit ? `Unit ${quiz.unit}` : "No unit"}</span>
-                <span>{quiz.isOpenQuiz ? "Open quiz" : quiz.classCode}</span>
+                <span>{test.examType}</span>
+                <span>{test.skill}</span>
+                <span>{test.availability}</span>
               </div>
 
-              <h2>{quiz.title}</h2>
+              <h2>{test.title}</h2>
               <p className={styles.quizCardDescription}>
-                {quiz.description || `${quiz.courseTitle} - ${quiz.classCode}`}
+                {test.description || `${test.courseTitle} - ${test.classCode}`}
               </p>
 
               <div className={styles.quizMetaGrid}>
-                <div><Layers3 size={16} /><span>{quiz.questionCount} questions</span></div>
-                <div><Clock size={16} /><span>{quiz.timeLimit ? `${quiz.timeLimit} min` : "No time limit"}</span></div>
-                <div><Trophy size={16} /><span>Best {scoreLabel(quiz.bestScore)}</span></div>
-                <div><RotateCcw size={16} /><span>{quiz.attemptCount}/{quiz.attemptLimit} attempts</span></div>
+                <div><Layers3 size={16} /><span>{test.questionCount} questions</span></div>
+                <div><FileText size={16} /><span>{test.sectionCount} sections</span></div>
+                <div><Clock size={16} /><span>{test.timeLimit ? `${test.timeLimit} min` : "No time limit"}</span></div>
+                <div><Trophy size={16} /><span>Best {scoreLabel(test.bestScore)}</span></div>
+                <div><RotateCcw size={16} /><span>{test.attemptCount}/{test.attemptLimit} attempts</span></div>
+                <div><BookOpen size={16} /><span>{test.programCode} {test.unit ? `- Unit ${test.unit}` : ""}</span></div>
               </div>
 
               <div className={styles.quizProgressBlock}>
                 <div>
                   <span>Progress</span>
-                  <strong>{quiz.progress}%</strong>
+                  <strong>{test.progress}%</strong>
                 </div>
                 <div className={styles.quizProgressTrack}>
-                  <div style={{ width: `${quiz.progress}%` }} />
+                  <div style={{ width: `${test.progress}%` }} />
                 </div>
               </div>
 
               <div className={styles.quizCardFooter}>
-                <span>{quiz.lastAttemptAt ? `Last attempt ${dateFormatter.format(quiz.lastAttemptAt)}` : "No attempts yet"}</span>
+                <span>{test.lastAttemptAt ? `Last attempt ${dateFormatter.format(test.lastAttemptAt)}` : `${test.classCode} - ${test.courseTitle}`}</span>
                 <strong>
-                  {quiz.status === "in_progress" ? "Resume" : quiz.status === "completed" ? "Review / Retake" : "Start quiz"}
-                  <PlayCircle size={16} />
+                  {test.status === "in_progress" ? "Continue" : test.limitReached ? "View result" : test.available ? "Start test" : "View details"}
+                  {test.status === "completed" ? <CheckCircle2 size={16} /> : <PlayCircle size={16} />}
                 </strong>
               </div>
             </Link>
