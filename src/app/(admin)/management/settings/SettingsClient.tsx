@@ -131,7 +131,7 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
         
         {/* Account Settings */}
         {user && (
-          <Card>
+          <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
             <CardHeader>
               <CardTitle>Account Information</CardTitle>
               <CardDescription>Manage your admin profile. Leave password blank to keep it unchanged.</CardDescription>
@@ -169,7 +169,7 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
         )}
 
         {/* Standard Settings */}
-        <Card>
+        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
           <CardHeader>
             <CardTitle>Standard Settings</CardTitle>
             <CardDescription>Core contact info and basic site details.</CardDescription>
@@ -202,7 +202,7 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
         </Card>
 
         {/* Landing Page Content */}
-        <Card>
+        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
           <CardHeader>
             <CardTitle>Landing Page Content</CardTitle>
             <CardDescription>Configure text and imagery for the public site's homepage.</CardDescription>
@@ -239,7 +239,7 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
         </Card>
 
         {/* Custom Variables */}
-        <Card>
+        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
           <CardHeader className="flex flex-row items-start justify-between space-y-0">
             <div>
               <CardTitle>Custom Settings</CardTitle>

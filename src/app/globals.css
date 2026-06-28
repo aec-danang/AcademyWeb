@@ -97,8 +97,6 @@ body {
 
 * {
   box-sizing: border-box;
-  padding: 0;
-  margin: 0;
 }
 
 a {
@@ -194,6 +192,8 @@ section {
 .dark {
   --background: hsl(240 10% 3.9%);
   --foreground: hsl(0 0% 98%);
+  --text-main: var(--foreground);
+  --text-muted: hsl(240 5% 64.9%);
   --card: hsl(240 10% 3.9%);
   --card-foreground: hsl(0 0% 98%);
   --popover: hsl(240 10% 3.9%);
