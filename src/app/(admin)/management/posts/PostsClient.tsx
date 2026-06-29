@@ -31,6 +31,7 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
   const router = useRouter();
   const [posts, setPosts] = useState([...initialPosts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 50;
@@ -43,10 +44,16 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
     setSelectedSlugs([]);
   };
 
-  const filteredPosts = posts.filter(p => 
-    p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    p.type.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredPosts = posts.filter(p => {
+    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          p.type.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    let matchesStatus = true;
+    if (statusFilter === "published") matchesStatus = p.published === true;
+    if (statusFilter === "draft") matchesStatus = p.published === false;
+
+    return matchesSearch && matchesStatus;
+  });
 
   const totalPages = Math.ceil(filteredPosts.length / ITEMS_PER_PAGE);
   const paginatedPosts = filteredPosts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
@@ -132,6 +139,16 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
               className="pl-9 w-[250px] bg-white dark:bg-slate-900"
             />
           </div>
+          <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val); setCurrentPage(1); setSelectedSlugs([]); }}>
+            <SelectTrigger className="w-[140px] bg-white dark:bg-slate-900">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+            </SelectContent>
+          </Select>
           <Button className="bg-orange hover:bg-orange-hover text-white" onClick={() => router.push("/management/posts/new")}>
             <Plus className="mr-2 h-4 w-4" />
             Create Post
@@ -162,8 +179,6 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
                 <SelectItem value="post">Post</SelectItem>
                 <SelectItem value="news">News</SelectItem>
                 <SelectItem value="event">Event</SelectItem>
-                <SelectItem value="article">Article</SelectItem>
-                <SelectItem value="page">Page</SelectItem>
               </SelectContent>
             </Select>
           </div>

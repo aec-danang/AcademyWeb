@@ -9,7 +9,10 @@ import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough, 
   Heading1, Heading2, List, ListOrdered, Link as LinkIcon, ImageIcon 
 } from 'lucide-react';
-import { useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type SimpleEditorProps = {
   content: string;
@@ -39,32 +42,50 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
     },
     editorProps: {
       attributes: {
-        class: 'min-h-[500px] p-6 focus:outline-none prose prose-slate dark:prose-invert max-w-none',
+        class: 'min-h-[500px] py-4 focus:outline-none prose prose-slate dark:prose-invert max-w-none prose-p:leading-relaxed prose-headings:font-bold prose-a:text-orange prose-a:no-underline hover:prose-a:underline text-slate-800 dark:text-slate-200',
         style: 'outline: none;'
       },
     },
   });
 
-  const setLink = useCallback(() => {
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
+
+  const openLinkDialog = useCallback(() => {
     if (!editor) return;
     const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL', previousUrl);
-
-    if (url === null) return;
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      return;
-    }
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    setLinkUrl(previousUrl || '');
+    setLinkDialogOpen(true);
   }, [editor]);
 
-  const addImage = useCallback(() => {
+  const confirmLink = () => {
     if (!editor) return;
-    const url = window.prompt('Image URL');
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+    if (linkUrl === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    } else {
+      editor.chain().focus().extendMarkRange('link').setLink({ href: linkUrl }).run();
     }
+    setLinkDialogOpen(false);
+    setLinkUrl('');
+  };
+
+  const openImageDialog = useCallback(() => {
+    if (!editor) return;
+    setImageUrl('');
+    setImageDialogOpen(true);
   }, [editor]);
+
+  const confirmImage = () => {
+    if (!editor) return;
+    if (imageUrl) {
+      editor.chain().focus().setImage({ src: imageUrl }).run();
+    }
+    setImageDialogOpen(false);
+    setImageUrl('');
+  };
 
   if (!editor) {
     return null;
@@ -86,9 +107,9 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
   );
 
   return (
-    <div className="flex flex-col border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
+    <div className="flex flex-col w-full group">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 p-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+      <div className="sticky top-20 z-10 flex flex-wrap items-center gap-2 p-1.5 mb-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm transition-opacity duration-200 opacity-60 group-focus-within:opacity-100 hover:opacity-100">
         <div className="flex gap-1 pr-4 border-r border-slate-200 dark:border-slate-700">
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -156,14 +177,14 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
 
         <div className="flex gap-1 pl-4">
           <ToolbarButton
-            onClick={setLink}
+            onClick={openLinkDialog}
             isActive={editor.isActive('link')}
             title="Link"
           >
             <LinkIcon size={18} />
           </ToolbarButton>
           <ToolbarButton
-            onClick={addImage}
+            onClick={openImageDialog}
             title="Image"
           >
             <ImageIcon size={18} />
@@ -175,6 +196,60 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
       <div className="flex-1 overflow-y-auto">
         <EditorContent editor={editor} />
       </div>
+
+      {/* Link Dialog */}
+      <Dialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Insert Link</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">URL</label>
+              <Input
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                placeholder="https://example.com"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') confirmLink();
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLinkDialogOpen(false)}>Cancel</Button>
+            <Button onClick={confirmLink}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Dialog */}
+      <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Insert Image</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Image URL</label>
+              <Input
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="https://example.com/image.jpg"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') confirmImage();
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setImageDialogOpen(false)}>Cancel</Button>
+            <Button onClick={confirmImage}>Insert</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
