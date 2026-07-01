@@ -84,7 +84,7 @@ export function AppSidebar() {
                       asChild 
                       isActive={isActive} 
                       tooltip={item.name}
-                      className={`h-11 rounded-xl transition-all duration-200 ${
+                      className={`h-11 rounded-xl transition-all duration-200 cursor-pointer ${
                         isActive 
                           ? "bg-orange/10 dark:bg-orange/20 text-orange dark:text-orange-400 font-semibold shadow-sm border border-orange/20" 
                           : "hover:bg-slate-200/50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white text-slate-600 dark:text-slate-400"
@@ -106,13 +106,13 @@ export function AppSidebar() {
       <SidebarFooter className="bg-slate-50 dark:bg-slate-950 p-4 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-4">
         {/* 3. Buttons */}
         <div className="flex items-center justify-around pb-4 border-b border-slate-200 dark:border-slate-800">
-          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy dark:text-slate-400 dark:hover:text-white rounded-full">
+          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy dark:text-slate-400 dark:hover:text-white rounded-full cursor-pointer">
             <Search className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy dark:text-slate-400 dark:hover:text-white rounded-full">
+          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy dark:text-slate-400 dark:hover:text-white rounded-full cursor-pointer">
             <Bell className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-slate-500 hover:text-navy dark:text-slate-400 dark:hover:text-white rounded-full">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-slate-500 hover:text-navy dark:text-slate-400 dark:hover:text-white rounded-full cursor-pointer">
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
         </div>
@@ -139,7 +139,7 @@ export function AppSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={() => signOut({ callbackUrl: "/login" })}
-                className="h-10 mt-1 rounded-lg text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/50 transition-all duration-200 font-medium w-full justify-start px-3"
+                className="h-10 mt-1 rounded-lg text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/50 transition-all duration-200 font-medium w-full justify-start px-3 cursor-pointer"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 <span className="text-sm">Log out</span>

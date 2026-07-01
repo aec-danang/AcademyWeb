@@ -26,7 +26,7 @@ export default async function AdminDashboard() {
   ]);
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Overview</h2>
@@ -41,7 +41,7 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-10">
-        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50 overflow-hidden relative group transition-all hover:shadow-[0_8px_30px_rgb(246,141,46,0.12)]">
+        <Card className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden relative group transition-all hover:shadow-md hover:border-orange/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 pt-6 px-6">
             <CardTitle className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Accounts</CardTitle>
             <div className="p-3 bg-orange/10 dark:bg-orange/20 rounded-2xl text-orange dark:text-orange-400 group-hover:scale-110 transition-transform duration-300">
@@ -57,7 +57,7 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
         
-        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50 overflow-hidden relative group transition-all hover:shadow-[0_8px_30px_rgb(59,130,246,0.12)]">
+        <Card className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden relative group transition-all hover:shadow-md hover:border-blue-500/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 pt-6 px-6">
             <CardTitle className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Students</CardTitle>
             <div className="p-3 bg-blue-500/10 dark:bg-blue-500/20 rounded-2xl text-blue-500 dark:text-blue-400 group-hover:scale-110 transition-transform duration-300">
@@ -70,7 +70,7 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
         
-        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50 overflow-hidden relative group transition-all hover:shadow-[0_8px_30px_rgb(168,85,247,0.12)]">
+        <Card className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden relative group transition-all hover:shadow-md hover:border-purple-500/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 pt-6 px-6">
             <CardTitle className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Teachers</CardTitle>
             <div className="p-3 bg-purple-500/10 dark:bg-purple-500/20 rounded-2xl text-purple-500 dark:text-purple-400 group-hover:scale-110 transition-transform duration-300">
@@ -83,7 +83,7 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
         
-        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50 overflow-hidden relative group transition-all hover:shadow-[0_8px_30px_rgb(16,185,129,0.12)]">
+        <Card className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden relative group transition-all hover:shadow-md hover:border-emerald-500/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 pt-6 px-6">
             <CardTitle className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Admin</CardTitle>
             <div className="p-3 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-2xl text-emerald-500 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-300">
@@ -97,32 +97,32 @@ export default async function AdminDashboard() {
         </Card>
       </div>
 
-      <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50 overflow-hidden">
-        <CardHeader className="border-b border-slate-100 dark:border-slate-800/60 pb-5 pt-6 px-8">
+      <Card className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden">
+        <CardHeader className="border-b border-slate-200 dark:border-slate-800 pb-5 pt-6 px-8 bg-slate-50/30 dark:bg-slate-900/20">
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-xl font-bold text-slate-900 dark:text-white">Recent Registrations</CardTitle>
               <CardDescription className="mt-1.5 text-slate-500 dark:text-slate-400 font-medium">The latest users to join the platform.</CardDescription>
             </div>
-            <Button variant="outline" size="sm" asChild className="rounded-xl shadow-sm h-10 px-5 font-semibold border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+            <Button variant="outline" size="sm" asChild className="rounded-xl shadow-sm h-10 px-5 font-semibold bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300">
               <Link href="/management/accounts">View All</Link>
             </Button>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
-            <TableHeader>
-              <TableRow className="border-b-slate-100 dark:border-b-slate-800/60 hover:bg-transparent">
-                <TableHead className="w-[250px] pl-8 py-4 font-semibold text-slate-500 dark:text-slate-400">Action</TableHead>
-                <TableHead className="font-semibold text-slate-500 dark:text-slate-400 py-4">User</TableHead>
-                <TableHead className="font-semibold text-slate-500 dark:text-slate-400 py-4">Contact</TableHead>
-                <TableHead className="font-semibold text-slate-500 dark:text-slate-400 py-4">Date</TableHead>
-                <TableHead className="text-right pr-8 font-semibold text-slate-500 dark:text-slate-400 py-4">Status</TableHead>
+            <TableHeader className="bg-slate-50/80 dark:bg-slate-800/40 backdrop-blur-sm">
+              <TableRow className="border-b border-slate-200 dark:border-slate-800 hover:bg-transparent">
+                <TableHead className="w-[250px] pl-8 py-4 text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase">Action</TableHead>
+                <TableHead className="text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">User</TableHead>
+                <TableHead className="text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Contact</TableHead>
+                <TableHead className="text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Date</TableHead>
+                <TableHead className="text-right pr-8 text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {recentUsers.map((user) => (
-                <TableRow key={user.id} className="border-b-slate-50 dark:border-b-slate-800/40 hover:bg-slate-50/80 dark:hover:bg-slate-800/30 transition-colors group cursor-pointer">
+                <TableRow key={user.id} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group cursor-pointer">
                   <TableCell className="font-medium flex items-center gap-4 pl-8 py-5">
                     <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 group-hover:bg-orange/10 group-hover:text-orange dark:group-hover:text-orange-400 transition-colors shadow-sm">
                       <Activity className="h-4 w-4" />

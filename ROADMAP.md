@@ -29,7 +29,7 @@ Each phase is formatted as an **AI Agent Prompt** so that it can be directly cop
 > 1. Replace the static 'coming soon' placeholders with a dynamic feed of posts (filtered by type: 'news' or 'post').
 > 2. Implement a fully functional blog listing page and individual post pages (`[slug]`).
 > 3. **CRITICAL:** You must strictly use the existing AEC design system, fonts, and colors. Do not invent new styles or layouts; adapt the dynamic data to fit flawlessly into the current public page design patterns. Do not touch any `(elearning)` code."
-
+------------------
 ## Phase 4: Public Pages - About & Additional Content
 **Agent Prompt:**
 > "Your task is to connect the remaining public pages (like `/about`, `/programs`, etc. in `src/app/(public)`) to their respective Prisma models (e.g., `Sponsor`, `Testimonial`, `Faq`).

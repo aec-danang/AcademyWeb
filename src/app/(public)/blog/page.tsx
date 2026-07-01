@@ -4,14 +4,14 @@ import { prisma } from '@/lib/prisma';
 import Card from '@/lib/ui/Card';
 
 export const metadata: Metadata = {
-  title: 'News & Events | Academy',
-  description: 'Learn more about News & Events at Academy English Center.',
+  title: 'Blog | Academy',
+  description: 'Read the latest blog posts from Academy English Center.',
 };
 
-export default async function NewsPage() {
+export default async function BlogPage() {
   const posts = await prisma.post.findMany({
     where: {
-      type: 'news',
+      type: 'post',
       published: true,
     },
     orderBy: {
@@ -22,20 +22,19 @@ export default async function NewsPage() {
   return (
     <div className="min-h-screen p-8 max-w-5xl mx-auto">
       <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold mb-4">News & Events</h1>
-        <p className="text-lg text-gray-600">Stay updated with the latest happenings at Academy English Center.</p>
+        <h1 className="text-4xl font-bold mb-4">Our Blog</h1>
+        <p className="text-lg text-gray-600">Insights, tips, and stories from our English learning community.</p>
       </div>
 
       {posts.length === 0 ? (
-        <p className="text-center text-gray-500">No news articles available at the moment. Please check back later!</p>
+        <p className="text-center text-gray-500">No blog posts available at the moment. Please check back later!</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => (
-            <Link key={post.slug} href={`/news/${post.slug}`} className="block text-inherit no-underline hover:opacity-90 transition-opacity">
+            <Link key={post.slug} href={`/blog/${post.slug}`} className="block text-inherit no-underline hover:opacity-90 transition-opacity">
               <Card className="h-full flex flex-col p-6 hover:shadow-lg transition-shadow">
                 {post.featuredImage && (
                   <div className="mb-4 -mx-6 -mt-6">
-                    {/* Assuming featuredImage is a valid URL or path. If standard Next.js Image is required, we would need to know the domains. Using standard img tag for simplicity. */}
                     <img
                       src={post.featuredImage}
                       alt={post.title}

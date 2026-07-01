@@ -9,9 +9,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen overflow-hidden w-full bg-slate-50 dark:bg-slate-950">
+      <div className="flex min-h-screen w-full bg-slate-50 dark:bg-slate-950">
         <AppSidebar />
-        <SidebarInset className="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-transparent">
+        <SidebarInset className="flex-1 flex flex-col min-w-0 relative bg-transparent">
           <header className="flex h-16 items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 md:hidden backdrop-blur-sm z-10 sticky top-0">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="text-slate-500 hover:text-navy dark:text-slate-400 dark:hover:text-white transition-colors" />
@@ -21,7 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </header>
           
-          <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10">
+          <div className="flex-1 p-6 md:p-8 lg:p-10">
             <div className="max-w-7xl mx-auto pb-12">
               {children}
             </div>

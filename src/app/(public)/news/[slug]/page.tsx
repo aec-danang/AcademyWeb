@@ -14,19 +14,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     where: { slug: resolvedParams.slug },
   });
 
-  if (!post || post.type !== 'post' || !post.published) {
+  if (!post || post.type !== 'news' || !post.published) {
     return {
       title: 'Post Not Found | Academy',
     };
   }
 
   return {
-    title: post.metaTitle || `${post.title} | Academy Blog`,
+    title: post.metaTitle || `${post.title} | Academy News`,
     description: post.metaDescription || post.excerpt || `Read ${post.title} at Academy English Center.`,
   };
 }
 
-export default async function BlogPostPage({ params }: Props) {
+export default async function NewsPostPage({ params }: Props) {
   const resolvedParams = await params;
   const post = await prisma.post.findUnique({
     where: { slug: resolvedParams.slug },
@@ -35,16 +35,16 @@ export default async function BlogPostPage({ params }: Props) {
     },
   });
 
-  if (!post || post.type !== 'post' || !post.published) {
+  if (!post || post.type !== 'news' || !post.published) {
     notFound();
   }
 
   return (
     <div className="min-h-screen p-8 max-w-4xl mx-auto">
       <div className="mb-8">
-        <Link href="/blog" className="inline-flex items-center text-orange-600 hover:text-orange-700 transition-colors">
+        <Link href="/news" className="inline-flex items-center text-orange-600 hover:text-orange-700 transition-colors">
           <ArrowLeft size={20} className="mr-2" />
-          Back to Blog
+          Back to News
         </Link>
       </div>
 
