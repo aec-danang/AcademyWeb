@@ -74,7 +74,6 @@
 @custom-variant dark (&:is(.dark *));
 
 html {
-  height: 100%;
   scroll-behavior: smooth;
 }
 
@@ -85,11 +84,11 @@ body {
 }
 
 body {
-  min-height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  color: var(--text-main);
-  background: var(--color-white);
+  color: var(--foreground);
+  background: var(--background);
   font-family: var(--font-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
