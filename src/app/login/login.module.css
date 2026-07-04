@@ -1,10 +1,14 @@
 .container {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  flex: 1;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--color-navy-light) 0%, #e0e0f0 100%);
   padding: 24px;
+  overflow-y: auto;
 }
 
 .loginCard {

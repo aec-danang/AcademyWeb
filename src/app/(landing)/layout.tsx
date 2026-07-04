@@ -14,10 +14,10 @@ export default async function LandingLayout({
   });
 
   return (
-    <>
+    <div className="flex flex-col h-screen overflow-y-auto">
       <Navbar />
-      <main>{children}</main>
+      <main className="flex-1">{children}</main>
       <Footer sponsors={sponsors} />
-    </>
+    </div>
   );
 }
