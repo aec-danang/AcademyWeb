@@ -45,17 +45,20 @@ export default function Home() {
     });
 
     // 3. Quick Links Section
-    gsap.from(".btn-secondary", {
-      scrollTrigger: {
-        trigger: `.${styles.programs} + section`,
-        start: "top 85%"
-      },
-      y: 20,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.15,
-      ease: "power4.out"
-    });
+    gsap.fromTo("section:nth-of-type(3) .btn-secondary", 
+      { y: 20, opacity: 0 },
+      {
+        scrollTrigger: {
+          trigger: `section:nth-of-type(3)`,
+          start: "top 85%"
+        },
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: "power4.out"
+      }
+    );
 
     // 4. Why Choose AEC Section
     ScrollTrigger.batch(`.${styles.whyGrid} > div`, {
@@ -80,17 +83,20 @@ export default function Home() {
     });
 
     // 6. CTA Section
-    gsap.from(`.${styles.ctaSection} .container > *`, {
-      scrollTrigger: {
-        trigger: `.${styles.ctaSection}`,
-        start: "top 85%"
-      },
-      y: 40,
-      opacity: 0,
-      duration: 1,
-      stagger: 0.15,
-      ease: "power4.out"
-    });
+    gsap.fromTo(`.${styles.ctaSection} .container > *`, 
+      { y: 40, opacity: 0 },
+      {
+        scrollTrigger: {
+          trigger: `.${styles.ctaSection}`,
+          start: "top 85%"
+        },
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        stagger: 0.15,
+        ease: "power4.out"
+      }
+    );
 
   }, { scope: containerRef });
 
@@ -108,13 +114,20 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.heroImage}>
-            <div style={{ padding: "40px", textAlign: "center", color: "var(--color-orange-700)" }}>
-              [Hero Image Placeholder]<br/>Happy students learning
+            <div className={styles.imageWrapper}>
+              <Image 
+                src="/images/hero.png" 
+                alt="Happy students learning at Academy English Center" 
+                fill 
+                style={{ objectFit: "cover" }} 
+                priority
+              />
+              <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(44, 45, 101, 0.1)" }}></div>
             </div>
             <div className={styles.badge}>
               <Trophy color="var(--color-orange)" size={24} />
               <div>
-                <div style={{ fontSize: "14px", color: "var(--text-muted)", fontWeight: "normal" }}>Founded in</div>
+                <div style={{ fontSize: "14px", color: "#5f607a", fontWeight: "normal" }}>Founded in</div>
                 <div>2006</div>
               </div>
             </div>
@@ -134,56 +147,56 @@ export default function Home() {
               <Card className={styles.programCard}>
                 <div className={styles.programIcon}><Baby size={48} strokeWidth={1.5} /></div>
                 <h3>English for Kids</h3>
-                <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Interactive learning for young minds (6-11 years).</p>
+                <p style={{ marginTop: "12px", color: "#5f607a" }}>Interactive learning for young minds (6-11 years).</p>
               </Card>
             </Link>
             <Link href="/programs/teens" style={{ display: "block", textDecoration: "none" }}>
               <Card className={styles.programCard}>
                 <div className={styles.programIcon}><Baby size={48} strokeWidth={1.5} /></div>
                 <h3>English for Teens</h3>
-                <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Building foundation for success (11-15 years).</p>
+                <p style={{ marginTop: "12px", color: "#5f607a" }}>Building foundation for success (11-15 years).</p>
               </Card>
             </Link>
             <Link href="/programs/ielts" style={{ display: "block", textDecoration: "none" }}>
               <Card className={styles.programCard}>
                 <div className={styles.programIcon}><GraduationCap size={48} strokeWidth={1.5} /></div>
                 <h3>IELTS Prep</h3>
-                <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Achieve your target score.</p>
+                <p style={{ marginTop: "12px", color: "#5f607a" }}>Achieve your target score.</p>
               </Card>
             </Link>
             <Link href="/programs/testprep" style={{ display: "block", textDecoration: "none" }}>
               <Card className={styles.programCard}>
                 <div className={styles.programIcon}><GraduationCap size={48} strokeWidth={1.5} /></div>
                 <h3>Test Prep</h3>
-                <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>TOEFL iBT, TOEIC, SAT, CERF.</p>
+                <p style={{ marginTop: "12px", color: "#5f607a" }}>TOEFL iBT, TOEIC, SAT, CERF.</p>
               </Card>
             </Link>
             <Link href="/programs/communication" style={{ display: "block", textDecoration: "none" }}>
               <Card className={styles.programCard}>
                 <div className={styles.programIcon}><Briefcase size={48} strokeWidth={1.5} /></div>
                 <h3>Adults & Comm</h3>
-                <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Confidence in daily communication.</p>
+                <p style={{ marginTop: "12px", color: "#5f607a" }}>Confidence in daily communication.</p>
               </Card>
             </Link>
             <Link href="/programs/corporate" style={{ display: "block", textDecoration: "none" }}>
               <Card className={styles.programCard}>
                 <div className={styles.programIcon}><Building size={48} strokeWidth={1.5} /></div>
                 <h3>Corporate English</h3>
-                <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Empower your workforce.</p>
+                <p style={{ marginTop: "12px", color: "#5f607a" }}>Empower your workforce.</p>
               </Card>
             </Link>
             <Link href="/programs/public-speaking" style={{ display: "block", textDecoration: "none" }}>
               <Card className={styles.programCard}>
                 <div className={styles.programIcon}><Trophy size={48} strokeWidth={1.5} /></div>
                 <h3>Public Speaking</h3>
-                <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Master presentation & debate skills.</p>
+                <p style={{ marginTop: "12px", color: "#5f607a" }}>Master presentation & debate skills.</p>
               </Card>
             </Link>
             <Link href="/study-abroad" style={{ display: "block", textDecoration: "none" }}>
               <Card className={styles.programCard}>
                 <div className={styles.programIcon}><Briefcase size={48} strokeWidth={1.5} /></div>
                 <h3>Study Abroad & Summer Camp</h3>
-                <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Global experiences and consulting.</p>
+                <p style={{ marginTop: "12px", color: "#5f607a" }}>Global experiences and consulting.</p>
               </Card>
             </Link>
             <Link href="/addc" style={{ display: "block", textDecoration: "none" }}>
@@ -191,7 +204,7 @@ export default function Home() {
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "16px", height: "48px", alignItems: "center" }}>
                   <Image src="/logos/addc/addc-logo.png" alt="ADDC Logo" width={120} height={48} style={{ objectFit: 'contain' }} />
                 </div>
-                <p style={{ marginTop: "12px", color: "var(--text-muted)" }}>Speaking & debating for kids and teenagers.</p>
+                <p style={{ marginTop: "12px", color: "#5f607a" }}>Speaking & debating for kids and teenagers.</p>
               </Card>
             </Link>
           </div>
@@ -199,7 +212,7 @@ export default function Home() {
       </section>
 
       {/* Quick Links Section */}
-      <section style={{ padding: "40px 0", backgroundColor: "var(--color-neutral-100)" }}>
+      <section style={{ padding: "40px 0", backgroundColor: "#f0f0f8" }}>
         <div className="container" style={{ display: "flex", justifyContent: "center", gap: "24px", flexWrap: "wrap" }}>
           <Link href="/schedule" className="btn-secondary">View Opening Schedule</Link>
           <Link href="/news" className="btn-secondary">News & Events</Link>
