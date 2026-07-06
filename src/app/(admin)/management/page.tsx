@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default async function AdminDashboard() {
-  const [totalRevenue, newLeadsCount, totalEnrollments, activeStudents, recentOrders, recentLeads] = await Promise.all([
+  const [totalRevenue, newLeadsCount, totalEnrollments, activeStudents, recentOrders, recentLeads, publishedPostsCount, recentAccounts] = await Promise.all([
     prisma.order.aggregate({
       _sum: { totalAmount: true },
       where: { status: "completed" }
@@ -23,6 +23,11 @@ export default async function AdminDashboard() {
     prisma.lead.findMany({
       where: { status: "new" },
       take: 4,
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.post.count({ where: { published: true } }),
+    prisma.user.findMany({
+      take: 5,
       orderBy: { createdAt: "desc" },
     }),
   ]);
@@ -99,9 +104,9 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
-        {/* Left Column (2/3) - Recent Orders */}
-        <div className="lg:col-span-2">
-          <Card className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden h-full">
+        {/* Left Column (2/3) - Recent Orders & Recent Accounts */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden">
             <CardHeader className="border-b border-slate-200 dark:border-slate-800 pb-5 pt-6 px-8 bg-slate-50/30 dark:bg-slate-900/20">
               <div className="flex items-center justify-between">
                 <div>
@@ -172,6 +177,69 @@ export default async function AdminDashboard() {
               </Table>
             </CardContent>
           </Card>
+
+          <Card className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden">
+            <CardHeader className="border-b border-slate-200 dark:border-slate-800 pb-5 pt-6 px-8 bg-slate-50/30 dark:bg-slate-900/20">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl font-bold text-slate-900 dark:text-white">Recent Accounts</CardTitle>
+                  <CardDescription className="mt-1.5 text-slate-500 dark:text-slate-400 font-medium">The latest registered users and staff.</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" asChild className="rounded-xl shadow-sm h-10 px-5 font-semibold bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300">
+                  <Link href="/management/accounts">View All</Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader className="bg-slate-50/80 dark:bg-slate-800/40 backdrop-blur-sm">
+                  <TableRow className="border-b border-slate-200 dark:border-slate-800 hover:bg-transparent">
+                    <TableHead className="w-[250px] pl-8 py-4 text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase">User</TableHead>
+                    <TableHead className="text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Role</TableHead>
+                    <TableHead className="text-right pr-8 text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Joined</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentAccounts.map((account) => (
+                    <TableRow key={account.id} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group cursor-pointer">
+                      <TableCell className="font-semibold text-slate-900 dark:text-slate-200 pl-8 py-5">
+                        <div className="flex flex-col">
+                          <span>{account.name || account.username || "Unknown"}</span>
+                          {account.email && <span className="text-xs text-slate-500 font-normal">{account.email}</span>}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-5">
+                        <Badge variant="outline" className={`font-semibold rounded-full px-3 py-0.5 ${
+                          account.role === "ADMIN" ? "bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20" :
+                          account.role === "TEACHER" ? "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20" :
+                          "bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-300 dark:border-slate-500/20"
+                        }`}>
+                          {account.role}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right pr-8 py-5 text-slate-500 dark:text-slate-400 text-sm font-medium">
+                        {new Intl.DateTimeFormat("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        }).format(new Date(account.createdAt))}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {recentAccounts.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={3} className="h-32 text-center text-slate-500 dark:text-slate-400">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <Users className="h-8 w-8 text-slate-300 dark:text-slate-600" />
+                          <p>No accounts found.</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Right Column (1/3) - Pending Leads & Quick Actions */}
@@ -233,6 +301,19 @@ export default async function AdminDashboard() {
                 </Button>
               </CardFooter>
             )}
+          </Card>
+
+          <Card className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-5 px-6 bg-slate-50/30 dark:bg-slate-900/20 border-b border-slate-200 dark:border-slate-800">
+              <CardTitle className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Published Posts</CardTitle>
+              <div className="p-2 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-xl text-indigo-500 dark:text-indigo-400">
+                <FileText className="h-4 w-4" />
+              </div>
+            </CardHeader>
+            <CardContent className="px-6 py-4">
+              <div className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{publishedPostsCount}</div>
+              <p className="text-xs text-slate-500 mt-1 font-medium opacity-80">Active blog & news posts</p>
+            </CardContent>
           </Card>
 
           <Card className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden">
