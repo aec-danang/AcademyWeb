@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 
-export type AppRole = "ADMIN" | "TEACHER" | "STUDENT";
+export type AppRole = "ADMIN" | "TEACHER" | "STUDENT" | "USER";
 
 export async function getCurrentUser() {
   const session = await getServerSession(authOptions);
@@ -13,10 +13,10 @@ export async function getCurrentUser() {
     // --- MOCK FOR E-LEARNING DEV ---
     return {
       id: "mock-student-id",
-      name: "Mock Student",
-      email: "student@example.com",
+      name: "Mock Teacher",
+      email: "teacher@example.com",
       phone: "123456789",
-      role: "STUDENT" as AppRole,
+      role: "TEACHER" as AppRole,
       isActive: true,
     };
     // --- END MOCK ---
@@ -35,7 +35,7 @@ export async function getCurrentUser() {
   });
 }
 
-export async function requireUser(roles?: AppRole[]) {
+export async function requireUser(roles?: AppRole[]): Promise<{ id: string; name: string | null; email: string | null; phone: string | null; role: AppRole; isActive: boolean }> {
   const user = await getCurrentUser();
 
   if (!user || !user.isActive) {

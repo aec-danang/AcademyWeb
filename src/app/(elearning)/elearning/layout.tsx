@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Award, BookMarked, BookOpen, ClipboardList, FileCheck2, LogOut, Target, Users } from "lucide-react";
 import styles from "./elearning.module.css";
 import { requireUser } from "@/lib/session";
+import { AnimatedLayoutWrapper } from "./AnimatedLayoutWrapper";
 
 export default async function ElearningLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
@@ -19,6 +20,7 @@ export default async function ElearningLayout({ children }: { children: React.Re
   ];
 
   return (
+    <AnimatedLayoutWrapper>
     <div className={styles.elearningContainer}>
       <aside className={styles.sidebar}>
         <div style={{ paddingLeft: "1rem", marginTop: "-30px", marginBottom: "-30px", display: "flex", alignItems: "flex-start" }}>
@@ -69,5 +71,6 @@ export default async function ElearningLayout({ children }: { children: React.Re
         <main className={styles.mainContent}>{children}</main>
       </div>
     </div>
+    </AnimatedLayoutWrapper>
   );
 }

@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
-type AccountRole = "USER" | "TEACHER" | "ADMIN";
+type AccountRole = "USER" | "TEACHER" | "ADMIN" | "STUDENT";
 
 type AccountRow = {
   id?: string;
@@ -24,9 +24,10 @@ type AccountRow = {
 };
 
 const roleLabels: Record<AccountRole, string> = {
-  USER: "Student",
-  TEACHER: "Teacher",
-  ADMIN: "Admin",
+  USER: "Người dùng (User)",
+  TEACHER: "Giáo viên (Teacher)",
+  ADMIN: "Quản trị viên (Admin)",
+  STUDENT: "Học viên (Student)"
 };
 
 function normalizeRole(value: string): AccountRole {

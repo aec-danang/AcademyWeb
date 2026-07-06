@@ -7,7 +7,7 @@ import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
-type AccountRole = "USER" | "TEACHER" | "ADMIN";
+type AccountRole = "USER" | "TEACHER" | "ADMIN" | "STUDENT";
 
 type SessionUser = {
   role?: string;

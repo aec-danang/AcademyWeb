@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import styles from "../../elearning.module.css";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
+import { TeacherCourseEditView } from "./TeacherCourseEditView";
 
 type Props = { params: Promise<{ courseId: string }> };
 
@@ -28,6 +29,11 @@ function lessonPreview(content: string | null) {
 
 export default async function CourseDetailPage({ params }: Props) {
   const user = await requireUser();
+  
+  if (user.role === "TEACHER" || user.role === "ADMIN") {
+    return <TeacherCourseEditView params={params} />;
+  }
+
   const { courseId } = await params;
   const course = await prisma.course.findUnique({
     where: { id: courseId },

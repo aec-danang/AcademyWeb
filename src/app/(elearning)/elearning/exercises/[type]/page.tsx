@@ -36,6 +36,53 @@ const dateTimeFormatter = new Intl.DateTimeFormat("en-US", {
   minute: "2-digit",
 });
 
+import React from "react";
+
+function parseMediaTags(text: string) {
+  if (!text) return null;
+  const lines = text.split('\n');
+  return lines.map((line, idx) => {
+    const imgMatch = line.match(/\[Image:\s*(.+?)\]/i);
+    if (imgMatch) {
+      return <img key={idx} src={imgMatch[1]} alt="Media" className={styles.mediaImage} />;
+    }
+    const vidMatch = line.match(/\[Video:\s*(.+?)\]/i);
+    if (vidMatch) {
+      let url = vidMatch[1];
+      if (url.includes('youtube.com/watch?v=')) {
+        url = url.replace('watch?v=', 'embed/');
+      } else if (url.includes('youtu.be/')) {
+        url = url.replace('youtu.be/', 'youtube.com/embed/');
+      }
+      return <iframe key={idx} src={url} width="100%" height="315" frameBorder="0" allowFullScreen className={styles.mediaVideo} />;
+    }
+    const audMatch = line.match(/\[Audio:\s*(.+?)\]/i);
+    if (audMatch) {
+      return <audio key={idx} controls src={audMatch[1]} className={styles.mediaAudio} />;
+    }
+    
+    const rawYoutubeMatch = line.match(/(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+)/i);
+    if (rawYoutubeMatch) {
+      let url = rawYoutubeMatch[1];
+      if (url.includes('youtube.com/watch?v=')) {
+        url = url.replace('watch?v=', 'embed/');
+      } else if (url.includes('youtu.be/')) {
+        url = url.replace('youtu.be/', 'youtube.com/embed/');
+      }
+      const textWithoutUrl = line.replace(rawYoutubeMatch[0], '');
+      return (
+        <React.Fragment key={idx}>
+          {textWithoutUrl && <span>{textWithoutUrl}</span>}
+          <iframe src={url} width="100%" height="315" frameBorder="0" allowFullScreen className={styles.mediaVideo} style={{ marginTop: '8px' }} />
+          {idx < lines.length - 1 && <br />}
+        </React.Fragment>
+      );
+    }
+    
+    return <React.Fragment key={idx}>{line}{idx < lines.length - 1 && <br />}</React.Fragment>;
+  });
+}
+
 function gridRows(value: unknown) {
   if (!Array.isArray(value)) return [];
   return value
@@ -109,10 +156,18 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
     },
   });
 
-  if (!quiz || quiz.isPracticeTest) notFound();
+  if (!quiz) notFound();
 
-  const isEnrolled = quiz.classSection.enrollments.some((enrollment) => enrollment.userId === user.id && enrollment.status === "ACTIVE");
-  const canView = user.role !== "STUDENT" || quiz.isOpenQuiz || isEnrolled;
+  let canView = true;
+  if (user.role === "STUDENT") {
+    if (!quiz.isPracticeTest && !quiz.isOpenQuiz) {
+      const isEnrolled = quiz.classSection?.enrollments.some(
+        (enrollment) => enrollment.userId === user.id && enrollment.status === "ACTIVE"
+      );
+      if (!isEnrolled) canView = false;
+    }
+  }
+  
   if (!canView) notFound();
 
   const attemptCount = quiz.attempts.length;
@@ -190,7 +245,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
             Your browser does not support audio.
           </audio>
         ) : null}
-        <p className={styles.reviewQuestionText}>{question.text}</p>
+        <div className={styles.reviewQuestionText}>{parseMediaTags(question.text)}</div>
 
         {isMultipleChoice && (
           <div className={styles.reviewOptions}>
@@ -254,7 +309,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
           </div>
         )}
 
-        {!isMultipleChoice && !isGrid && (
+        {!isMultipleChoice && !isGrid && question.type !== "READING" && (
           <textarea
             className={styles.reviewTextarea}
             name={`question_${question.id}`}
@@ -305,7 +360,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
           <span className={styles.cockpitEyebrow}><Target size={16} /> Quiz review</span>
           <h1>{quiz.title}</h1>
           <p>
-            {quiz.program?.code || "General"} | Unit {quiz.unit || "-"} | {quiz.questions.length} questions | {quiz.sourceTitle || quiz.classSection.code}
+            {quiz.program?.code || "General"} | Unit {quiz.unit || "-"} | {quiz.questions.length} questions | {quiz.sourceTitle || quiz.classSection?.code || "Practice Test"}
           </p>
         </div>
         <div className={styles.reviewHeroActions}>

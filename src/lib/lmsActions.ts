@@ -1135,11 +1135,18 @@ export async function submitPracticeTestAttemptAction(formData: FormData) {
       const selectedOption = question.options.find((option) => option.id === optionId);
       isCorrect = Boolean(selectedOption?.isCorrect);
       pointsAwarded = isCorrect ? link.points : 0;
-    } else if (question.type === "FILL_BLANK") {
-      const expected = (question.answerKey || "").trim().toLowerCase();
-      const actual = (typedAnswer || "").trim().toLowerCase();
-      isCorrect = Boolean(expected && actual === expected);
-      pointsAwarded = isCorrect ? link.points : 0;
+    } else if (question.type === "FILL_BLANK" || question.type === "SHORT_ANSWER" || question.type === "GRID") {
+      const textCorrect = isTextAnswerCorrect(typedAnswer || "", question.answerKey);
+      if (textCorrect !== null) {
+        isCorrect = textCorrect;
+        pointsAwarded = isCorrect ? link.points : 0;
+      } else {
+        requiresManualGrade = true;
+        pointsAwarded = 0;
+      }
+    } else if (["READING", "LISTENING", "SECTION", "INFO"].includes(question.type)) {
+      isCorrect = null;
+      pointsAwarded = 0;
     } else {
       requiresManualGrade = true;
       pointsAwarded = 0;
@@ -1242,7 +1249,7 @@ export async function submitQuizAttemptAction(formData: FormData) {
   if (!quizId) return;
 
   const quiz = await prisma.quiz.findFirst({
-    where: { id: quizId, isPracticeTest: false },
+    where: { id: quizId },
     include: {
       classSection: { include: { enrollments: true } },
       questions: {
@@ -1259,11 +1266,11 @@ export async function submitQuizAttemptAction(formData: FormData) {
 
   if (!quiz) return;
 
-  const isEnrolled = quiz.classSection.enrollments.some(
+  const isEnrolled = quiz.classSection?.enrollments?.some(
     (enrollment) => enrollment.userId === actor.id && enrollment.status === "ACTIVE",
-  );
+  ) || false;
 
-  if ((!quiz.isOpenQuiz && !isEnrolled) || quiz.attempts.length >= quiz.attemptLimit) return;
+  if ((!quiz.isOpenQuiz && !quiz.isPracticeTest && !isEnrolled) || quiz.attempts.length >= quiz.attemptLimit) return;
 
   let score = 0;
   let requiresManualGrade = false;
@@ -1309,6 +1316,9 @@ export async function submitQuizAttemptAction(formData: FormData) {
       } else {
         requiresManualGrade = true;
       }
+    } else if (["READING", "LISTENING", "SECTION", "INFO"].includes(question.type)) {
+      isCorrect = null;
+      pointsAwarded = 0;
     } else {
       requiresManualGrade = true;
     }
