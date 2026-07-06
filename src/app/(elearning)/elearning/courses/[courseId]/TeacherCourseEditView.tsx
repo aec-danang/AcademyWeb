@@ -17,8 +17,12 @@ export async function TeacherCourseEditView({
   const { courseId } = await params;
   const user = await requireUser(["TEACHER", "ADMIN"]);
 
-  const classSection = await prisma.classSection.findUnique({
-    where: { id: courseId },
+  const classSection = await prisma.classSection.findFirst({
+    where: {
+      courseId,
+      ...(user.role === "TEACHER" ? { teacherId: user.id } : {}),
+    },
+    orderBy: { createdAt: "desc" },
     include: {
       course: true,
       _count: {
@@ -45,8 +49,8 @@ export async function TeacherCourseEditView({
     );
   }
 
-  const updateWithId = updateClassSectionAction.bind(null, courseId);
-  const deleteWithId = deleteClassSectionAction.bind(null, courseId);
+  const updateWithId = updateClassSectionAction.bind(null, classSection.id);
+  const deleteWithId = deleteClassSectionAction.bind(null, classSection.id);
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">

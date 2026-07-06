@@ -1,8 +1,8 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import {
   AlertCircle,
   ArrowRight,
-  BookMarked,
   CheckCircle2,
   ChevronLeft,
   Clock,
@@ -18,6 +18,7 @@ import { submitQuizAttemptAction } from "@/lib/lmsActions";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import AutoSubmitTimer from "./AutoSubmitTimer";
+import ReviewQuestionMap from "./ReviewQuestionMap";
 
 type Props = {
   params: Promise<{ type: string }>;
@@ -38,6 +39,42 @@ const dateTimeFormatter = new Intl.DateTimeFormat("en-US", {
 
 import React from "react";
 
+function toYoutubeEmbedUrl(url: string) {
+  if (url.includes("youtube.com/watch?v=")) {
+    return url.replace("watch?v=", "embed/");
+  }
+  if (url.includes("youtu.be/")) {
+    return url.replace("youtu.be/", "youtube.com/embed/");
+  }
+  return url;
+}
+
+function isYoutubeUrl(url: string) {
+  return /(?:youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtu\.be\/)/i.test(url);
+}
+
+function renderMediaSource(url: string, key?: React.Key) {
+  if (isYoutubeUrl(url)) {
+    return (
+      <iframe
+        key={key}
+        src={toYoutubeEmbedUrl(url)}
+        width="100%"
+        height="315"
+        frameBorder="0"
+        allowFullScreen
+        className={styles.mediaVideo}
+      />
+    );
+  }
+
+  return (
+    <audio key={key} controls src={url} className={styles.reviewAudio}>
+      Your browser does not support audio.
+    </audio>
+  );
+}
+
 function parseMediaTags(text: string) {
   if (!text) return null;
   const lines = text.split('\n');
@@ -48,32 +85,20 @@ function parseMediaTags(text: string) {
     }
     const vidMatch = line.match(/\[Video:\s*(.+?)\]/i);
     if (vidMatch) {
-      let url = vidMatch[1];
-      if (url.includes('youtube.com/watch?v=')) {
-        url = url.replace('watch?v=', 'embed/');
-      } else if (url.includes('youtu.be/')) {
-        url = url.replace('youtu.be/', 'youtube.com/embed/');
-      }
-      return <iframe key={idx} src={url} width="100%" height="315" frameBorder="0" allowFullScreen className={styles.mediaVideo} />;
+      return renderMediaSource(vidMatch[1], idx);
     }
     const audMatch = line.match(/\[Audio:\s*(.+?)\]/i);
     if (audMatch) {
-      return <audio key={idx} controls src={audMatch[1]} className={styles.mediaAudio} />;
+      return renderMediaSource(audMatch[1], idx);
     }
     
     const rawYoutubeMatch = line.match(/(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+)/i);
     if (rawYoutubeMatch) {
-      let url = rawYoutubeMatch[1];
-      if (url.includes('youtube.com/watch?v=')) {
-        url = url.replace('watch?v=', 'embed/');
-      } else if (url.includes('youtu.be/')) {
-        url = url.replace('youtu.be/', 'youtube.com/embed/');
-      }
       const textWithoutUrl = line.replace(rawYoutubeMatch[0], '');
       return (
         <React.Fragment key={idx}>
           {textWithoutUrl && <span>{textWithoutUrl}</span>}
-          <iframe src={url} width="100%" height="315" frameBorder="0" allowFullScreen className={styles.mediaVideo} style={{ marginTop: '8px' }} />
+          {renderMediaSource(rawYoutubeMatch[1])}
           {idx < lines.length - 1 && <br />}
         </React.Fragment>
       );
@@ -131,6 +156,13 @@ function questionStateLabel(state: QuestionState) {
   return "Pending review";
 }
 
+function answerStateClass(state: QuestionState) {
+  if (state === "correct") return styles.reviewAnswerCorrect;
+  if (state === "wrong") return styles.reviewAnswerWrong;
+  if (state === "blank") return styles.reviewAnswerBlank;
+  return styles.reviewAnswerPending;
+}
+
 export default async function QuizAttemptPage({ params, searchParams }: Props) {
   const user = await requireUser(["STUDENT", "TEACHER", "ADMIN"]);
   const { type: quizId } = await params;
@@ -174,7 +206,8 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
   const selectedAttemptId = resolvedSearchParams?.attempt;
   const reviewAttempt = selectedAttemptId ? quiz.attempts.find((attempt) => attempt.id === selectedAttemptId) || null : null;
   const reviewMode = Boolean(reviewAttempt);
-  const canAnswer = user.role === "STUDENT" && !reviewMode && attemptCount < quiz.attemptLimit;
+  const canTakeQuiz = user.role === "STUDENT" || user.role === "TEACHER" || user.role === "ADMIN";
+  const canAnswer = canTakeQuiz && !reviewMode && attemptCount < quiz.attemptLimit;
   const reviewAnswerMap = new Map(reviewAttempt?.answers.map((answer) => [answer.questionId, answer]) || []);
   const totalPoints = quiz.questions.reduce((sum, link) => sum + link.points, 0);
   const reviewedQuestions = quiz.questions.map((link, index) => {
@@ -189,10 +222,11 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
           : "pending";
     return { link, answer, index: index + 1, state };
   });
-  const correctCount = reviewedQuestions.filter((item) => item.state === "correct").length;
-  const wrongCount = reviewedQuestions.filter((item) => item.state === "wrong").length;
-  const blankCount = reviewedQuestions.filter((item) => item.state === "blank").length;
-  const pendingCount = reviewedQuestions.filter((item) => item.state === "pending").length;
+  const scoredReviewedQuestions = reviewedQuestions.filter((item) => item.link.points > 0);
+  const correctCount = scoredReviewedQuestions.filter((item) => item.state === "correct").length;
+  const wrongCount = scoredReviewedQuestions.filter((item) => item.state === "wrong").length;
+  const blankCount = scoredReviewedQuestions.filter((item) => item.state === "blank").length;
+  const pendingCount = scoredReviewedQuestions.filter((item) => item.state === "pending").length;
   const awardedPoints = reviewAttempt?.answers.reduce((sum, answer) => sum + (answer.pointsAwarded || 0), 0) || 0;
   const scoreValue = reviewAttempt?.score ?? (reviewAttempt ? awardedPoints : null);
   const scorePercent = reviewAttempt && totalPoints > 0 ? Math.round(((scoreValue || 0) / totalPoints) * 100) : 0;
@@ -224,6 +258,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
     const studentOptionText = reviewAnswer?.option
       ? `${reviewAnswer.option.label ? `${reviewAnswer.option.label}. ` : ""}${reviewAnswer.option.text}`
       : null;
+    const isInformationalQuestion = link.points <= 0 && !question.answerKey && question.options.length === 0;
 
     return (
       <article id={`question-${question.id}`} className={reviewMode ? styles.reviewQuestionCard : styles.panel} key={link.id}>
@@ -240,11 +275,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
         </div>
 
         {question.passage ? <div className={styles.reviewPassage}>{question.passage}</div> : null}
-        {question.audioUrl ? (
-          <audio controls src={question.audioUrl} className={styles.reviewAudio}>
-            Your browser does not support audio.
-          </audio>
-        ) : null}
+        {question.audioUrl ? renderMediaSource(question.audioUrl) : null}
         <div className={styles.reviewQuestionText}>{parseMediaTags(question.text)}</div>
 
         {isMultipleChoice && (
@@ -305,13 +336,14 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
               required={canAnswer}
               placeholder="Write your answers in order, one per line."
               defaultValue={reviewMode ? reviewAnswer?.answerText || "" : ""}
+              className={reviewMode ? answerStateClass(state) : undefined}
             />
           </div>
         )}
 
-        {!isMultipleChoice && !isGrid && question.type !== "READING" && (
+        {!isInformationalQuestion && !isMultipleChoice && !isGrid && question.type !== "READING" && (
           <textarea
-            className={styles.reviewTextarea}
+            className={`${styles.reviewTextarea} ${reviewMode ? answerStateClass(state) : ""}`}
             name={`question_${question.id}`}
             disabled={!canAnswer}
             required={canAnswer}
@@ -322,7 +354,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
 
         {reviewMode ? (
           <div className={styles.reviewAnswerGrid}>
-            <div>
+            <div className={answerStateClass(state)}>
               <span>Your answer</span>
               <strong>{isBlank ? "Blank" : studentOptionText || reviewAnswer?.answerText || "-"}</strong>
             </div>
@@ -371,6 +403,18 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
           )}
         </div>
       </section>
+
+      {quiz.audioUrl ? (
+        <section className={styles.panel}>
+          <div className={styles.cockpitPanelHeader}>
+            <div>
+              <span className={styles.cockpitEyebrow}>Listening media</span>
+              <h2>{quiz.sourceTitle || quiz.title}</h2>
+            </div>
+          </div>
+          {renderMediaSource(quiz.audioUrl)}
+        </section>
+      ) : null}
 
       {reviewAttempt ? (
         <section className={styles.reviewSummary}>
@@ -431,7 +475,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
         </section>
       )}
 
-      {!canAnswer && !reviewMode && user.role === "STUDENT" && (
+      {!canAnswer && !reviewMode && canTakeQuiz && (
         <section className={styles.quizEmptyState}>
           <Trophy size={42} />
           <h2>Attempt limit reached</h2>
@@ -442,7 +486,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
 
       {reviewMode ? (
         <div className={styles.reviewLayout}>
-          <aside className={styles.reviewSidebar}>
+          <ReviewQuestionMap>
             <h2>Question map</h2>
             <p>Jump to any question and inspect the result.</p>
             <div>
@@ -457,11 +501,14 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
                 </a>
               ))}
             </div>
-          </aside>
+          </ReviewQuestionMap>
           <div className={styles.reviewQuestionList}>
             {sectionGroups.map((group) => (
               <section key={group.section.id} className={styles.reviewSection}>
                 <h2>{group.section.title}</h2>
+                {group.section.instructions ? <div className={styles.reviewQuestionText}>{parseMediaTags(group.section.instructions)}</div> : null}
+                {group.section.passage ? <div className={styles.reviewPassage}>{group.section.passage}</div> : null}
+                {group.section.audioUrl ? renderMediaSource(group.section.audioUrl) : null}
                 {group.links.map((link) => renderQuestion(link, quiz.questions.findIndex((item) => item.id === link.id) + 1))}
               </section>
             ))}
@@ -475,6 +522,9 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
             {sectionGroups.map((group) => (
               <section key={group.section.id} className={styles.reviewSection}>
                 <h2>{group.section.title}</h2>
+                {group.section.instructions ? <div className={styles.reviewQuestionText}>{parseMediaTags(group.section.instructions)}</div> : null}
+                {group.section.passage ? <div className={styles.reviewPassage}>{group.section.passage}</div> : null}
+                {group.section.audioUrl ? renderMediaSource(group.section.audioUrl) : null}
                 {group.links.map((link) => renderQuestion(link, quiz.questions.findIndex((item) => item.id === link.id) + 1))}
               </section>
             ))}

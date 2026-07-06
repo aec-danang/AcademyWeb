@@ -1,51 +1,43 @@
-import 'dotenv/config';
-import { prisma } from '../src/lib/prisma';
-import { google } from 'googleapis';
-import * as fs from 'fs';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import * as fs from "fs";
+import { google } from "googleapis";
+import {
+  appendGroupImage,
+  appendQuestionImage,
+  CREDENTIALS_PATH,
+  firstVideoUrlFromForm,
+  inferExamSkill,
+  isListeningTitle,
+  isSurveyItem,
+  mediaTextForStandaloneItem,
+  optionTextWithImage,
+  TOKEN_PATH,
+} from "./form-import-utils";
 
-const TOKEN_PATH = "e:/AEC/google-form-import-test/token.json";
-const CREDENTIALS_PATH = "e:/AEC/google-form-import-test/credentials.json";
-import { join } from 'path';
+const DEFAULT_QUIZ_ID = "cmqypaz8j0feam4usunfbky3z";
+const DEFAULT_FORM_ID = "1dnAeIFNvCBSZM9JE5iM7L9hg_7vZamaEr7Oe0HZ8Afs";
+const DEFAULT_TITLE = "TO75.P-10 (LISTENING)";
+let prismaForDisconnect: { $disconnect: () => Promise<void> } | null = null;
 
-async function downloadImage(auth: any, contentUri: string): Promise<string> {
-    try {
-        const token = await auth.getAccessToken();
-        const res = await fetch(contentUri, {
-            headers: {
-                Authorization: `Bearer ${token.token}`
-            }
-        });
-        
-        if (!res.ok) {
-            console.error("Failed to download image", contentUri, res.statusText);
-            return contentUri;
-        }
-        
-        const publicDir = join(process.cwd(), 'public', 'uploads', 'forms');
-        if (!fs.existsSync(publicDir)) {
-            fs.mkdirSync(publicDir, { recursive: true });
-        }
-        
-        const contentType = res.headers.get('content-type') || 'image/jpeg';
-        let ext = 'jpg';
-        if (contentType.includes('png')) ext = 'png';
-        else if (contentType.includes('gif')) ext = 'gif';
-        
-        const filename = `img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${ext}`;
-        const filePath = join(publicDir, filename);
-        
-        const arrayBuffer = await res.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        fs.writeFileSync(filePath, buffer);
-        
-        return `/uploads/forms/${filename}`;
-    } catch (e) {
-        console.error("Error downloading image", e);
-        return contentUri;
+function loadEnvFile() {
+  if (!fs.existsSync(".env")) return;
+  const envText = fs.readFileSync(".env", "utf8");
+  for (const line of envText.split(/\r?\n/)) {
+    const match = line.match(/^\s*([\w.-]+)\s*=\s*"?([^"\r\n]*)"?\s*$/);
+    if (match && !process.env[match[1]]) {
+      process.env[match[1]] = match[2];
     }
+  }
 }
 
 async function getAuth() {
+  if (!fs.existsSync(CREDENTIALS_PATH) || !fs.existsSync(TOKEN_PATH)) {
+    throw new Error(
+      `Missing Google API credentials. Expected credentials at ${CREDENTIALS_PATH} and token at ${TOKEN_PATH}. ` +
+        "You can override them with GOOGLE_CREDENTIALS_PATH and GOOGLE_TOKEN_PATH."
+    );
+  }
+
   const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, "utf8"));
   const { client_secret, client_id, redirect_uris } = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
@@ -53,201 +45,179 @@ async function getAuth() {
   return oAuth2Client;
 }
 
+async function createStandaloneQuestion(prisma: any, quizId: string, formId: string, item: any, auth: any, order: number) {
+  const mediaText = await mediaTextForStandaloneItem(auth, item);
+  if (!mediaText) return false;
+
+  const question = await prisma.question.create({
+    data: {
+      type: "READING",
+      text: mediaText,
+      points: 0,
+      sourceOrder: order,
+      sourceType: item.pageBreakItem ? "SECTION" : item.videoItem ? "VIDEO" : item.imageItem ? "IMAGE" : "TEXT",
+      importSource: formId,
+    },
+  });
+
+  await prisma.quizQuestion.create({
+    data: { quizId, questionId: question.id, points: 0, order },
+  });
+
+  return true;
+}
+
 async function reimport() {
-    const auth = await getAuth();
-    const oldQuizId = 'cmqypaz8j0feam4usunfbky3z';
-    const formId = '1dnAeIFNvCBSZM9JE5iM7L9hg_7vZamaEr7Oe0HZ8Afs';
-    const title = 'TO75.P-10 (LISTENING)';
-    const unit = '4';
+  loadEnvFile();
+  const auth = await getAuth();
+  const { prisma } = await import("../src/lib/prisma");
+  prismaForDisconnect = prisma;
 
-    console.log("Deleting old quiz questions...");
-    // Find all questions linked to this quiz
-    const quizQuestions = await prisma.quizQuestion.findMany({
-        where: { quizId: oldQuizId }
-    });
-    const questionIds = quizQuestions.map(qq => qq.questionId);
+  const quizId = process.env.QUIZ_ID || DEFAULT_QUIZ_ID;
+  const formId = process.env.FORM_ID || DEFAULT_FORM_ID;
+  const fallbackTitle = process.env.FORM_TITLE || DEFAULT_TITLE;
 
-    // Delete QuizQuestion links
-    await prisma.quizQuestion.deleteMany({
-        where: { quizId: oldQuizId }
-    });
+  console.log("Deleting old quiz questions...");
+  const quizQuestions = await prisma.quizQuestion.findMany({ where: { quizId } });
+  const questionIds = quizQuestions.map((qq) => qq.questionId);
 
-    // Delete Questions (options will cascade if QuestionOption relates to Question onDelete: Cascade)
-    await prisma.question.deleteMany({
-        where: { id: { in: questionIds } }
-    });
+  await prisma.quizQuestion.deleteMany({ where: { quizId } });
+  await prisma.question.deleteMany({ where: { id: { in: questionIds } } });
 
-    console.log("Fetching new form data...");
-    const forms = google.forms({ version: "v1", auth });
-    const res = await forms.forms.get({ formId });
-    const form = res.data;
+  console.log("Fetching new form data...");
+  const forms = google.forms({ version: "v1", auth });
+  const res = await forms.forms.get({ formId });
+  const form = res.data;
+  const title = form.info?.documentTitle || fallbackTitle;
+  const sourceTitle = form.info?.documentTitle || form.info?.title || null;
+  const skill = inferExamSkill(title, sourceTitle);
+  const firstVideoUrl = firstVideoUrlFromForm(form);
 
-    let order = 0;
-    let questionsCreated = 0;
-    
-    for (const item of (form.items || [])) {
-        const questionItem = item.questionItem;
-        const groupItem = item.questionGroupItem;
-        const imageItem = item.imageItem;
-        const videoItem = item.videoItem;
-        const textItem = item.textItem;
+  await prisma.quiz.update({
+    where: { id: quizId },
+    data: {
+      title,
+      sourceTitle,
+      importSource: formId,
+      skill,
+      audioUrl: isListeningTitle(title) || skill === "LISTENING" ? firstVideoUrl : null,
+    },
+  });
 
-        if (!questionItem && !groupItem && !imageItem && !videoItem && !textItem) continue;
-        
-        let text = item.title || "";
-        const lowerText = text.toLowerCase();
-        const surveyKeywords = [
-            "họ và tên", "họ tên", "mã sinh viên", "mã học viên", "email", "sđt", "số điện thoại", "lớp", "your name", "student id",
-            "học viên academy", "birthday", "ngày sinh", "ngay sinh", "parent's name", "tên bố", "tên mẹ", "nghề nghiệp", "job", "target score", "điểm số mục tiêu"
-        ];
-        if (text.length < 100 && surveyKeywords.some((keyword) => lowerText.includes(keyword))) {
-            continue;
-        }
+  let order = 0;
+  let questionsCreated = 0;
 
-        if (imageItem || videoItem || textItem) {
-            let mediaText = text;
-            if (item.description) {
-                mediaText += `\n${item.description}`;
-            }
-            if (imageItem?.image?.contentUri) {
-                const localUri = await downloadImage(auth, imageItem.image.contentUri as string);
-                mediaText += `\n[Image: ${localUri}]`;
-            }
-            if (videoItem?.video?.youtubeUri) {
-                let yUri = videoItem.video.youtubeUri;
-                if (!yUri.startsWith('http')) yUri = 'https://' + yUri;
-                mediaText += `\n[Video: ${yUri}]`;
-            }
+  for (const item of form.items || []) {
+    const questionItem = item.questionItem;
+    const groupItem = item.questionGroupItem;
+    const imageItem = item.imageItem;
+    const videoItem = item.videoItem;
+    const textItem = item.textItem;
+    const pageBreakItem = item.pageBreakItem;
 
-            const question = await prisma.question.create({
-                data: {
-                    type: "READING",
-                    text: mediaText.trim(),
-                    points: 0,
-                }
-            });
+    if (!questionItem && !groupItem && !imageItem && !videoItem && !textItem && !pageBreakItem) continue;
 
-            await prisma.quizQuestion.create({
-                data: {
-                    quizId: oldQuizId,
-                    questionId: question.id,
-                    points: 0,
-                    order: order
-                }
-            });
-            questionsCreated++;
-            continue;
-        }
+    const titleText = item.title || "";
+    if (isSurveyItem(titleText)) continue;
 
-        if (groupItem) {
-            let commonText = text;
-            if (groupItem.image && groupItem.image.contentUri) {
-                const localUri = await downloadImage(auth, groupItem.image.contentUri as string);
-                commonText += `\n[Image: ${localUri}]`;
-            }
+    if (imageItem || videoItem || textItem || pageBreakItem) {
+      order++;
+      if (await createStandaloneQuestion(prisma, quizId, formId, item, auth, order)) {
+        questionsCreated++;
+      }
+      continue;
+    }
 
-            const options = groupItem.grid?.columns?.options || [];
-            
-            for (const rowQ of groupItem.questions || []) {
-                order++;
-                const rowText = `${commonText}\n\n${rowQ.rowQuestion?.title || ""}`.trim();
-                const pointValue = rowQ.grading?.pointValue || 0;
-                
-                let correctAnswers: string[] = [];
-                if (rowQ.grading?.correctAnswers?.answers) {
-                    correctAnswers = rowQ.grading.correctAnswers.answers.map((a: any) => a.value);
-                }
-                let answerKey = correctAnswers.join(" | ");
+    if (groupItem) {
+      const commonText = await appendGroupImage(auth, titleText, groupItem);
+      const options = groupItem.grid?.columns?.options || [];
 
-                const optionsData = [];
-                let optOrder = 0;
-                for (const opt of options) {
-                    optOrder++;
-                    optionsData.push({
-                        text: opt.value || "",
-                        isCorrect: correctAnswers.includes(opt.value),
-                        order: optOrder
-                    });
-                }
-
-                const question = await prisma.question.create({
-                    data: {
-                        type: "MULTIPLE_CHOICE",
-                        text: rowText,
-                        points: pointValue,
-                        answerKey: answerKey,
-                        options: { create: optionsData }
-                    }
-                });
-
-                await prisma.quizQuestion.create({
-                    data: {
-                        quizId: oldQuizId,
-                        questionId: question.id,
-                        points: pointValue,
-                        order: order
-                    }
-                });
-                questionsCreated++;
-            }
-            continue;
-        }
-
-        const q = questionItem!.question;
-        if (!q) continue;
-        
+      for (const rowQ of groupItem.questions || []) {
         order++;
-        let type: any = "MULTIPLE_CHOICE";
-        if (q.textQuestion) type = "SHORT_ANSWER";
+        const rowText = `${commonText}\n\n${rowQ.rowQuestion?.title || ""}`.trim();
+        const pointValue = rowQ.grading?.pointValue || 0;
+        const correctAnswers = rowQ.grading?.correctAnswers?.answers?.map((a: any) => a.value) || [];
 
-        if (questionItem!.image?.contentUri) {
-            const localUri = await downloadImage(auth, questionItem!.image.contentUri as string);
-            text += `\n[Image: ${localUri}]`;
-        }
-
-        const pointValue = q.grading?.pointValue || 0;
-        
         const optionsData = [];
-        let correctAnswers: string[] = [];
-        if (q.grading?.correctAnswers?.answers) {
-            correctAnswers = q.grading.correctAnswers.answers.map((a: any) => a.value);
-        }
-        let answerKey = correctAnswers.join(" | ");
-
-        if (q.choiceQuestion) {
-            let optOrder = 0;
-            for (const opt of q.choiceQuestion.options || []) {
-                optOrder++;
-                optionsData.push({
-                    text: opt.value || "",
-                    isCorrect: correctAnswers.includes(opt.value),
-                    order: optOrder
-                });
-            }
+        let optOrder = 0;
+        for (const opt of options) {
+          optOrder++;
+          optionsData.push({
+            text: await optionTextWithImage(auth, opt),
+            isCorrect: correctAnswers.includes(opt.value),
+            order: optOrder,
+          });
         }
 
         const question = await prisma.question.create({
-            data: {
-                type: type,
-                text: text,
-                points: pointValue,
-                answerKey: answerKey,
-                options: { create: optionsData }
-            }
+          data: {
+            type: "MULTIPLE_CHOICE",
+            text: rowText,
+            points: pointValue,
+            answerKey: correctAnswers.join(" | "),
+            sourceOrder: order,
+            sourceType: "GRID",
+            importSource: formId,
+            options: { create: optionsData },
+          },
         });
 
         await prisma.quizQuestion.create({
-            data: {
-                quizId: oldQuizId,
-                questionId: question.id,
-                points: pointValue,
-                order: order
-            }
+          data: { quizId, questionId: question.id, points: pointValue, order },
         });
         questionsCreated++;
+      }
+      continue;
     }
 
-    console.log(`Re-import complete! Created ${questionsCreated} questions.`);
+    const q = questionItem?.question;
+    if (!q) continue;
+
+    order++;
+    const type = q.textQuestion ? "SHORT_ANSWER" : "MULTIPLE_CHOICE";
+    const text = await appendQuestionImage(auth, titleText, questionItem);
+    const pointValue = q.grading?.pointValue || 0;
+    const correctAnswers = q.grading?.correctAnswers?.answers?.map((a: any) => a.value) || [];
+    const optionsData = [];
+
+    if (q.choiceQuestion) {
+      let optOrder = 0;
+      for (const opt of q.choiceQuestion.options || []) {
+        optOrder++;
+        optionsData.push({
+          text: await optionTextWithImage(auth, opt),
+          isCorrect: correctAnswers.includes(opt.value),
+          order: optOrder,
+        });
+      }
+    }
+
+    const question = await prisma.question.create({
+      data: {
+        type,
+        text,
+        points: pointValue,
+        answerKey: correctAnswers.join(" | "),
+        sourceOrder: order,
+        importSource: formId,
+        options: { create: optionsData },
+      },
+    });
+
+    await prisma.quizQuestion.create({
+      data: { quizId, questionId: question.id, points: pointValue, order },
+    });
+    questionsCreated++;
+  }
+
+  console.log(`Re-import complete! Created ${questionsCreated} items/questions.`);
 }
 
-reimport().catch(console.error).finally(() => prisma.$disconnect());
+reimport()
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await prismaForDisconnect?.$disconnect();
+  });

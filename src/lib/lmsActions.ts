@@ -1244,7 +1244,7 @@ export async function gradePracticeAttemptAction(formData: FormData) {
 }
 
 export async function submitQuizAttemptAction(formData: FormData) {
-  const actor = await requireUser(["STUDENT"]);
+  const actor = await requireUser(["STUDENT", "TEACHER", "ADMIN"]);
   const quizId = textValue(formData, "quizId");
   if (!quizId) return;
 
@@ -1294,7 +1294,11 @@ export async function submitQuizAttemptAction(formData: FormData) {
     let isCorrect: boolean | null = null;
     let pointsAwarded: number | null = null;
 
-    if (question.type === "MULTIPLE_CHOICE") {
+    if (link.points <= 0 && !question.answerKey && question.options.length === 0) {
+      isCorrect = null;
+      pointsAwarded = 0;
+      answerText = null;
+    } else if (question.type === "MULTIPLE_CHOICE") {
       optionId = rawAnswer || null;
       answerText = null;
       const selectedOption = question.options.find((option) => option.id === optionId);

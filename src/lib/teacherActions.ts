@@ -23,7 +23,8 @@ export async function updateClassSectionAction(classId: string, formData: FormDa
   }
 
   const name = formData.get("name") as string;
-  const status = formData.get("status") as any;
+  const rawStatus = formData.get("status");
+  const status = rawStatus === "ARCHIVED" ? "ARCHIVED" : "ACTIVE";
   const startAt = formData.get("startAt") ? new Date(formData.get("startAt") as string) : null;
   const endAt = formData.get("endAt") ? new Date(formData.get("endAt") as string) : null;
 
@@ -52,7 +53,7 @@ export async function updateClassSectionAction(classId: string, formData: FormDa
   ]);
 
   revalidatePath(`/elearning/courses`);
-  revalidatePath(`/elearning/courses/${classId}`);
+  revalidatePath(`/elearning/courses/${classSection.courseId}`);
 }
 
 export async function deleteClassSectionAction(classId: string) {
@@ -75,6 +76,7 @@ export async function deleteClassSectionAction(classId: string) {
   });
 
   revalidatePath("/elearning/courses");
+  revalidatePath(`/elearning/courses/${classSection.courseId}`);
   redirect("/elearning/courses");
 }
 
@@ -103,7 +105,7 @@ export async function createLessonAction(classId: string, formData: FormData) {
     },
   });
 
-  revalidatePath(`/elearning/courses/${classId}/lessons`);
+  revalidatePath(`/elearning/courses/${classSection.courseId}`);
 }
 
 export async function deleteLessonAction(classId: string, lessonId: string) {
@@ -120,7 +122,7 @@ export async function deleteLessonAction(classId: string, lessonId: string) {
     where: { id: lessonId },
   });
 
-  revalidatePath(`/elearning/courses/${classId}/lessons`);
+  revalidatePath(`/elearning/courses/${classSection.courseId}`);
 }
 
 export async function createClassSectionAction(formData: FormData) {
@@ -128,7 +130,8 @@ export async function createClassSectionAction(formData: FormData) {
 
   const name = formData.get("name") as string;
   const code = formData.get("code") as string;
-  const status = formData.get("status") as any;
+  const rawStatus = formData.get("status");
+  const status = rawStatus === "ARCHIVED" ? "ARCHIVED" : "ACTIVE";
   const startAt = formData.get("startAt") ? new Date(formData.get("startAt") as string) : null;
   const endAt = formData.get("endAt") ? new Date(formData.get("endAt") as string) : null;
 
@@ -145,7 +148,7 @@ export async function createClassSectionAction(formData: FormData) {
     }
   });
 
-  const newClass = await prisma.classSection.create({
+  await prisma.classSection.create({
     data: {
       name,
       code,
@@ -158,5 +161,5 @@ export async function createClassSectionAction(formData: FormData) {
   });
 
   revalidatePath("/elearning/courses");
-  redirect(`/elearning/courses/${newClass.id}`);
+  redirect(`/elearning/courses/${newCourse.id}`);
 }

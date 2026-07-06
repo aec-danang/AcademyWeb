@@ -2,21 +2,23 @@ import Link from "next/link";
 import styles from "./elearning.module.css";
 import {
   Activity,
+  AlertCircle,
   ArrowRight,
   Award,
-  BarChart3,
+  BookPlus,
   BookOpen,
   CheckCircle2,
-  Clock,
+  CheckSquare,
   ClipboardList,
+  FileText,
   FileCheck2,
   GraduationCap,
-  LineChart,
   ListTodo,
   PlayCircle,
   Sparkles,
   Target,
   Trophy,
+  UserPlus,
   Users,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
@@ -55,23 +57,6 @@ function scoreTone(score: number | null) {
   if (score >= 8) return "Excellent";
   if (score >= 6.5) return "On track";
   return "Needs practice";
-}
-
-function buildChartPath(points: { score: number }[]) {
-  if (points.length === 0) return { line: "", dots: [], maxScore: 0 };
-
-  const maxScore = Math.max(10, ...points.map((point) => point.score));
-  const dots = points.map((point, index) => {
-    const x = points.length === 1 ? 180 : 24 + (index * 312) / (points.length - 1);
-    const y = 126 - (Math.max(0, point.score) / maxScore) * 92;
-    return { x, y, score: point.score };
-  });
-
-  return {
-    line: dots.map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(" "),
-    dots,
-    maxScore,
-  };
 }
 
 export default async function ElearningDashboard() {
@@ -205,24 +190,6 @@ export default async function ElearningDashboard() {
     const overallProgress = totalLearningItems ? Math.round((finishedLearningItems / totalLearningItems) * 100) : 0;
     const averageScore = grades.length ? grades.reduce((sum, grade) => sum + grade.score, 0) / grades.length : null;
 
-    const gradedAttemptIds = new Set(grades.map((grade) => grade.attemptId).filter(Boolean));
-    const attemptScorePoints = recentAttempts
-      .filter((attempt) => typeof attempt.score === "number" && !gradedAttemptIds.has(attempt.id))
-      .map((attempt) => ({
-        label: attempt.quiz.title,
-        date: attempt.submittedAt || attempt.startedAt,
-        score: attempt.score || 0,
-      }));
-    const gradeScorePoints = grades.map((grade) => ({
-      label: grade.assignment?.title || grade.quiz?.title || "Grade",
-      date: grade.createdAt,
-      score: grade.score,
-    }));
-    const scoreSeries = [...gradeScorePoints, ...attemptScorePoints]
-      .sort((a, b) => a.date.getTime() - b.date.getTime())
-      .slice(-8);
-    const chart = buildChartPath(scoreSeries);
-
     const firstInProgressAttempt = recentAttempts.find((attempt) => attempt.status === "IN_PROGRESS");
     const nextQuiz = quizzes.find((quiz) => quiz.attempts.length === 0);
     const nextPracticeTest = practiceTests.find((test) => test.attempts.length === 0);
@@ -342,192 +309,148 @@ export default async function ElearningDashboard() {
       .sort((a, b) => b.date.getTime() - a.date.getTime())
       .slice(0, 8);
 
+    const studentActions = [
+      {
+        href: "/elearning/practice",
+        title: "Practice library",
+        detail: `${availableQuizCount} quizzes and tests available`,
+        icon: <ClipboardList size={20} />,
+      },
+      {
+        href: "/elearning/scores",
+        title: "Scores",
+        detail: averageScore === null ? "Waiting for first grade" : `${averageScore.toFixed(1)} average`,
+        icon: <Trophy size={20} />,
+      },
+      {
+        href: "/elearning/courses",
+        title: "Courses",
+        detail: `${enrollments.length} active class${enrollments.length === 1 ? "" : "es"}`,
+        icon: <BookOpen size={20} />,
+      },
+    ];
+
+    const latestGrade = grades[0];
+    const latestAttempt = recentAttempts[0];
+
     return (
-      <div className={styles.cockpitShell}>
-        <section className={styles.cockpitHero}>
-          <div className={styles.cockpitHeroContent}>
-            <span className={styles.cockpitEyebrow}><Sparkles size={16} /> Learning Cockpit</span>
-            <h1>Welcome back, {user.name || "Student"}.</h1>
-            <p>
-              Your dashboard is powered by your real enrollments, quizzes, assignments, attempts, and grades.
-              Keep an eye on what matters next.
-            </p>
-            <div className={styles.heroQuickStats}>
-              <span>{enrollments.length} active class{enrollments.length === 1 ? "" : "es"}</span>
-              <span>{availableQuizCount} quiz/test{availableQuizCount === 1 ? "" : "s"}</span>
-              <span>{grades.length} grade{grades.length === 1 ? "" : "s"}</span>
-            </div>
+      <div className={styles.dashboardShell}>
+        <section className={styles.dashboardHero}>
+          <div className={styles.dashboardHeroCopy}>
+            <span className={styles.cockpitEyebrow}><Sparkles size={16} /> Student dashboard</span>
+            <h1>{user.name || "Student"}, start with one thing.</h1>
+            <p>Your dashboard now prioritizes the next useful action, then keeps progress and recent feedback close by.</p>
           </div>
-          <Link href={continueLearning.href} className={styles.continueCard}>
-            <div className={styles.continueIcon}>{continueLearning.icon}</div>
+          <Link href={continueLearning.href} className={styles.dashboardPrimaryAction}>
+            <div className={styles.dashboardActionIcon}>{continueLearning.icon}</div>
             <span>{continueLearning.eyebrow}</span>
-            <h2>{continueLearning.title}</h2>
+            <strong>{continueLearning.title}</strong>
             <p>{continueLearning.meta}</p>
-            <strong>{continueLearning.action} <ArrowRight size={16} /></strong>
+            <em>{continueLearning.action} <ArrowRight size={16} /></em>
           </Link>
         </section>
 
-        <section className={styles.metricGrid} aria-label="Learning summary">
-          <div className={styles.metricCard}>
-            <div className={styles.metricTop}><Target size={20} /><span>Overall Progress</span></div>
+        <section className={styles.dashboardStats} aria-label="Learning status">
+          <div>
+            <span>Progress</span>
             <strong>{overallProgress}%</strong>
-            <div className={styles.progressBarLarge}><div style={{ width: `${overallProgress}%` }} /></div>
-            <p>{finishedLearningItems}/{totalLearningItems || 0} learning items completed</p>
+            <p>{finishedLearningItems}/{totalLearningItems || 0} done</p>
           </div>
-          <div className={styles.metricCard}>
-            <div className={styles.metricTop}><Trophy size={20} /><span>Average Score</span></div>
+          <div>
+            <span>Pending</span>
+            <strong>{pendingAssignments.length + taskCards.filter((task) => task.badge !== "Assignment").length}</strong>
+            <p>Assignments, quizzes, tests</p>
+          </div>
+          <div>
+            <span>Average</span>
             <strong>{averageScore === null ? "-" : averageScore.toFixed(1)}</strong>
-            <p>{averageScore === null ? "No graded work yet" : scoreTone(averageScore)}</p>
-          </div>
-          <div className={styles.metricCard}>
-            <div className={styles.metricTop}><ClipboardList size={20} /><span>Completed Quizzes</span></div>
-            <strong>{completedQuizzes}</strong>
-            <p>{quizzes.length - completedQuizzes} quiz{quizzes.length - completedQuizzes === 1 ? "" : "zes"} still open</p>
-          </div>
-          <div className={styles.metricCard}>
-            <div className={styles.metricTop}><Clock size={20} /><span>Pending Assignments</span></div>
-            <strong>{pendingAssignments.length}</strong>
-            <p>{submittedAssignments} assignment{submittedAssignments === 1 ? "" : "s"} submitted</p>
+            <p>{averageScore === null ? "No scores yet" : scoreTone(averageScore)}</p>
           </div>
         </section>
 
-        <section className={styles.cockpitGrid}>
-          <div className={styles.cockpitPanel}>
-            <div className={styles.cockpitPanelHeader}>
-              <div>
-                <span className={styles.cockpitEyebrow}><LineChart size={16} /> Score trend</span>
-                <h2>Performance over time</h2>
-              </div>
-              <Link href="/elearning/scores">View scores</Link>
-            </div>
-            {scoreSeries.length > 0 ? (
-              <div className={styles.scoreChart}>
-                <svg viewBox="0 0 360 150" role="img" aria-label="Score trend chart">
-                  <line x1="24" y1="126" x2="336" y2="126" />
-                  <line x1="24" y1="34" x2="24" y2="126" />
-                  <polyline points={chart.line} />
-                  {chart.dots.map((dot, index) => (
-                    <circle key={`${dot.x}-${index}`} cx={dot.x} cy={dot.y} r="4.5" />
-                  ))}
-                </svg>
-                <div className={styles.chartLegend}>
-                  <span>Last {scoreSeries.length} score{scoreSeries.length === 1 ? "" : "s"}</span>
-                  <strong>Peak {chart.maxScore.toFixed(chart.maxScore % 1 === 0 ? 0 : 1)}</strong>
-                </div>
-              </div>
-            ) : (
-              <div className={styles.emptyStateInline}>
-                <BarChart3 size={32} />
-                <p>No scores yet. Submit quizzes or assignments to build your trend.</p>
-              </div>
-            )}
-          </div>
+        <section className={styles.actionHub} aria-label="Quick actions">
+          {studentActions.map((action) => (
+            <Link href={action.href} className={styles.actionHubItem} key={action.title}>
+              <div>{action.icon}</div>
+              <strong>{action.title}</strong>
+              <p>{action.detail}</p>
+              <ArrowRight size={16} />
+            </Link>
+          ))}
+        </section>
 
-          <div className={styles.cockpitPanel}>
-            <div className={styles.cockpitPanelHeader}>
+        <section className={styles.dashboardMain}>
+          <div className={styles.dashboardPanel}>
+            <div className={styles.dashboardPanelHeader}>
               <div>
-                <span className={styles.cockpitEyebrow}><ListTodo size={16} /> Upcoming tasks</span>
-                <h2>Pending work</h2>
+                <span className={styles.cockpitEyebrow}><ListTodo size={16} /> Needs attention</span>
+                <h2>Do next</h2>
               </div>
-              <Link href="/elearning/assignments">Assignments</Link>
+              <Link href="/elearning/practice">Open practice</Link>
             </div>
             {taskCards.length > 0 ? (
-              <div className={styles.taskList}>
-                {taskCards.map((task) => (
-                  <Link href={task.href} key={task.key} className={styles.taskItem}>
+              <div className={styles.focusList}>
+                {taskCards.slice(0, 5).map((task) => (
+                  <Link href={task.href} key={task.key} className={styles.focusItem}>
                     <div className={styles.taskIcon}>{task.icon}</div>
                     <div>
                       <strong>{task.title}</strong>
                       <p>{task.meta}</p>
-                      <small>{task.due}</small>
                     </div>
-                    <span>{task.badge}</span>
+                    <span>{task.due}</span>
                   </Link>
                 ))}
               </div>
             ) : (
               <div className={styles.emptyStateInline}>
                 <CheckCircle2 size={32} />
-                <p>You are all caught up. New tasks will appear here when your teacher publishes them.</p>
+                <p>You are caught up. New work will appear here when it is published.</p>
               </div>
             )}
           </div>
+
+          <aside className={styles.dashboardPanel}>
+            <div className={styles.dashboardPanelHeader}>
+              <div>
+                <span className={styles.cockpitEyebrow}><Target size={16} /> Snapshot</span>
+                <h2>Progress pulse</h2>
+              </div>
+              <Link href="/elearning/scores">Scores</Link>
+            </div>
+            <div className={styles.progressPulse}>
+              <div className={styles.progressRing} style={{ background: `conic-gradient(#10b981 ${overallProgress * 3.6}deg, #e2e8f0 0deg)` }}>
+                <strong>{overallProgress}%</strong>
+              </div>
+              <div>
+                <strong>{latestGrade ? scoreLabel(latestGrade.score) : "No grade"}</strong>
+                <p>{latestGrade?.assignment?.title || latestGrade?.quiz?.title || "Complete a quiz to start your score history."}</p>
+              </div>
+            </div>
+            {latestAttempt ? (
+              <Link
+                href={latestAttempt.quiz.isPracticeTest ? `/elearning/tests/${latestAttempt.quizId}` : `/elearning/exercises/${latestAttempt.quizId}?attempt=${latestAttempt.id}`}
+                className={styles.snapshotRow}
+              >
+                <ClipboardList size={18} />
+                <div>
+                  <strong>{latestAttempt.quiz.title}</strong>
+                  <p>{latestAttempt.status === "IN_PROGRESS" ? "In progress" : `Score ${scoreLabel(latestAttempt.score)}`}</p>
+                </div>
+              </Link>
+            ) : null}
+          </aside>
         </section>
 
-        <section className={styles.cockpitGrid}>
-          <div className={styles.cockpitPanel}>
-            <div className={styles.cockpitPanelHeader}>
-              <div>
-                <span className={styles.cockpitEyebrow}><Activity size={16} /> Recent quiz attempts</span>
-                <h2>Quiz activity</h2>
-              </div>
-              <Link href="/elearning/exercises">Open quizzes</Link>
-            </div>
-            {recentAttempts.length > 0 ? (
-              <div className={styles.compactRows}>
-                {recentAttempts.map((attempt) => (
-                  <Link
-                    href={attempt.quiz.isPracticeTest ? `/elearning/tests/${attempt.quizId}` : `/elearning/exercises/${attempt.quizId}?attempt=${attempt.id}`}
-                    key={attempt.id}
-                    className={styles.compactRow}
-                  >
-                    <div>
-                      <strong>{attempt.quiz.title}</strong>
-                      <p>{attempt.quiz.isPracticeTest ? "Practice Test" : attempt.quiz.program?.code || "Quiz"} | {formatDateTime(attempt.startedAt)}</p>
-                    </div>
-                    <span className={attempt.status === "IN_PROGRESS" ? styles.statusPending : styles.statusCompleted}>
-                      {attempt.status === "IN_PROGRESS" ? "In progress" : scoreLabel(attempt.score)}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className={styles.emptyStateInline}>
-                <ClipboardList size={32} />
-                <p>No quiz attempts yet. Your completed attempts will show up here.</p>
-              </div>
-            )}
-          </div>
-
-          <div className={styles.cockpitPanel}>
-            <div className={styles.cockpitPanelHeader}>
-              <div>
-                <span className={styles.cockpitEyebrow}><Award size={16} /> Recent grades</span>
-                <h2>Feedback</h2>
-              </div>
-              <Link href="/elearning/scores">All grades</Link>
-            </div>
-            {grades.length > 0 ? (
-              <div className={styles.compactRows}>
-                {grades.slice(0, 5).map((grade) => (
-                  <Link href="/elearning/scores" key={grade.id} className={styles.compactRow}>
-                    <div>
-                      <strong>{grade.assignment?.title || grade.quiz?.title || "Manual grade"}</strong>
-                      <p>{formatDate(grade.createdAt)} | {grade.feedback || "No feedback yet"}</p>
-                    </div>
-                    <span className={styles.scorePill}>{scoreLabel(grade.score)}</span>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className={styles.emptyStateInline}>
-                <Award size={32} />
-                <p>No grades yet. Scores and teacher feedback will appear here.</p>
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className={styles.cockpitPanel}>
-          <div className={styles.cockpitPanelHeader}>
+        <section className={styles.dashboardPanel}>
+          <div className={styles.dashboardPanelHeader}>
             <div>
-              <span className={styles.cockpitEyebrow}><Activity size={16} /> Learning timeline</span>
-              <h2>Recent activity</h2>
+              <span className={styles.cockpitEyebrow}><Activity size={16} /> Recent movement</span>
+              <h2>Activity</h2>
             </div>
           </div>
           {timeline.length > 0 ? (
             <div className={styles.timelineList}>
-              {timeline.map((item) => (
+              {timeline.slice(0, 5).map((item) => (
                 <Link href={item.href} key={item.key} className={styles.timelineItem}>
                   <div className={styles.timelineIcon}>{item.icon}</div>
                   <div>
@@ -541,7 +464,7 @@ export default async function ElearningDashboard() {
           ) : (
             <div className={styles.emptyStateInline}>
               <Activity size={32} />
-              <p>Your quiz attempts, assignment submissions, and new grades will create a timeline here.</p>
+              <p>Your quiz attempts, submissions, and new grades will appear here.</p>
             </div>
           )}
         </section>
@@ -549,29 +472,282 @@ export default async function ElearningDashboard() {
     );
   }
 
-  const [classes, submissions, assignments, grades] = await Promise.all([
-    prisma.classSection.findMany({ where: classWhere, include: { enrollments: { where: { status: "ACTIVE" } } } }),
-    prisma.submission.findMany({ where: user.role === "TEACHER" ? { assignment: { classSection: { teacherId: user.id } } } : {} }),
-    prisma.assignment.findMany({ where: user.role === "TEACHER" ? { classSection: { teacherId: user.id } } : {} }),
-    prisma.grade.findMany({ where: user.role === "TEACHER" ? { assignment: { classSection: { teacherId: user.id } } } : {} }),
+  const teacherScopedWhere = user.role === "TEACHER" ? { classSection: { teacherId: user.id } } : {};
+  const [
+    classes,
+    submissions,
+    grades,
+    recentActivity,
+  ] = await Promise.all([
+    prisma.classSection.findMany({
+      where: classWhere,
+      orderBy: { createdAt: "desc" },
+      include: {
+        course: true,
+        enrollments: {
+          include: { student: true },
+          orderBy: { requestedAt: "desc" },
+        },
+      },
+    }),
+    prisma.submission.findMany({
+      where: user.role === "TEACHER" ? { assignment: { classSection: { teacherId: user.id } } } : {},
+      orderBy: { submittedAt: "desc" },
+      take: 50,
+      include: {
+        grade: true,
+        student: true,
+        assignment: {
+          include: {
+            classSection: { include: { course: true } },
+          },
+        },
+      },
+    }),
+    prisma.grade.findMany({
+      where: user.role === "TEACHER"
+        ? { OR: [{ assignment: teacherScopedWhere }, { quiz: teacherScopedWhere }] }
+        : {},
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      include: { assignment: true, quiz: true, student: true },
+    }),
+    prisma.activityLog.findMany({
+      where: user.role === "TEACHER" ? { actorId: user.id } : {},
+      orderBy: { createdAt: "desc" },
+      take: 8,
+      include: { actor: true },
+    }),
   ]);
-  const studentCount = classes.reduce((sum, classSection) => sum + classSection.enrollments.length, 0);
-  const average = grades.length ? grades.reduce((sum, grade) => sum + grade.score, 0) / grades.length : 0;
+
+  const activeStudentIds = new Set(
+    classes.flatMap((classSection) => (
+      classSection.enrollments
+        .filter((enrollment) => enrollment.status === "ACTIVE")
+        .map((enrollment) => enrollment.userId)
+    )),
+  );
+  const pendingEnrollmentRequests = classes.flatMap((classSection) => (
+    classSection.enrollments
+      .filter((enrollment) => enrollment.status === "REQUESTED")
+      .map((enrollment) => ({ ...enrollment, classSection }))
+  ));
+  const submissionsToGrade = submissions.filter((submission) => submission.status !== "GRADED" && !submission.grade);
+  const average = grades.length ? grades.reduce((sum, grade) => sum + grade.score, 0) / grades.length : null;
+
+  const actionCards = [
+    { href: "/elearning/courses/new", label: "Create class", detail: "Open a new course section", icon: <BookPlus size={18} /> },
+    { href: "/elearning/classrooms", label: "Review enrollments", detail: `${pendingEnrollmentRequests.length} pending request${pendingEnrollmentRequests.length === 1 ? "" : "s"}`, icon: <UserPlus size={18} /> },
+    { href: "/elearning/classrooms", label: "Create assignment", detail: "Use a class as the starting point", icon: <FileText size={18} /> },
+    { href: "/elearning/practice?tab=quizzes", label: "Build quiz", detail: "Manage class quiz library", icon: <ClipboardList size={18} /> },
+    { href: "/elearning/practice?tab=tests", label: "Practice tests", detail: "Review imported test sets", icon: <FileCheck2 size={18} /> },
+    { href: "/elearning/scores", label: "Open scores", detail: `${submissionsToGrade.length} submission${submissionsToGrade.length === 1 ? "" : "s"} need review`, icon: <Award size={18} /> },
+  ];
+
+  const activityHref = (entityType: string) => {
+    if (entityType === "Enrollment" || entityType === "ClassSection") return "/elearning/classrooms";
+    if (entityType === "Quiz" || entityType === "Attempt" || entityType === "Question") return "/elearning/practice";
+    if (entityType === "Grade" || entityType === "Submission") return "/elearning/scores";
+    if (entityType === "Assignment") return "/elearning/classrooms";
+    return "/elearning";
+  };
+
+  const primaryTeacherAction = submissionsToGrade[0]
+    ? {
+        href: "/elearning/scores",
+        eyebrow: "Grade next",
+        title: submissionsToGrade[0].assignment.title,
+        meta: `${submissionsToGrade[0].student.name || submissionsToGrade[0].student.email} | ${submissionsToGrade[0].assignment.classSection.code}`,
+        icon: <CheckSquare size={22} />,
+      }
+    : pendingEnrollmentRequests[0]
+      ? {
+          href: "/elearning/classrooms",
+          eyebrow: "Enrollment request",
+          title: pendingEnrollmentRequests[0].student.name || pendingEnrollmentRequests[0].student.email || "New student",
+          meta: `${pendingEnrollmentRequests[0].classSection.code} | ${pendingEnrollmentRequests.length} pending`,
+          icon: <UserPlus size={22} />,
+        }
+      : {
+          href: "/elearning/classrooms",
+          eyebrow: "Open workspace",
+          title: "Manage classrooms",
+          meta: `${classes.length} class${classes.length === 1 ? "" : "es"} | ${activeStudentIds.size} active students`,
+          icon: <Users size={22} />,
+        };
 
   return (
-    <div>
-      <div className={styles.header}>
-        <div>
-          <h1 style={{ marginBottom: "0.5rem" }}>{user.role} Dashboard</h1>
-          <p style={{ color: "var(--text-muted)", margin: 0 }}>Statistics are loaded from ClassSection, Enrollment, Submission, and Grade tables.</p>
+    <div className={styles.dashboardShell}>
+      <section className={`${styles.dashboardHero} ${styles.dashboardHeroTeacher}`}>
+        <div className={styles.dashboardHeroCopy}>
+          <span className={styles.cockpitEyebrow}><Activity size={16} /> {user.role === "ADMIN" ? "Admin dashboard" : "Teacher dashboard"}</span>
+          <h1>Control the classroom flow.</h1>
+          <p>Queues, class health, and creation tools are grouped around what needs a decision now.</p>
         </div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.5rem" }}>
-        <div className={styles.panel}><Users size={24} color="var(--color-orange)" /><h3>{studentCount}</h3><p>Active students</p></div>
-        <div className={styles.panel}><BookOpen size={24} color="var(--color-navy)" /><h3>{assignments.length}</h3><p>Assignments</p></div>
-        <div className={styles.panel}><Clock size={24} color="#0891b2" /><h3>{submissions.length}</h3><p>Submitted work</p></div>
-        <div className={styles.panel}><Award size={24} color="#10b981" /><h3>{average ? average.toFixed(1) : "-"}</h3><p>Average grade</p></div>
-      </div>
+        <Link href={primaryTeacherAction.href} className={styles.dashboardPrimaryAction}>
+          <div className={styles.dashboardActionIcon}>{primaryTeacherAction.icon}</div>
+          <span>{primaryTeacherAction.eyebrow}</span>
+          <strong>{primaryTeacherAction.title}</strong>
+          <p>{primaryTeacherAction.meta}</p>
+          <em>Open <ArrowRight size={16} /></em>
+        </Link>
+      </section>
+
+      <section className={styles.dashboardStats} aria-label="Teaching status">
+        <div>
+          <span>Classes</span>
+          <strong>{classes.filter((classSection) => classSection.status === "ACTIVE").length}</strong>
+          <p>{classes.length} total</p>
+        </div>
+        <div>
+          <span>Students</span>
+          <strong>{activeStudentIds.size}</strong>
+          <p>Active learners</p>
+        </div>
+        <div>
+          <span>Queue</span>
+          <strong>{submissionsToGrade.length + pendingEnrollmentRequests.length}</strong>
+          <p>Needs action</p>
+        </div>
+      </section>
+
+      <section className={styles.actionHub} aria-label="Teaching actions">
+        {actionCards.slice(0, 4).map((action) => (
+          <Link href={action.href} key={action.label} className={styles.actionHubItem}>
+            <div>{action.icon}</div>
+            <strong>{action.label}</strong>
+            <p>{action.detail}</p>
+            <ArrowRight size={16} />
+          </Link>
+        ))}
+      </section>
+
+      <section className={styles.dashboardMain}>
+        <div className={styles.dashboardPanel}>
+          <div className={styles.dashboardPanelHeader}>
+            <div>
+              <span className={styles.cockpitEyebrow}><CheckSquare size={16} /> Decision queue</span>
+              <h2>Needs review</h2>
+            </div>
+            <Link href="/elearning/scores">Scores</Link>
+          </div>
+          {submissionsToGrade.length > 0 || pendingEnrollmentRequests.length > 0 ? (
+            <div className={styles.focusList}>
+              {submissionsToGrade.slice(0, 4).map((submission) => (
+                <Link href="/elearning/scores" key={submission.id} className={styles.focusItem}>
+                  <div className={styles.taskIcon}><FileText size={18} /></div>
+                  <div>
+                    <strong>{submission.assignment.title}</strong>
+                    <p>{submission.student.name || submission.student.email} | {submission.assignment.classSection.code}</p>
+                  </div>
+                  <span>Grade</span>
+                </Link>
+              ))}
+              {pendingEnrollmentRequests.slice(0, 3).map((enrollment) => (
+                <Link href="/elearning/classrooms" key={enrollment.id} className={styles.focusItem}>
+                  <div className={styles.taskIcon}><UserPlus size={18} /></div>
+                  <div>
+                    <strong>{enrollment.student.name || enrollment.student.email || "Unnamed student"}</strong>
+                    <p>{enrollment.classSection.code} | {enrollment.classSection.course.title}</p>
+                  </div>
+                  <span>Approve</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className={styles.emptyStateInline}>
+              <CheckCircle2 size={32} />
+              <p>No enrollment or grading decisions are waiting.</p>
+            </div>
+          )}
+        </div>
+
+        <aside className={styles.dashboardPanel}>
+          <div className={styles.dashboardPanelHeader}>
+            <div>
+              <span className={styles.cockpitEyebrow}><Award size={16} /> Score pulse</span>
+              <h2>Latest results</h2>
+            </div>
+            <Link href="/elearning/scores">All</Link>
+          </div>
+          <div className={styles.teacherPulse}>
+            <strong>{average === null ? "-" : average.toFixed(1)}</strong>
+            <p>Average from recent grades</p>
+          </div>
+          {grades.slice(0, 3).map((grade) => (
+            <Link href="/elearning/scores" key={grade.id} className={styles.snapshotRow}>
+              <Award size={18} />
+              <div>
+                <strong>{grade.assignment?.title || grade.quiz?.title || "Manual grade"}</strong>
+                <p>{grade.student.name || grade.student.email} | {scoreLabel(grade.score)}</p>
+              </div>
+            </Link>
+          ))}
+        </aside>
+      </section>
+
+      <section className={styles.dashboardMain}>
+        <div className={styles.dashboardPanel}>
+          <div className={styles.dashboardPanelHeader}>
+            <div>
+              <span className={styles.cockpitEyebrow}><BookOpen size={16} /> Classes</span>
+              <h2>Current classrooms</h2>
+            </div>
+            <Link href="/elearning/courses/new">New class</Link>
+          </div>
+          {classes.length > 0 ? (
+            <div className={styles.focusList}>
+              {classes.slice(0, 5).map((classSection) => {
+                const activeCount = classSection.enrollments.filter((enrollment) => enrollment.status === "ACTIVE").length;
+                const requestCount = classSection.enrollments.filter((enrollment) => enrollment.status === "REQUESTED").length;
+                return (
+                  <Link href={`/elearning/courses/${classSection.courseId}`} key={classSection.id} className={styles.focusItem}>
+                    <div className={styles.taskIcon}><Users size={18} /></div>
+                    <div>
+                      <strong>{classSection.name}</strong>
+                      <p>{classSection.code} | {classSection.course.title}</p>
+                    </div>
+                    <span>{activeCount} / {requestCount}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div className={styles.emptyStateInline}>
+              <AlertCircle size={32} />
+              <p>No classes found. Create a class to start enrolling students.</p>
+            </div>
+          )}
+        </div>
+
+        <aside className={styles.dashboardPanel}>
+          <div className={styles.dashboardPanelHeader}>
+            <div>
+              <span className={styles.cockpitEyebrow}><Activity size={16} /> Activity</span>
+              <h2>Recent movement</h2>
+            </div>
+          </div>
+          {recentActivity.length > 0 ? (
+            <div className={styles.timelineList}>
+              {recentActivity.slice(0, 5).map((activity) => (
+                <Link href={activityHref(activity.entityType)} key={activity.id} className={styles.timelineItem}>
+                  <div className={styles.timelineIcon}><Activity size={16} /></div>
+                  <div>
+                    <strong>{activity.action.replaceAll("_", " ").toLowerCase()}</strong>
+                    <p>{activity.entityType} | {activity.actor?.name || activity.actor?.email || "System"}</p>
+                  </div>
+                  <time>{formatDateTime(activity.createdAt)}</time>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className={styles.emptyStateInline}>
+              <Activity size={32} />
+              <p>Activity logs will appear here as the LMS is used.</p>
+            </div>
+          )}
+        </aside>
+      </section>
     </div>
   );
 }
