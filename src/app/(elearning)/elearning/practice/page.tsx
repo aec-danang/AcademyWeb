@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { ClipboardList, FileCheck2, Target } from "lucide-react";
+import { ClipboardList, FileCheck2, Target, PenTool } from "lucide-react";
 import styles from "../elearning.module.css";
 import { ClassQuizzesTab } from "./ClassQuizzesTab";
 import { PracticeTestsTab } from "./PracticeTestsTab";
 import { WrongQuestionsTab } from "./WrongQuestionsTab";
+import { WritingEvaluationTab } from "./WritingEvaluationTab";
 
 export const dynamic = "force-dynamic";
 
@@ -73,6 +74,24 @@ export default async function PracticeHubPage(props: Props) {
           <Target size={18} />
           Wrong Questions
         </Link>
+        <Link 
+          href="/elearning/practice?tab=writing"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            padding: "0.5rem 1rem",
+            borderRadius: "0.5rem",
+            fontWeight: 500,
+            textDecoration: "none",
+            backgroundColor: activeTab === "writing" ? "var(--primary-subtle)" : "transparent",
+            color: activeTab === "writing" ? "var(--primary)" : "var(--text)",
+            transition: "all 0.2s"
+          }}
+        >
+          <PenTool size={18} />
+          Writing Grading
+        </Link>
       </div>
 
       {/* Tab Content */}
@@ -80,6 +99,7 @@ export default async function PracticeHubPage(props: Props) {
         {activeTab === "quizzes" && <ClassQuizzesTab searchParams={props.searchParams} />}
         {activeTab === "tests" && <PracticeTestsTab searchParams={props.searchParams} />}
         {activeTab === "wrong" && <WrongQuestionsTab searchParams={props.searchParams} />}
+        {activeTab === "writing" && <WritingEvaluationTab />}
       </div>
     </div>
   );

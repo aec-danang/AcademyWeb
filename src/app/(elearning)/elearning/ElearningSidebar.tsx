@@ -12,6 +12,12 @@ import {
   LogOut,
   Settings,
   Users,
+  CheckSquare,
+  Bot,
+  LineChart,
+  MessageSquare,
+  FolderOpen,
+  UserCircle,
 } from "lucide-react";
 import styles from "./elearning.module.css";
 
@@ -21,13 +27,26 @@ type SidebarUser = {
   role: string;
 };
 
-const navItems = [
+const studentNavItems = [
   { name: "Dashboard", path: "/elearning", icon: LayoutDashboard },
   { name: "Courses", path: "/elearning/courses", icon: BookOpen },
   { name: "Classrooms", path: "/elearning/classrooms", icon: Users },
   { name: "Practice", path: "/elearning/practice", icon: ClipboardList },
-  { name: "Assignments", path: "/elearning/assignments", icon: GraduationCap, roles: ["STUDENT"] },
+  { name: "Assignments", path: "/elearning/assignments", icon: GraduationCap },
   { name: "Scores", path: "/elearning/scores", icon: Award },
+];
+
+const teacherNavItems = [
+  { name: "Dashboard", path: "/elearning", icon: LayoutDashboard },
+  { name: "Classrooms", path: "/elearning/classrooms", icon: Users },
+  { name: "Courses", path: "/elearning/teacher/courses", icon: BookOpen },
+  { name: "Tasks", path: "/elearning/teacher/tasks", icon: CheckSquare },
+  { name: "AI Grading", path: "/elearning/teacher/ai-grading", icon: Bot },
+  { name: "Gradebook", path: "/elearning/scores", icon: Award },
+  { name: "Progress", path: "/elearning/teacher/progress", icon: LineChart },
+  { name: "Discussions", path: "/elearning/teacher/discussions", icon: MessageSquare },
+  { name: "Resources", path: "/elearning/teacher/resources", icon: FolderOpen },
+  { name: "Profile", path: "/elearning/teacher/profile", icon: UserCircle },
 ];
 
 function isActivePath(pathname: string, path: string) {
@@ -74,7 +93,7 @@ export function ElearningSidebar({ user }: { user: SidebarUser }) {
       </div>
 
       <nav className={styles.sidebarNav} aria-label="E-learning navigation">
-        {navItems.filter((item) => !item.roles || item.roles.includes(user.role)).map((item) => {
+        {(user.role === "TEACHER" || user.role === "ADMIN" ? teacherNavItems : studentNavItems).map((item) => {
           const Icon = item.icon;
           const active = isActivePath(pathname, item.path);
           return (

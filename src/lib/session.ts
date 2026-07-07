@@ -11,12 +11,15 @@ export async function getCurrentUser() {
 
   if (!email) {
     // --- MOCK FOR E-LEARNING DEV ---
+    // MẸO: Đổi giá trị TEST_ROLE thành "TEACHER" hoặc "STUDENT" để test các chức năng tương ứng
+    let TEST_ROLE: AppRole = "TEACHER"; 
+    
     return {
-      id: "mock-student-id",
-      name: "Mock Teacher",
-      email: "teacher@example.com",
-      phone: "123456789",
-      role: "TEACHER" as AppRole,
+      id: TEST_ROLE === "TEACHER" ? "mock-teacher-id" : "mock-student-id",
+      name: TEST_ROLE === "TEACHER" ? "Mock Teacher" : "Mock Student",
+      email: TEST_ROLE === "TEACHER" ? "teacher@example.com" : "student@example.com",
+      phone: "0123456789",
+      role: TEST_ROLE,
       isActive: true,
     };
     // --- END MOCK ---
