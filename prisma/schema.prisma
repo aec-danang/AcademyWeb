@@ -8,17 +8,20 @@ datasource db {
 }
 
 model Course {
-  id          String             @id @default(cuid())
-  title       String
-  description String?
-  price       Float              @default(0)
-  imageUrl    String?
-  published   Boolean            @default(false)
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  enrollments CourseEnrollment[]
-  lessons     Lesson[]
-  orders      Order[]
+  id           String             @id @default(cuid())
+  title        String
+  description  String?
+  price        Float              @default(0)
+  imageUrl     String?
+  published    Boolean            @default(false)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  curriculum   String?
+  program      String?
+  ClassSection ClassSection[]
+  enrollments  CourseEnrollment[]
+  lessons      Lesson[]
+  orders       Order[]
 
   @@schema("elearning")
 }
@@ -32,8 +35,8 @@ model Lesson {
   courseId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  published Boolean  @default(true)
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  tests     Test[]
 
   @@schema("elearning")
 }
@@ -66,43 +69,6 @@ model Post {
   author          User?    @relation(fields: [authorId], references: [id])
 
   @@schema("public")
-}
-
-model Test {
-  id        String         @id @default(cuid())
-  title     String
-  timeLimit Int?
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  lessonId  String?
-  lesson    Lesson?        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  questions TestQuestion[]
-  results   TestResult[]
-
-  @@schema("elearning")
-}
-
-model TestQuestion {
-  id      String @id @default(cuid())
-  testId  String
-  text    String
-  options String
-  answer  String
-  test    Test   @relation(fields: [testId], references: [id], onDelete: Cascade)
-
-  @@schema("elearning")
-}
-
-model TestResult {
-  id        String   @id @default(cuid())
-  testId    String
-  userId    String?
-  score     Float
-  createdAt DateTime @default(now())
-  test      Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
-  user      User?    @relation(fields: [userId], references: [id])
-
-  @@schema("elearning")
 }
 
 model Lead {
@@ -194,23 +160,33 @@ model Sponsor {
 }
 
 model User {
-  id            String             @id
-  name          String?
-  username      String?            @unique
-  email         String?            @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          Role               @default(USER)
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime
-  courses       CourseEnrollment[]
-  orders        Order[]
-  testResults   TestResult[]
-  Account       Account[]
-  posts         Post[]
-  Session       Session[]
-  testimonials  Testimonial[]
+  id                           String             @id
+  name                         String?
+  email                        String?            @unique
+  emailVerified                DateTime?
+  image                        String?
+  password                     String?
+  role                         Role               @default(USER)
+  createdAt                    DateTime           @default(now())
+  updatedAt                    DateTime
+  username                     String?            @unique
+  isActive                     Boolean            @default(true)
+  phone                        String?
+  ActivityLog                  ActivityLog[]
+  Attempt                      Attempt[]
+  ClassSection                 ClassSection[]
+  courses                      CourseEnrollment[]
+  Enrollment                   Enrollment[]
+  Grade_Grade_gradedByIdToUser Grade[]            @relation("Grade_gradedByIdToUser")
+  Grade_Grade_studentIdToUser  Grade[]            @relation("Grade_studentIdToUser")
+  orders                       Order[]
+  Question                     Question[]
+  Quiz                         Quiz[]
+  Submission                   Submission[]
+  Account                      Account[]
+  posts                        Post[]
+  Session                      Session[]
+  testimonials                 Testimonial[]
 
   @@schema("elearning")
 }
@@ -253,10 +229,406 @@ model VerificationToken {
   @@schema("public")
 }
 
+model ActivityLog {
+  id         String   @id
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  User       User?    @relation(fields: [actorId], references: [id])
+
+  @@schema("elearning")
+}
+
+model Assignment {
+  id             String               @id
+  title          String
+  description    String?
+  type           AssignmentType       @default(HOMEWORK)
+  status         AssignmentStatus     @default(PUBLISHED)
+  difficulty     AssignmentDifficulty @default(MEDIUM)
+  category       String?
+  tags           String[]             @default([])
+  instructions   String?
+  attachmentUrl  String?
+  attachmentName String?
+  dueAt          DateTime?
+  classSectionId String
+  createdById    String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime
+  ClassSection   ClassSection         @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+  Grade          Grade[]
+  Submission     Submission[]
+
+  @@schema("elearning")
+}
+
+model Attempt {
+  id            String          @id
+  quizId        String
+  studentId     String
+  startedAt     DateTime        @default(now())
+  submittedAt   DateTime?
+  status        AttemptStatus   @default(IN_PROGRESS)
+  score         Float?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime
+  Quiz          Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  User          User            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  AttemptAnswer AttemptAnswer[]
+  Grade         Grade[]
+
+  @@schema("elearning")
+}
+
+model AttemptAnswer {
+  id             String          @id
+  attemptId      String
+  questionId     String
+  optionId       String?
+  answerText     String?
+  isCorrect      Boolean?
+  pointsAwarded  Float?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime
+  Attempt        Attempt         @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  QuestionOption QuestionOption? @relation(fields: [optionId], references: [id])
+  Question       Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
+  @@schema("elearning")
+}
+
+model ClassSection {
+  id         String       @id
+  name       String
+  code       String       @unique
+  status     ClassStatus  @default(ACTIVE)
+  courseId   String
+  teacherId  String?
+  startAt    DateTime?
+  endAt      DateTime?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime
+  Assignment Assignment[]
+  Course     Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  User       User?        @relation(fields: [teacherId], references: [id])
+  Enrollment Enrollment[]
+  Quiz       Quiz[]
+
+  @@schema("elearning")
+}
+
+model Enrollment {
+  id             String           @id
+  userId         String
+  classSectionId String
+  status         EnrollmentStatus @default(REQUESTED)
+  requestedAt    DateTime         @default(now())
+  decidedAt      DateTime?
+  decidedById    String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  ClassSection   ClassSection     @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+  User           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, classSectionId])
+  @@schema("elearning")
+}
+
+model Grade {
+  id                          String      @id
+  studentId                   String
+  assignmentId                String?
+  quizId                      String?
+  attemptId                   String?
+  submissionId                String?     @unique
+  score                       Float
+  feedback                    String?
+  gradedById                  String?
+  createdAt                   DateTime    @default(now())
+  updatedAt                   DateTime
+  Assignment                  Assignment? @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  Attempt                     Attempt?    @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  User_Grade_gradedByIdToUser User?       @relation("Grade_gradedByIdToUser", fields: [gradedById], references: [id])
+  Quiz                        Quiz?       @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  User_Grade_studentIdToUser  User        @relation("Grade_studentIdToUser", fields: [studentId], references: [id], onDelete: Cascade)
+  Submission                  Submission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@schema("elearning")
+}
+
+model Program {
+  id          String   @id
+  code        String   @unique
+  name        String
+  band        String?
+  description String?
+  source      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  Quiz        Quiz[]
+
+  @@schema("elearning")
+}
+
+model Question {
+  id                   String                @id
+  categoryId           String?
+  createdById          String?
+  type                 QuestionType
+  text                 String
+  section              String?
+  sourceOrder          Int?
+  sourceType           String?
+  importSource         String?
+  audioUrl             String?
+  passage              String?
+  gridRows             Json?
+  points               Float                 @default(1)
+  answerKey            String?
+  explanation          String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime
+  AttemptAnswer        AttemptAnswer[]
+  QuestionBankCategory QuestionBankCategory? @relation(fields: [categoryId], references: [id])
+  User                 User?                 @relation(fields: [createdById], references: [id])
+  QuestionOption       QuestionOption[]
+  QuizQuestion         QuizQuestion[]
+
+  @@schema("elearning")
+}
+
+model QuestionBankCategory {
+  id          String     @id
+  name        String     @unique
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime
+  Question    Question[]
+
+  @@schema("elearning")
+}
+
+model QuestionOption {
+  id            String          @id
+  questionId    String
+  label         String?
+  text          String
+  isCorrect     Boolean         @default(false)
+  order         Int             @default(0)
+  AttemptAnswer AttemptAnswer[]
+  Question      Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@schema("elearning")
+}
+
+model Quiz {
+  id               String         @id
+  title            String
+  description      String?
+  classSectionId   String?
+  createdById      String?
+  programId        String?
+  unit             String?
+  sourceTitle      String?
+  sourceGroup      String?
+  importSource     String?
+  isOpenQuiz       Boolean        @default(false)
+  isPracticeTest   Boolean        @default(false)
+  examType         ExamType       @default(GENERAL)
+  skill            ExamSkill      @default(GRAMMAR)
+  timeLimit        Int?
+  instructions     String?
+  audioUrl         String?
+  passage          String?
+  openAt           DateTime?
+  closeAt          DateTime?
+  attemptLimit     Int            @default(1)
+  shuffleQuestions Boolean        @default(false)
+  published        Boolean        @default(true)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime
+  Attempt          Attempt[]
+  Grade            Grade[]
+  ClassSection     ClassSection?  @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+  User             User?          @relation(fields: [createdById], references: [id])
+  Program          Program?       @relation(fields: [programId], references: [id])
+  QuizQuestion     QuizQuestion[]
+  TestSection      TestSection[]
+
+  @@index([importSource])
+  @@index([programId])
+  @@schema("elearning")
+}
+
+model QuizQuestion {
+  id          String       @id
+  quizId      String
+  sectionId   String?
+  questionId  String
+  points      Float        @default(1)
+  order       Int          @default(0)
+  Question    Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  Quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  TestSection TestSection? @relation(fields: [sectionId], references: [id])
+
+  @@unique([quizId, questionId])
+  @@index([sectionId])
+  @@schema("elearning")
+}
+
+model Submission {
+  id           String           @id
+  assignmentId String
+  studentId    String
+  content      String?
+  fileUrl      String?
+  status       SubmissionStatus @default(SUBMITTED)
+  submittedAt  DateTime         @default(now())
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime
+  Grade        Grade?
+  Assignment   Assignment       @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  User         User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, studentId])
+  @@schema("elearning")
+}
+
+model TestSection {
+  id           String         @id
+  quizId       String
+  title        String
+  skill        ExamSkill      @default(READING)
+  instructions String?
+  audioUrl     String?
+  passage      String?
+  order        Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  QuizQuestion QuizQuestion[]
+  Quiz         Quiz           @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+  @@schema("elearning")
+}
+
 enum Role {
   USER
   TEACHER
   ADMIN
+  STUDENT
 
   @@schema("elearning")
+}
+
+enum AssignmentDifficulty {
+  EASY
+  MEDIUM
+  HARD
+
+  @@schema("elearning")
+}
+
+enum AssignmentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+
+  @@schema("elearning")
+}
+
+enum AssignmentType {
+  HOMEWORK
+  WRITING
+  SPEAKING
+  FILE_UPLOAD
+
+  @@schema("elearning")
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  AUTO_SUBMITTED
+  GRADED
+
+  @@schema("elearning")
+}
+
+enum ClassStatus {
+  ACTIVE
+  ARCHIVED
+
+  @@schema("elearning")
+}
+
+enum EnrollmentStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  ACTIVE
+  REMOVED
+
+  @@schema("elearning")
+}
+
+enum ExamSkill {
+  LISTENING
+  READING
+  WRITING
+  SPEAKING
+  GRAMMAR
+  MIXED
+
+  @@schema("elearning")
+}
+
+enum ExamType {
+  TOEIC
+  IELTS
+  GENERAL
+
+  @@schema("elearning")
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  SHORT_ANSWER
+  GRID
+  FILL_BLANK
+  ESSAY
+  LISTENING
+  READING
+
+  @@schema("elearning")
+}
+
+enum SubmissionStatus {
+  PENDING
+  SUBMITTED
+  GRADED
+  MISSING
+
+  @@schema("elearning")
+}
+
+model SiteProgram {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  content     String?  @db.Text
+  iconType    String   @default("lucide") // "lucide" or "image"
+  iconValue   String   // Name of lucide icon or image URL
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@schema("public")
 }

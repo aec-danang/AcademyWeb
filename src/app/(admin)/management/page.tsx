@@ -345,6 +345,12 @@ export default async function AdminDashboard() {
                   <span className="text-xs font-semibold">Sponsors</span>
                 </Link>
               </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2 bg-slate-50/50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-800" asChild>
+                <Link href="/management/programs">
+                  <BookOpen className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+                  <span className="text-xs font-semibold">Programs</span>
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         </div>

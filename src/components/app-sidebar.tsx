@@ -15,6 +15,7 @@ import {
   Sun,
   Moon,
   LogOut,
+  BookOpen,
 } from "lucide-react"
 import { useSession, signOut } from "next-auth/react"
 import { useTheme } from "@/lib/contexts/ThemeProvider"
@@ -37,6 +38,7 @@ const navItems = [
   { name: "Dashboard", path: "/management", icon: LayoutDashboard },
   { name: "Accounts", path: "/management/accounts", icon: Users },
   { name: "Posts", path: "/management/posts", icon: Newspaper },
+  { name: "Programs", path: "/management/programs", icon: BookOpen },
   { name: "Sponsors", path: "/management/sponsors", icon: FileText },
   { name: "Notifications", path: "/management/notifications", icon: Bell },
   { name: "Page Settings", path: "/management/settings", icon: Settings },

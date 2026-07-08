@@ -151,6 +151,9 @@
   font-size: 48px;
   margin-bottom: 16px;
   color: var(--color-orange);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .whyChoose {
