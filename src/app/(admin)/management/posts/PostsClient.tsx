@@ -34,6 +34,7 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
   const [posts, setPosts] = useState([...initialPosts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
 
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 50;
@@ -56,7 +57,10 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
     if (statusFilter === "published") matchesStatus = p.published === true;
     if (statusFilter === "draft") matchesStatus = p.published === false;
 
-    return matchesSearch && matchesStatus;
+    let matchesType = true;
+    if (typeFilter !== "all") matchesType = p.type === typeFilter;
+
+    return matchesSearch && matchesStatus && matchesType;
   });
 
   const totalPages = Math.ceil(filteredPosts.length / ITEMS_PER_PAGE);
@@ -194,6 +198,17 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
               className="pl-9 bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-800 w-full h-10 shadow-sm focus-visible:ring-1 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-600 transition-shadow"
             />
           </div>
+          <Select value={typeFilter} onValueChange={(val) => { setTypeFilter(val); setCurrentPage(1); setSelectedSlugs([]); setLastSelectedSlug(null); }}>
+            <SelectTrigger className="w-[120px] h-10 bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-800 shadow-sm">
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="post">Post</SelectItem>
+              <SelectItem value="news">News</SelectItem>
+              <SelectItem value="event">Event</SelectItem>
+            </SelectContent>
+          </Select>
           <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val); setCurrentPage(1); setSelectedSlugs([]); setLastSelectedSlug(null); }}>
             <SelectTrigger className="w-[140px] h-10 bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-800 shadow-sm">
               <SelectValue placeholder="Status" />

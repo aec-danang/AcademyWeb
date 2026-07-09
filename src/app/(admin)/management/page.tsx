@@ -1,4 +1,4 @@
-import { Users, Activity, Plus, DollarSign, Target, BookOpen, Clock, ChevronRight, Mail, Phone, FileText, ShieldCheck } from "lucide-react";
+import { Users, Activity, Plus, DollarSign, Target, BookOpen, Clock, ChevronRight, Mail, Phone, FileText, ShieldCheck, Star, MessageSquare } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -328,27 +328,21 @@ export default async function AdminDashboard() {
                 </Link>
               </Button>
               <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2 bg-slate-50/50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-800" asChild>
-                <Link href="/management/accounts">
-                  <Users className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-                  <span className="text-xs font-semibold">Add User</span>
+                <Link href="/management/features">
+                  <Star className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+                  <span className="text-xs font-semibold">Features</span>
                 </Link>
               </Button>
               <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2 bg-slate-50/50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-800" asChild>
-                <Link href="/management">
-                  <BookOpen className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-                  <span className="text-xs font-semibold">New Course</span>
+                <Link href="/management/testimonials">
+                  <MessageSquare className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+                  <span className="text-xs font-semibold">Testimonials</span>
                 </Link>
               </Button>
               <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2 bg-slate-50/50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-800" asChild>
                 <Link href="/management/sponsors">
                   <Activity className="h-5 w-5 text-slate-500 dark:text-slate-400" />
                   <span className="text-xs font-semibold">Sponsors</span>
-                </Link>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 flex flex-col items-center justify-center gap-2 bg-slate-50/50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-800" asChild>
-                <Link href="/management/programs">
-                  <BookOpen className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-                  <span className="text-xs font-semibold">Programs</span>
                 </Link>
               </Button>
             </CardContent>

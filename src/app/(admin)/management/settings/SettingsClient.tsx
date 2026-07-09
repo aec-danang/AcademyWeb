@@ -27,13 +27,19 @@ const DEFAULT_KEYS = [
   { key: "footer_text", label: "Footer Text", placeholder: "© 2026 Academy English Center..." },
 ];
 
+const STATS_KEYS = [
+  { key: "stats_native_teachers", label: "Native Teachers", placeholder: "e.g. 44" },
+  { key: "stats_happy_students", label: "Happy Students", placeholder: "e.g. 15,000+" },
+  { key: "stats_years_experience", label: "Years Experience", placeholder: "e.g. 15" },
+];
+
 export default function SettingsClient({ initialSettings, user }: { initialSettings: Setting[], user?: UserInfo }) {
   const [settingsMap, setSettingsMap] = useState<Record<string, string>>(
     initialSettings.reduce((acc, curr) => ({ ...acc, [curr.key]: curr.value }), {})
   );
 
   const [customSettings, setCustomSettings] = useState<Setting[]>(
-    initialSettings.filter(s => !DEFAULT_KEYS.some(dk => dk.key === s.key))
+    initialSettings.filter(s => !DEFAULT_KEYS.some(dk => dk.key === s.key) && !STATS_KEYS.some(sk => sk.key === s.key))
   );
 
   const [accountData, setAccountData] = useState({
@@ -90,6 +96,12 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
     DEFAULT_KEYS.forEach(dk => {
       if (settingsMap[dk.key] !== undefined) {
         finalSettings.push({ key: dk.key, value: settingsMap[dk.key] });
+      }
+    });
+
+    STATS_KEYS.forEach(sk => {
+      if (settingsMap[sk.key] !== undefined) {
+        finalSettings.push({ key: sk.key, value: settingsMap[sk.key] });
       }
     });
 
@@ -196,6 +208,27 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
                     onChange={e => handleStandardChange(item.key, e.target.value)}
                   />
                 )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Stats Counters */}
+        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
+          <CardHeader>
+            <CardTitle>Stats Counters</CardTitle>
+            <CardDescription>Manage the numeric statistics displayed on the landing page.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 grid sm:grid-cols-3 gap-6 sm:space-y-0">
+            {STATS_KEYS.map((item) => (
+              <div key={item.key} className="grid gap-2">
+                <label className="text-sm font-medium">{item.label}</label>
+                <Input 
+                  type="text" 
+                  placeholder={item.placeholder}
+                  value={settingsMap[item.key] || ""}
+                  onChange={e => handleStandardChange(item.key, e.target.value)}
+                />
               </div>
             ))}
           </CardContent>
