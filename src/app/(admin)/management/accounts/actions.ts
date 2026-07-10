@@ -7,7 +7,7 @@ import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
-type AccountRole = "USER" | "TEACHER" | "ADMIN";
+type AccountRole = "USER" | "TEACHER" | "ADMIN" | "STUDENT";
 
 type SessionUser = {
   role?: string;
@@ -32,8 +32,8 @@ async function requireAdmin() {
 }
 
 function normalizeRole(role: string): AccountRole {
-  if (role === "TEACHER" || role === "ADMIN") {
-    return role;
+  if (role === "TEACHER" || role === "ADMIN" || role === "STUDENT") {
+    return role as AccountRole;
   }
 
   return "USER";

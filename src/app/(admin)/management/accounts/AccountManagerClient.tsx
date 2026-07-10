@@ -21,7 +21,7 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 
-type AccountRole = "USER" | "TEACHER" | "ADMIN";
+type AccountRole = "USER" | "TEACHER" | "ADMIN" | "STUDENT";
 
 type AccountRow = {
   id?: string;
@@ -35,7 +35,8 @@ type AccountRow = {
 };
 
 const roleLabels: Record<AccountRole, string> = {
-  USER: "Student",
+  USER: "User",
+  STUDENT: "Student",
   TEACHER: "Teacher",
   ADMIN: "Admin",
 };
@@ -44,6 +45,7 @@ function normalizeRole(value: string): AccountRole {
   const normalizedValue = value.trim().toUpperCase();
   if (normalizedValue === "TEACHER") return "TEACHER";
   if (normalizedValue === "ADMIN") return "ADMIN";
+  if (normalizedValue === "STUDENT") return "STUDENT";
   return "USER";
 }
 
@@ -273,7 +275,8 @@ export default function AccountManagerClient({ initialUsers }: { initialUsers: A
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All Roles</SelectItem>
-              <SelectItem value="USER">Student</SelectItem>
+              <SelectItem value="USER">User</SelectItem>
+              <SelectItem value="STUDENT">Student</SelectItem>
               <SelectItem value="TEACHER">Teacher</SelectItem>
               <SelectItem value="ADMIN">Admin</SelectItem>
             </SelectContent>
@@ -449,7 +452,8 @@ export default function AccountManagerClient({ initialUsers }: { initialUsers: A
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="USER">Student</SelectItem>
+                    <SelectItem value="USER">User</SelectItem>
+                    <SelectItem value="STUDENT">Student</SelectItem>
                     <SelectItem value="TEACHER">Teacher</SelectItem>
                     <SelectItem value="ADMIN">Admin</SelectItem>
                   </SelectContent>
@@ -497,7 +501,8 @@ export default function AccountManagerClient({ initialUsers }: { initialUsers: A
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="USER">Student</SelectItem>
+                  <SelectItem value="USER">User</SelectItem>
+                  <SelectItem value="STUDENT">Student</SelectItem>
                   <SelectItem value="TEACHER">Teacher</SelectItem>
                   <SelectItem value="ADMIN">Admin</SelectItem>
                 </SelectContent>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPost, updatePost } from "../actions";
 import { ArrowLeft, Save, Image as ImageIcon, Settings, X } from "lucide-react";
-import SimpleEditor from "./SimpleEditor";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -185,7 +185,7 @@ export default function PostEditorClient({ initialData }: { initialData?: Post }
         {/* Main Editor Column */}
         <div className="flex flex-col gap-4 flex-1 min-w-0">
 
-          <SimpleEditor
+          <RichTextEditor
             content={formData.content}
             onChange={(content) => setFormData({ ...formData, content })}
           />

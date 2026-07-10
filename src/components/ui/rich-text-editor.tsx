@@ -5,21 +5,22 @@ import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
+import Youtube from '@tiptap/extension-youtube';
 import { 
   Bold, Italic, Underline as UnderlineIcon, Strikethrough, 
-  Heading1, Heading2, List, ListOrdered, Link as LinkIcon, ImageIcon 
+  Heading1, Heading2, List, ListOrdered, Link as LinkIcon, ImageIcon, Video as VideoIcon 
 } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-type SimpleEditorProps = {
+type RichTextEditorProps = {
   content: string;
   onChange: (content: string) => void;
 };
 
-export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
+export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -35,6 +36,12 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
       Image.configure({
         inline: true,
       }),
+      Youtube.configure({
+        inline: false,
+        HTMLAttributes: {
+          class: 'w-full aspect-video rounded-lg',
+        },
+      }),
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -42,7 +49,7 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
     },
     editorProps: {
       attributes: {
-        class: 'min-h-[500px] py-4 focus:outline-none prose prose-slate dark:prose-invert max-w-none prose-p:leading-relaxed prose-headings:font-bold prose-a:text-orange prose-a:no-underline hover:prose-a:underline text-slate-800 dark:text-slate-200',
+        class: 'min-h-[200px] py-4 focus:outline-none prose prose-slate dark:prose-invert max-w-none prose-p:leading-relaxed prose-headings:font-bold prose-a:text-orange prose-a:no-underline hover:prose-a:underline text-slate-800 dark:text-slate-200 w-full',
         style: 'outline: none;'
       },
     },
@@ -53,6 +60,9 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
 
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
+
+  const [youtubeDialogOpen, setYoutubeDialogOpen] = useState(false);
+  const [youtubeUrl, setYoutubeUrl] = useState('');
 
   const openLinkDialog = useCallback(() => {
     if (!editor) return;
@@ -87,12 +97,32 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
     setImageUrl('');
   };
 
+  const openYoutubeDialog = useCallback(() => {
+    if (!editor) return;
+    setYoutubeUrl('');
+    setYoutubeDialogOpen(true);
+  }, [editor]);
+
+  const confirmYoutube = () => {
+    if (!editor) return;
+    if (youtubeUrl) {
+      editor.commands.setYoutubeVideo({
+        src: youtubeUrl,
+        width: 640,
+        height: 480,
+      });
+    }
+    setYoutubeDialogOpen(false);
+    setYoutubeUrl('');
+  };
+
   if (!editor) {
     return null;
   }
 
   const ToolbarButton = ({ onClick, isActive, disabled = false, children, title }: any) => (
     <button
+      type="button"
       onClick={(e) => { e.preventDefault(); onClick(); }}
       disabled={disabled}
       title={title}
@@ -107,37 +137,37 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
   );
 
   return (
-    <div className="flex flex-col w-full group">
+    <div className="flex flex-col w-full group border border-slate-200 dark:border-slate-800 rounded-md overflow-hidden bg-white dark:bg-slate-950">
       {/* Toolbar */}
-      <div className="sticky top-20 z-10 flex flex-wrap items-center gap-2 p-1.5 mb-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm transition-opacity duration-200 opacity-60 group-focus-within:opacity-100 hover:opacity-100">
+      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
         <div className="flex gap-1 pr-4 border-r border-slate-200 dark:border-slate-700">
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             isActive={editor.isActive('bold')}
             title="Bold"
           >
-            <Bold size={18} />
+            <Bold size={16} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleItalic().run()}
             isActive={editor.isActive('italic')}
             title="Italic"
           >
-            <Italic size={18} />
+            <Italic size={16} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleUnderline().run()}
             isActive={editor.isActive('underline')}
             title="Underline"
           >
-            <UnderlineIcon size={18} />
+            <UnderlineIcon size={16} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleStrike().run()}
             isActive={editor.isActive('strike')}
             title="Strikethrough"
           >
-            <Strikethrough size={18} />
+            <Strikethrough size={16} />
           </ToolbarButton>
         </div>
 
@@ -147,14 +177,14 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
             isActive={editor.isActive('heading', { level: 1 })}
             title="Heading 1"
           >
-            <Heading1 size={18} />
+            <Heading1 size={16} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
             isActive={editor.isActive('heading', { level: 2 })}
             title="Heading 2"
           >
-            <Heading2 size={18} />
+            <Heading2 size={16} />
           </ToolbarButton>
         </div>
 
@@ -164,14 +194,14 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
             isActive={editor.isActive('bulletList')}
             title="Bullet List"
           >
-            <List size={18} />
+            <List size={16} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
             isActive={editor.isActive('orderedList')}
             title="Numbered List"
           >
-            <ListOrdered size={18} />
+            <ListOrdered size={16} />
           </ToolbarButton>
         </div>
 
@@ -181,19 +211,25 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
             isActive={editor.isActive('link')}
             title="Link"
           >
-            <LinkIcon size={18} />
+            <LinkIcon size={16} />
           </ToolbarButton>
           <ToolbarButton
             onClick={openImageDialog}
             title="Image"
           >
-            <ImageIcon size={18} />
+            <ImageIcon size={16} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={openYoutubeDialog}
+            title="YouTube Video"
+          >
+            <VideoIcon size={16} />
           </ToolbarButton>
         </div>
       </div>
 
       {/* Editor Content Area */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto px-4 w-full">
         <EditorContent editor={editor} />
       </div>
 
@@ -247,6 +283,33 @@ export default function SimpleEditor({ content, onChange }: SimpleEditorProps) {
           <DialogFooter>
             <Button variant="outline" onClick={() => setImageDialogOpen(false)}>Cancel</Button>
             <Button onClick={confirmImage}>Insert</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* YouTube Dialog */}
+      <Dialog open={youtubeDialogOpen} onOpenChange={setYoutubeDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Insert YouTube Video</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">YouTube Video URL</label>
+              <Input
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=..."
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') confirmYoutube();
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setYoutubeDialogOpen(false)}>Cancel</Button>
+            <Button onClick={confirmYoutube}>Insert</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

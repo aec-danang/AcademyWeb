@@ -23,7 +23,47 @@ type SiteProgram = {
   iconValue: string;
 };
 
-export default function LandingClient({ programs }: { programs: SiteProgram[] }) {
+type SiteFeature = {
+  id: string;
+  title: string;
+  description: string;
+  iconValue: string;
+};
+
+type SitePost = {
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  featuredImage: string | null;
+  createdAt: Date;
+};
+
+type SiteTestimonial = {
+  id: string;
+  authorName: string;
+  authorRole: string | null;
+  content: string;
+  avatarUrl: string | null;
+  score: string | null;
+  isHallOfFame: boolean;
+  isFeatured: boolean;
+};
+
+export default function LandingClient({ 
+  programs,
+  features,
+  settings,
+  events,
+  news,
+  testimonials
+}: { 
+  programs: SiteProgram[];
+  features: SiteFeature[];
+  settings: Record<string, string>;
+  events: SitePost[];
+  news: SitePost[];
+  testimonials: SiteTestimonial[];
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
@@ -107,6 +147,64 @@ export default function LandingClient({ programs }: { programs: SiteProgram[] })
       }
     );
 
+    // 7. Stats Section Counter
+    const statElements = gsap.utils.toArray<HTMLElement>(`.${styles.statNumber}`);
+    statElements.forEach((el) => {
+      const text = el.innerText;
+      const numMatch = text.match(/[\d,]+/);
+      if (!numMatch) return;
+      
+      const targetNum = parseInt(numMatch[0].replace(/,/g, ''), 10);
+      const prefix = text.substring(0, text.indexOf(numMatch[0]));
+      const suffix = text.substring(text.indexOf(numMatch[0]) + numMatch[0].length);
+      
+      const counter = { val: 0 };
+      
+      gsap.to(counter, {
+        val: targetNum,
+        duration: 2,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: `.${styles.statsSection}`,
+          start: "top 85%",
+        },
+        onUpdate: () => {
+          el.innerText = prefix + Math.floor(counter.val).toLocaleString() + suffix;
+        }
+      });
+    });
+
+    // 8. Features Section
+    gsap.fromTo(`.${styles.featuresGrid} > div`,
+      { opacity: 0, y: 50 },
+      {
+        scrollTrigger: {
+          trigger: `.${styles.featuresSection}`,
+          start: "top 80%"
+        },
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.2,
+        ease: "power4.out"
+      }
+    );
+
+    // 9. Events, News & Testimonials Animations
+    gsap.fromTo(`.${styles.sectionHeader}`, 
+      { opacity: 0, y: 30 },
+      {
+        scrollTrigger: {
+          trigger: `.${styles.sectionHeader}`,
+          start: "top 85%"
+        },
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.2
+      }
+    );
+
   }, { scope: containerRef });
 
   return (
@@ -141,6 +239,55 @@ export default function LandingClient({ programs }: { programs: SiteProgram[] })
                 <div>2006</div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className={styles.statsSection}>
+        <div className="container">
+          <div className={styles.statsGrid}>
+            <div className={styles.statItem}>
+              <div className={styles.statNumber}>{settings.stats_native_teachers || '40+'}</div>
+              <div className={styles.statLabel}>Native Teachers</div>
+            </div>
+            <div className={styles.statItem}>
+              <div className={styles.statNumber}>{settings.stats_happy_students || '15,000+'}</div>
+              <div className={styles.statLabel}>Happy Students</div>
+            </div>
+            <div className={styles.statItem}>
+              <div className={styles.statNumber}>{settings.stats_years_experience || '15+'}</div>
+              <div className={styles.statLabel}>Years of Experience</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Key Features Section */}
+      <section className={styles.featuresSection}>
+        <div className="container">
+          <div className={styles.sectionHeader}>
+            <h2 style={{ color: 'var(--color-white)' }}>Đặc điểm nổi bật</h2>
+            <p style={{ color: '#aeb0cc' }}>What makes Academy English Center stand out.</p>
+          </div>
+          <div className={styles.featuresGrid}>
+            {features.map((feature) => {
+              // Convert kebab-case (e.g. graduation-cap) to PascalCase (GraduationCap)
+              const iconName = feature.iconValue.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
+              // @ts-ignore
+              const Icon = LucideIcons[iconName] || LucideIcons.CheckCircle;
+              return (
+                <div key={feature.id} className={styles.featureItem}>
+                  <div className={styles.featureIconWrapper}>
+                    <Icon size={32} strokeWidth={2} />
+                  </div>
+                  <div className={styles.featureContent}>
+                    <h3>{feature.title}</h3>
+                    <p>{feature.description}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -233,6 +380,105 @@ export default function LandingClient({ programs }: { programs: SiteProgram[] })
           </div>
         </div>
       </section>
+
+      {/* Events Section */}
+      {events.length > 0 && (
+        <section className={styles.eventsSection}>
+          <div className="container">
+            <div className={styles.sectionHeader}>
+              <h2>Upcoming Events</h2>
+              <p>Join our interactive workshops, camps, and activities.</p>
+            </div>
+            <div className={styles.carouselContainer}>
+              {events.map((event) => (
+                <Link key={event.slug} href={`/posts/${event.slug}`} className={styles.eventCard}>
+                  <div className={styles.eventImageWrapper}>
+                    <Image 
+                      src={event.featuredImage || "/images/placeholder.svg"} 
+                      alt={event.title} 
+                      fill 
+                      style={{ objectFit: 'cover' }} 
+                    />
+                  </div>
+                  <div className={styles.eventContent}>
+                    <h3>{event.title}</h3>
+                    {event.excerpt && <p>{event.excerpt}</p>}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* News Section */}
+      {news.length > 0 && (
+        <section className={styles.newsSection}>
+          <div className="container">
+            <div className={styles.sectionHeader}>
+              <h2>Latest News</h2>
+              <p>Stay updated with AEC.</p>
+            </div>
+            <div className={styles.newsGrid}>
+              {news.map((n) => (
+                <Link key={n.slug} href={`/posts/${n.slug}`} className={styles.newsCard}>
+                  {n.featuredImage && (
+                    <div className={styles.newsImageWrapper}>
+                      <Image src={n.featuredImage} alt={n.title} fill style={{ objectFit: 'cover' }} />
+                    </div>
+                  )}
+                  <div className={styles.newsContent}>
+                    <span className={styles.newsDate}>
+                      {new Date(n.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                    <h3>{n.title}</h3>
+                    {n.excerpt && <p>{n.excerpt}</p>}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Hall of Fame Testimonials */}
+      {testimonials.length > 0 && (
+        <section className={styles.testimonialsSection}>
+          <div className="container">
+            <div className={styles.sectionHeader}>
+              <h2 style={{ color: 'var(--color-white)' }}>Hall of Fame</h2>
+              <p style={{ color: '#aeb0cc' }}>Hear from our outstanding achievers.</p>
+            </div>
+            <div className={styles.testimonialGrid}>
+              {testimonials.map((t) => (
+                <div key={t.id} className={styles.testimonialCard}>
+                  <div className={styles.quoteIcon}>
+                    <LucideIcons.Quote size={40} color="var(--color-orange)" />
+                  </div>
+                  <p className={styles.testimonialContent}>"{t.content}"</p>
+                  <div className={styles.testimonialAuthor}>
+                    <div className={styles.authorAvatar}>
+                      {t.avatarUrl ? (
+                        <Image src={t.avatarUrl} alt={t.authorName} fill style={{ objectFit: 'cover' }} />
+                      ) : (
+                        <LucideIcons.User size={24} color="#aeb0cc" />
+                      )}
+                    </div>
+                    <div className={styles.authorInfo}>
+                      <h4>{t.authorName}</h4>
+                      {t.score ? (
+                        <span className={styles.authorScore}>{t.score}</span>
+                      ) : (
+                        <span className={styles.authorRole}>{t.authorRole || 'Student'}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className={styles.ctaSection}>

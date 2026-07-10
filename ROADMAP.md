@@ -18,13 +18,13 @@ The following tasks are formatted as specific AI Agent prompts so that each phas
 > 2. Build the corresponding Client UIs (Data Tables, Forms) for each. 
 > 3. Add their navigation links to the Admin sidebar (`app-sidebar.tsx`) and the dashboard Quick Links card (`management/page.tsx`)."
 
-## [ ] Task 3: Landing Page UI - Stats & Features
+## [x] Task 3: Landing Page UI - Stats & Features
 **Prompt:**
 > "Please implement the first half of the new landing page sections in `src/app/(landing)/page.tsx` and `src/app/(landing)/LandingClient.tsx`. 
 > 1. Fetch the statistics from the `SiteSetting` table and create a visually striking Stats Counter section, utilizing `gsap` for number counting animations when scrolled into view. 
 > 2. Fetch the `SiteFeature` data and build the 'Key Features' (Đặc điểm nổi bật) section. This section must match the brand's dark-blue background aesthetic, with left-aligned images/icons and right-aligned text descriptions."
 
-## [ ] Task 4: Landing Page UI - Events, News & Hall of Fame Testimonials
+## [x] Task 4: Landing Page UI - Events, News & Hall of Fame Testimonials
 **Prompt:**
 > "Please implement the remaining landing page sections in `LandingClient.tsx`. 
 > 1. Fetch `Post` data where `type='event'` and build an image-heavy Events Carousel. 

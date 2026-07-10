@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
@@ -222,12 +223,9 @@ export default function ProgramsClient({ initialPrograms }: { initialPrograms: P
 
             <div className="grid gap-2">
               <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Page Content (HTML)</label>
-              <Textarea 
-                placeholder="<p>Full content for the program page...</p>" 
-                value={formData.content} 
-                onChange={e => setFormData({...formData, content: e.target.value})} 
-                rows={8}
-                className="font-mono text-xs"
+              <RichTextEditor
+                content={formData.content}
+                onChange={content => setFormData({...formData, content})}
               />
             </div>
           </div>

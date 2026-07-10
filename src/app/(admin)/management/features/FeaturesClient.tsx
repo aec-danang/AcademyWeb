@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -197,10 +198,9 @@ export default function FeaturesClient({ initialFeatures }: { initialFeatures: S
             </div>
             <div className="grid gap-2">
               <label className="text-sm font-medium">Description</label>
-              <Textarea 
-                value={formData.description} 
-                onChange={e => setFormData({...formData, description: e.target.value})}
-                rows={3}
+              <RichTextEditor
+                content={formData.description}
+                onChange={content => setFormData({...formData, description: content})}
               />
             </div>
             <div className="grid gap-2">

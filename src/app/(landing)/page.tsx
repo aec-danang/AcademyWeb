@@ -15,5 +15,42 @@ export default async function LandingPage() {
     orderBy: { order: 'asc' }
   });
 
-  return <LandingClient programs={programs} />;
+  const features = await prisma.siteFeature.findMany({
+    where: { published: true },
+    orderBy: { order: 'asc' }
+  });
+
+  const settingsArray = await prisma.siteSetting.findMany();
+  const settings = settingsArray.reduce((acc, curr) => {
+    acc[curr.key] = curr.value;
+    return acc;
+  }, {} as Record<string, string>);
+
+  const events = await prisma.post.findMany({
+    where: { type: 'event', published: true },
+    orderBy: { createdAt: 'desc' },
+    take: 6
+  });
+
+  const news = await prisma.post.findMany({
+    where: { type: 'news', published: true },
+    orderBy: { createdAt: 'desc' },
+    take: 3
+  });
+
+  const testimonials = await prisma.testimonial.findMany({
+    where: { published: true },
+    orderBy: { order: 'asc' }
+  });
+
+  return (
+    <LandingClient 
+      programs={programs} 
+      features={features} 
+      settings={settings}
+      events={events}
+      news={news}
+      testimonials={testimonials}
+    />
+  );
 }
