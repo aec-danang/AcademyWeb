@@ -12,6 +12,7 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { IconSelector } from "@/components/ui/icon-selector";
 
 type SiteFeature = {
   id: string;
@@ -204,11 +205,10 @@ export default function FeaturesClient({ initialFeatures }: { initialFeatures: S
               />
             </div>
             <div className="grid gap-2">
-              <label className="text-sm font-medium">Icon (Lucide Name)</label>
-              <Input 
+              <label className="text-sm font-medium">Icon</label>
+              <IconSelector 
                 value={formData.iconValue} 
-                onChange={e => setFormData({...formData, iconValue: e.target.value})} 
-                placeholder="e.g. graduation-cap, book-open"
+                onValueChange={value => setFormData({...formData, iconValue: value})} 
               />
             </div>
             <div className="flex items-center gap-2 mt-2">

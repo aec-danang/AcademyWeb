@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
 
 type Props = {
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     where: { slug: resolvedParams.slug },
   });
 
-  if (!post || post.type !== 'news' || !post.published) {
+  if (!post || !['news', 'event'].includes(post.type) || !post.published) {
     return {
       title: 'Post Not Found | Academy',
     };
@@ -35,7 +36,7 @@ export default async function NewsPostPage({ params }: Props) {
     },
   });
 
-  if (!post || post.type !== 'news' || !post.published) {
+  if (!post || !['news', 'event'].includes(post.type) || !post.published) {
     notFound();
   }
 
@@ -64,9 +65,11 @@ export default async function NewsPostPage({ params }: Props) {
 
         {post.featuredImage && (
           <div className="mb-8">
-            <img
+            <Image
               src={post.featuredImage}
               alt={post.title}
+              width={1200}
+              height={500}
               className="w-full max-h-[500px] object-cover rounded-xl shadow-sm"
             />
           </div>

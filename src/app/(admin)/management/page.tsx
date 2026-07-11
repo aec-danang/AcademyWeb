@@ -296,8 +296,8 @@ export default async function AdminDashboard() {
             </CardContent>
             {recentLeads.length > 0 && (
               <CardFooter className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-center">
-                <Button variant="ghost" size="sm" className="text-slate-600 dark:text-slate-400 text-xs font-semibold w-full">
-                  View All Leads <ChevronRight className="w-4 h-4 ml-1" />
+                <Button variant="ghost" size="sm" className="text-slate-600 dark:text-slate-400 text-xs font-semibold w-full" asChild>
+                  <Link href="/management/leads">View All Leads <ChevronRight className="w-4 h-4 ml-1" /></Link>
                 </Button>
               </CardFooter>
             )}

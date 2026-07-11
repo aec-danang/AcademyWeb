@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { IconSelector } from "@/components/ui/icon-selector";
 
 type Program = {
   id: string;
@@ -216,8 +217,15 @@ export default function ProgramsClient({ initialPrograms }: { initialPrograms: P
                 </select>
               </div>
               <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{formData.iconType === 'lucide' ? 'Icon Name (e.g. Baby)' : 'Image URL'}</label>
-                <Input placeholder={formData.iconType === 'lucide' ? "Baby" : "/logos/addc.png"} value={formData.iconValue} onChange={e => setFormData({...formData, iconValue: e.target.value})} />
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{formData.iconType === 'lucide' ? 'Icon' : 'Image URL'}</label>
+                {formData.iconType === 'lucide' ? (
+                  <IconSelector 
+                    value={formData.iconValue} 
+                    onValueChange={value => setFormData({...formData, iconValue: value})} 
+                  />
+                ) : (
+                  <Input placeholder="/logos/addc.png" value={formData.iconValue} onChange={e => setFormData({...formData, iconValue: e.target.value})} />
+                )}
               </div>
             </div>
 

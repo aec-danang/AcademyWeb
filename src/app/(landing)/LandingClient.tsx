@@ -391,7 +391,7 @@ export default function LandingClient({
             </div>
             <div className={styles.carouselContainer}>
               {events.map((event) => (
-                <Link key={event.slug} href={`/posts/${event.slug}`} className={styles.eventCard}>
+                <Link key={event.slug} href={`/news/${event.slug}`} className={styles.eventCard}>
                   <div className={styles.eventImageWrapper}>
                     <Image 
                       src={event.featuredImage || "/images/placeholder.svg"} 
@@ -421,7 +421,7 @@ export default function LandingClient({
             </div>
             <div className={styles.newsGrid}>
               {news.map((n) => (
-                <Link key={n.slug} href={`/posts/${n.slug}`} className={styles.newsCard}>
+                <Link key={n.slug} href={`/news/${n.slug}`} className={styles.newsCard}>
                   {n.featuredImage && (
                     <div className={styles.newsImageWrapper}>
                       <Image src={n.featuredImage} alt={n.title} fill style={{ objectFit: 'cover' }} />

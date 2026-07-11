@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import Card from '@/lib/ui/Card';
 
@@ -34,11 +35,13 @@ export default async function BlogPage() {
             <Link key={post.slug} href={`/blog/${post.slug}`} className="block text-inherit no-underline hover:opacity-90 transition-opacity">
               <Card className="h-full flex flex-col p-6 hover:shadow-lg transition-shadow">
                 {post.featuredImage && (
-                  <div className="mb-4 -mx-6 -mt-6">
-                    <img
+                  <div className="relative w-full h-48 mb-4 -mx-6 -mt-6">
+                    <Image
                       src={post.featuredImage}
                       alt={post.title}
-                      className="w-full h-48 object-cover rounded-t-lg"
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      className="rounded-t-lg"
                     />
                   </div>
                 )}

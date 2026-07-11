@@ -31,10 +31,10 @@ The following tasks are formatted as specific AI Agent prompts so that each phas
 > 2. Fetch `Post` data where `type='news'` and build a modern News grid section. 
 > 3. Fetch `Testimonial` data and build the combined 'Testimonial / Hall of Fame' section. Display student quotes alongside their high scores (e.g., IELTS 8.0) and avatars using a premium grid or carousel. Ensure the design utilizes the brand's navy blue backgrounds and distinctive yellow quote accents."
 
-## [ ] Task 5: Implement a Full Rich Text Editor Engine
+## [x] Task 5: Implement a Full Rich Text Editor Engine
 **Prompt:**
 > "Please implement a robust, full-featured Rich Text Editor component (e.g., using TipTap or an equivalent modern library). Integrate this unified editor across the Admin Dashboard for managing `Program` contents, `Post` content, `SiteFeature` descriptions, and any other entities requiring rich text. The editor must support standard formatting, headings, lists, links, and embedded media."
 
-## [ ] Task 6: Visual Icon Selector Component
+## [x] Task 6: Visual Icon Selector Component
 **Prompt:**
 > "Please build an interactive, visual Icon Selector component for the Admin Dashboard. Replace the current manual text-input fields for icons (where users have to type Lucide icon names) with a searchable, visual grid of available icons. Integrate this selector into the management forms for `SiteProgram` and `SiteFeature`."

@@ -1,3 +1,5 @@
+import ContactFormClient from "./ContactFormClient";
+
 export default function ContactPage() {
   return (
     <div className="container" style={{ padding: "80px 24px" }}>
@@ -25,26 +27,7 @@ export default function ContactPage() {
         
         <div id="register" className="card">
           <h2 style={{ fontSize: "var(--text-2xl)", marginBottom: "24px" }}>Placement Test Registration</h2>
-          <form style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            <div>
-              <label style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>Full Name</label>
-              <input type="text" style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #ccc" }} placeholder="John Doe" />
-            </div>
-            <div>
-              <label style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>Phone Number</label>
-              <input type="tel" style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #ccc" }} placeholder="0901234567" />
-            </div>
-            <div>
-              <label style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>Program of Interest</label>
-              <select style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #ccc" }}>
-                <option>Kids & Teens</option>
-                <option>IELTS / Test Prep</option>
-                <option>Adults / Communication</option>
-                <option>Corporate English</option>
-              </select>
-            </div>
-            <button type="button" className="btn-primary" style={{ marginTop: "16px" }}>Submit Registration</button>
-          </form>
+          <ContactFormClient />
         </div>
       </div>
     </div>
