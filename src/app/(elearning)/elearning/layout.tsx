@@ -26,6 +26,7 @@ export default function ElearningLayout({ children }: { children: React.ReactNod
 
   return (
     <div className={styles.elearningContainer}>
+      <style dangerouslySetInnerHTML={{ __html: `body { overflow: hidden; }` }} />
       <aside className={styles.sidebar}>
         <div style={{ paddingLeft: "1rem", marginTop: "-30px", marginBottom: "-30px", display: "flex", alignItems: "flex-start" }}>
           <Image 

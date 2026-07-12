@@ -428,7 +428,7 @@ export default function LandingClient({
                     </div>
                   )}
                   <div className={styles.newsContent}>
-                    <span className={styles.newsDate}>
+                    <span className={styles.newsDate} suppressHydrationWarning>
                       {new Date(n.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                     <h3>{n.title}</h3>

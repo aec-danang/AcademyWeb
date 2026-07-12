@@ -80,7 +80,7 @@ export default function LeadsClient({ initialLeads }: { initialLeads: Lead[] }) 
                     <td className="p-4 text-slate-600 dark:text-slate-400">
                       {lead.message?.replace("Interested in: ", "")}
                     </td>
-                    <td className="p-4 text-slate-500 dark:text-slate-400 text-sm">
+                    <td className="p-4 text-slate-500 dark:text-slate-400 text-sm" suppressHydrationWarning>
                       {new Date(lead.createdAt).toLocaleDateString()}
                     </td>
                     <td className="p-4">
