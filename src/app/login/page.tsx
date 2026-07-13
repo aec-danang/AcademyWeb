@@ -1,15 +1,14 @@
 "use client";
 
-import React, { useRef, useState, useEffect, Suspense } from "react";
+import React, { useRef, Suspense, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import styles from "./login.module.css";
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebook } from "react-icons/fa";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 // Register the GSAP plugin
 if (typeof window !== "undefined") {
@@ -19,20 +18,48 @@ if (typeof window !== "undefined") {
 function AuthContent() {
   const containerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const searchParams = useSearchParams();
-  
-  // Set initial state based on URL search param ?mode=register
-  const modeParam = searchParams.get("mode");
-  const [isLogin, setIsLogin] = useState(modeParam !== "register");
+  const isLogin = true;
 
-  // Sync state if URL changes dynamically without reload
-  useEffect(() => {
-    if (modeParam === "register" && isLogin) {
-      setIsLogin(false);
-    } else if (modeParam !== "register" && !isLogin) {
-      setIsLogin(true);
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const res = await signIn("credentials", {
+        identifier,
+        password,
+        redirect: false,
+      });
+
+      if (res?.error) {
+        setError("Tài khoản hoặc mật khẩu không chính xác");
+        setIsLoading(false);
+        return;
+      }
+
+      if (res?.ok) {
+        const sessionRes = await fetch("/api/auth/session");
+        const session = await sessionRes.json();
+        
+        if (session?.user?.role === "ADMIN") {
+          router.push("/management");
+        } else {
+          router.push("/elearning");
+        }
+      }
+    } catch (err) {
+      setError("Đã xảy ra lỗi, vui lòng thử lại sau.");
+      setIsLoading(false);
     }
-  }, [modeParam]);
+  };
 
   // Initial load animation
   useGSAP(
@@ -61,33 +88,6 @@ function AuthContent() {
     { scope: containerRef }
   );
 
-  // Form switch animation using contextSafe
-  const { contextSafe } = useGSAP({ scope: containerRef });
-
-  const toggleAuthMode = contextSafe(() => {
-    const outX = isLogin ? -20 : 20;
-    const inX = isLogin ? 20 : -20;
-
-    gsap.to(`.${styles.formContainer}, .${styles.headerText} h1, .${styles.headerText} p`, {
-      opacity: 0,
-      x: outX,
-      duration: 0.2,
-      ease: "power2.in",
-      onComplete: () => {
-        setIsLogin(!isLogin);
-        
-        gsap.fromTo(`.${styles.formContainer}`, 
-          { opacity: 0, x: inX },
-          { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }
-        );
-        gsap.fromTo(`.${styles.headerText} h1, .${styles.headerText} p`,
-          { opacity: 0, y: -10, x: 0 },
-          { opacity: 1, y: 0, duration: 0.4, stagger: 0.1, ease: "power3.out" }
-        );
-      }
-    });
-  });
-
   return (
     <div className={styles.container} ref={containerRef}>
       <div className={styles.loginCard}>
@@ -108,16 +108,13 @@ function AuthContent() {
         </div>
 
         <div className={styles.headerText}>
-          <h1 className={styles.title}>{isLogin ? "Đăng Nhập" : "Đăng Ký"}</h1>
-          <p className={styles.subtitle}>
-            {isLogin 
-              ? "Chào mừng bạn quay lại Hệ thống Học tập AEC!" 
-              : "Tạo tài khoản để trải nghiệm các khóa học chuẩn quốc tế."}
-          </p>
+          <h1 className={styles.title}>Đăng Nhập</h1>
+          <p className={styles.subtitle}>Tài khoản học viên và giáo viên do quản trị viên tạo và phân quyền.</p>
         </div>
 
         <div className={styles.formContainer}>
-          <form className={styles.form} ref={formRef} onSubmit={(e) => e.preventDefault()}>
+          {error && <div style={{ color: "var(--color-orange)", marginBottom: "1rem", fontSize: "0.9rem", textAlign: "center" }}>{error}</div>}
+          <form className={styles.form} ref={formRef} onSubmit={handleLogin}>
             {!isLogin && (
               <div className={styles.inputGroup}>
                 <label htmlFor="name" className={styles.label}>Họ và tên</label>
@@ -126,8 +123,17 @@ function AuthContent() {
             )}
             
             <div className={styles.inputGroup}>
-              <label htmlFor="email" className={styles.label}>Email</label>
-              <input type="email" id="email" className={styles.input} placeholder="nhap.email@example.com" required />
+              <label htmlFor="identifier" className={styles.label}>Email hoặc Tên đăng nhập</label>
+              <input 
+                type="text" 
+                id="identifier" 
+                className={styles.input} 
+                placeholder="Email hoặc Tên đăng nhập" 
+                required 
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                disabled={isLoading}
+              />
             </div>
 
             {!isLogin && (
@@ -139,7 +145,27 @@ function AuthContent() {
 
             <div className={styles.inputGroup}>
               <label htmlFor="password" className={styles.label}>Mật khẩu</label>
-              <input type="password" id="password" className={styles.input} placeholder="••••••••" required />
+              <div style={{ position: "relative" }}>
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  id="password" 
+                  className={styles.input} 
+                  placeholder="••••••••" 
+                  required 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
+                  style={{ paddingRight: "40px" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#94a3b8", display: "flex", alignItems: "center", padding: 0 }}
+                  aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             {!isLogin && (
@@ -155,30 +181,14 @@ function AuthContent() {
               </div>
             )}
 
-            <button type="submit" className={`btn-primary ${styles.submitBtn}`}>
-              {isLogin ? "Vào Lớp Học" : "Đăng Ký Ngay"}
+            <button type="submit" className={`btn-primary ${styles.submitBtn}`} disabled={isLoading}>
+              {isLoading ? "Đang xử lý..." : "Đăng Nhập"}
             </button>
           </form>
         </div>
 
-        <div className={styles.divider}>Hoặc tiếp tục với</div>
-
-        <div className={styles.socialButtons}>
-          <button type="button" className={styles.btnSocial}>
-            <FcGoogle size={20} />
-            Google
-          </button>
-          <button type="button" className={styles.btnSocial}>
-            <FaFacebook size={20} color="#1877F2" />
-            Facebook
-          </button>
-        </div>
-
         <div className={styles.formFooter}>
-          {isLogin ? "Chưa có tài khoản?" : "Đã có tài khoản?"}
-          <span className={styles.switchLink} onClick={toggleAuthMode}>
-            {isLogin ? "Đăng ký ngay" : "Đăng nhập"}
-          </span>
+          Cần tạo tài khoản mới? <Link href="/contact#register" className={styles.switchLink}>Liên hệ trung tâm</Link>
         </div>
       </div>
     </div>

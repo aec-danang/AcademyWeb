@@ -1,0 +1,1 @@
+fetch('http://localhost:3000/teacher').then(r => r.text()).then(t => { console.log(t.substring(0, 1000)); const match = t.match(/<title>(.*?)<\/title>/); console.log(match ? match[1] : 'No title'); }).catch(console.error)

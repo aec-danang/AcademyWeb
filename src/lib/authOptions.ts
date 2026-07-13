@@ -1,6 +1,19 @@
 import { NextAuthOptions } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+
+type AuthUser = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  role: string;
+};
+
+type AuthToken = {
+  id?: string;
+  role?: string;
+};
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -8,48 +21,61 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "test@example.com" },
+        identifier: { label: "Email / Username", type: "text", placeholder: "Email or Username" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email) return null;
+        if (!credentials?.identifier || !credentials?.password) return null;
         
         // Find user from database
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
+        const user = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { email: credentials.identifier },
+              { username: credentials.identifier }
+            ]
+          }
         });
         
-        if (user) {
-          // You should add proper password checking here using bcrypt
+        if (user && user.password) {
+          const isValidPassword = await bcrypt.compare(credentials.password, user.password);
+          if (!isValidPassword) {
+            return null;
+          }
           return {
             id: user.id,
             name: user.name,
             email: user.email,
             role: user.role
-          } as any;
+          } as AuthUser;
         } else {
-          // Create dummy user for test prep phase
-          return { id: "test", name: "Test User", email: credentials.email, role: "USER" };
+          return null;
         }
       }
     })
   ],
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 Days
   },
+  secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development",
   callbacks: {
     async session({ session, token }) {
+      const authToken = token as AuthToken;
+
       if (token && session.user) {
         // Expose user ID and role to session object
-        (session.user as any).id = token.id;
-        (session.user as any).role = token.role;
+        (session.user as { id?: string; role?: string }).id = authToken.id;
+        (session.user as { id?: string; role?: string }).role = authToken.role;
       }
       return session;
     },
     async jwt({ token, user }) {
+      const authToken = token as AuthToken;
+
       if (user) {
-        token.id = user.id;
-        token.role = (user as any).role || "USER";
+        authToken.id = user.id;
+        authToken.role = (user as { role?: string }).role || "USER";
       }
       return token;
     }

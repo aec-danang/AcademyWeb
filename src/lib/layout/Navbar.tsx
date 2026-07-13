@@ -16,13 +16,8 @@ export default function Navbar() {
             <li><Link href="/teachers" className={styles.navLink}>Teachers</Link></li>
             <li><Link href="/contact" className={styles.navLink}>Contact</Link></li>
             <li>
-              <Link href="/login" className="btn-secondary" style={{ padding: "8px 16px", marginRight: "8px", borderRadius: "8px" }}>
+              <Link href="/login" className="btn-primary" style={{ padding: "8px 16px", borderRadius: "8px" }}>
                 Đăng nhập
-              </Link>
-            </li>
-            <li>
-              <Link href="/login?mode=register" className="btn-primary" style={{ padding: "8px 16px", borderRadius: "8px" }}>
-                Đăng ký
               </Link>
             </li>
           </ul>
