@@ -11,42 +11,48 @@ const experts = [
     name: "Mr. David Smith",
     title: "Chuyên gia IELTS (Cựu Giám khảo)",
     bio: "Hơn 15 năm kinh nghiệm giảng dạy và chấm thi IELTS tại Hội đồng Anh. Thầy David nổi tiếng với phương pháp tư duy Logic trong Writing Task 2 giúp học viên bứt phá điểm số.",
-    stats: { exp: "15+ Năm", score: "IELTS 9.0", students: "5000+" }
+    stats: { exp: "15+ Năm", score: "IELTS 9.0", students: "5000+" },
+    imageUrl: ""
   },
   {
     id: "t2",
     name: "Ms. Sarah Jane",
     title: "Chuyên gia Giao tiếp Tiếng Anh",
     bio: "Tốt nghiệp Thạc sĩ TESOL tại ĐH Cambridge. Cô Sarah chuyên huấn luyện kỹ năng phát âm chuẩn bản xứ và phản xạ giao tiếp nâng cao cho người đi làm.",
-    stats: { exp: "10 Năm", score: "TESOL", students: "3000+" }
+    stats: { exp: "10 Năm", score: "TESOL", students: "3000+" },
+    imageUrl: ""
   },
   {
     id: "t3",
     name: "Mr. Thomas Edison",
     title: "Trưởng ban Chuyên môn Kids & Teens",
     bio: "Sở hữu phương pháp dạy học qua trò chơi (Gamification). Thầy Thomas giúp hàng ngàn học viên nhí yêu thích tiếng Anh một cách tự nhiên và hiệu quả.",
-    stats: { exp: "8 Năm", score: "CELTA", students: "2500+" }
+    stats: { exp: "8 Năm", score: "CELTA", students: "2500+" },
+    imageUrl: ""
   },
   {
     id: "t4",
     name: "Ms. Anna Watson",
     title: "Chuyên gia Luyện thi TOEIC",
     bio: "Cô Anna đã giúp hàng ngàn sinh viên đạt mốc TOEIC 800+ chỉ trong 3 tháng bằng các chiến thuật giải đề tối ưu và bí kíp nghe hiểu xuất sắc.",
-    stats: { exp: "7 Năm", score: "TOEIC 990", students: "4000+" }
+    stats: { exp: "7 Năm", score: "TOEIC 990", students: "4000+" },
+    imageUrl: ""
   },
   {
     id: "t5",
     name: "Mr. Robert Chen",
     title: "Giảng viên Tiếng Anh Doanh Nghiệp",
     bio: "Chuyên gia đào tạo tiếng Anh thương mại cho các tập đoàn đa quốc gia. Phương pháp tập trung vào tình huống thực tế và thuyết trình thuyết phục.",
-    stats: { exp: "12 Năm", score: "MBA", students: "1000+" }
+    stats: { exp: "12 Năm", score: "MBA", students: "1000+" },
+    imageUrl: ""
   },
   {
     id: "t6",
     name: "Ms. Emily Rose",
     title: "Chuyên gia Kỹ năng Viết Học thuật",
     bio: "Từng có nhiều bài báo công bố quốc tế. Cô Emily hướng dẫn học viên cách lập luận sắc bén và từ vựng học thuật đỉnh cao.",
-    stats: { exp: "9 Năm", score: "IELTS 8.5", students: "2000+" }
+    stats: { exp: "9 Năm", score: "IELTS 8.5", students: "2000+" },
+    imageUrl: ""
   }
 ];
 
@@ -100,11 +106,16 @@ export default function TeachersPage() {
             >
               {/* Ảnh đại diện */}
               <div className={styles.imageWrapper}>
-                <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 0, color: "#cbd5e1" }}>
-                  <User size={120} strokeWidth={1} />
-                </div>
-                {/* Image component sẽ được dùng khi có ảnh thật. Tạm thời là một div màu nhạt */}
-                <div className={styles.expertImage} style={{ background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.05))" }}></div>
+                {expert.imageUrl ? (
+                  <Image src={expert.imageUrl} alt={expert.name} fill style={{ objectFit: 'cover' }} className={styles.expertImage} />
+                ) : (
+                  <>
+                    <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 0, color: "#cbd5e1" }}>
+                      <User size={120} strokeWidth={1} />
+                    </div>
+                    <div className={styles.expertImage} style={{ background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.05))" }}></div>
+                  </>
+                )}
                 
                 <div className={styles.badgeContainer}>
                   <span className={styles.badge}><Star size={12} color="#fbbf24" style={{ display: "inline", verticalAlign: "middle", marginRight: "2px", marginBottom: "2px" }} /> Top Rated</span>
