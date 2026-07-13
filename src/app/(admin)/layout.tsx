@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat, Inter } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -16,15 +16,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Academy English Center | AEC Da Nang",
-  description: "Learn English. Build Confidence. Become a Global Citizen. Academy English Center provides high-quality English programs for kids, teens, IELTS learners, working adults, and corporate teams in Da Nang.",
+  title: "Admin Dashboard | Academy English Center",
+  description: "Admin dashboard for Academy English Center",
 };
 
 import { ThemeProvider } from "@/lib/contexts/ThemeProvider";
 import { SessionProviderWrapper } from "@/lib/contexts/SessionProviderWrapper";
 import { Toaster } from "@/components/ui/sonner";
 
-export default function RootLayout({
+export default function AdminRootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
