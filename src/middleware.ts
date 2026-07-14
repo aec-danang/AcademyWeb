@@ -1,23 +1,21 @@
 import createMiddleware from 'next-intl/middleware';
 import { NextRequest } from 'next/server';
 
+const handleI18nRouting = createMiddleware({
+  locales: ['vi', 'en'],
+  defaultLocale: 'vi',
+  localePrefix: 'as-needed'
+});
+
 export default function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   
   // Admin pages are strictly English, bypass i18n completely
-  if (pathname.startsWith('/management')) {
+  if (pathname.startsWith('/admin')) {
     return; // Pass through
   }
 
-  const isElearning = pathname.startsWith('/elearning') || pathname.startsWith('/en/elearning') || pathname.startsWith('/vi/elearning');
-
-  const handleI18nRouting = createMiddleware({
-    locales: ['vi', 'en'],
-    // Elearning defaults to english, everything else defaults to vietnamese
-    defaultLocale: isElearning ? 'en' : 'vi',
-    localePrefix: 'as-needed'
-  });
-
+  // Next-intl handles the rest
   return handleI18nRouting(request);
 }
 

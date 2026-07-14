@@ -55,6 +55,7 @@ export default function LandingClient({
   settings,
   events,
   news,
+  posts,
   testimonials
 }: { 
   programs: SiteProgram[];
@@ -62,6 +63,7 @@ export default function LandingClient({
   settings: Record<string, string>;
   events: SitePost[];
   news: SitePost[];
+  posts: SitePost[];
   testimonials: SiteTestimonial[];
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -85,20 +87,23 @@ export default function LandingClient({
     }, "-=0.8");
 
     // 2. Programs Section (ScrollTrigger Batching)
-    ScrollTrigger.batch(`.${styles.programCard}`, {
-      onEnter: (batch) => gsap.fromTo(batch, 
-        { opacity: 0, y: 60 }, 
-        { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power4.out", overwrite: true }
-      ),
-      start: "top 85%"
-    });
+    if (programs.length > 0) {
+      ScrollTrigger.batch(`.${styles.programCard}`, {
+        onEnter: (batch) => gsap.fromTo(batch, 
+          { opacity: 0, y: 60 }, 
+          { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power4.out", overwrite: true }
+        ),
+        start: "top 85%"
+      });
+    }
 
     // 3. Quick Links Section
-    gsap.fromTo("section:nth-of-type(3) .btn-secondary", 
+    if (document.querySelector('.quick-links-section')) {
+      gsap.fromTo(".quick-links-section .btn-secondary", 
       { y: 20, opacity: 0 },
       {
         scrollTrigger: {
-          trigger: `section:nth-of-type(3)`,
+          trigger: `.quick-links-section`,
           start: "top 85%"
         },
         y: 0,
@@ -108,6 +113,7 @@ export default function LandingClient({
         ease: "power4.out"
       }
     );
+    }
 
     // 4. Why Choose AEC Section
     ScrollTrigger.batch(`.${styles.whyGrid} > div`, {
@@ -175,40 +181,61 @@ export default function LandingClient({
     });
 
     // 8. Features Section
-    gsap.fromTo(`.${styles.featuresGrid} > div`,
-      { opacity: 0, y: 50 },
-      {
-        scrollTrigger: {
-          trigger: `.${styles.featuresSection}`,
-          start: "top 80%"
-        },
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: "power4.out"
-      }
-    );
+    if (features.length > 0) {
+      gsap.fromTo(`.${styles.featuresGrid} > div`,
+        { opacity: 0, y: 50 },
+        {
+          scrollTrigger: {
+            trigger: `.${styles.featuresSection}`,
+            start: "top 80%"
+          },
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.2,
+          ease: "power4.out"
+        }
+      );
+    }
 
     // 9. Events, News & Testimonials Animations
-    gsap.fromTo(`.${styles.sectionHeader}`, 
-      { opacity: 0, y: 30 },
-      {
-        scrollTrigger: {
-          trigger: `.${styles.sectionHeader}`,
-          start: "top 85%"
-        },
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.2
-      }
-    );
+    const headers = gsap.utils.toArray(`.${styles.sectionHeader}`);
+    if (headers.length > 0) {
+      gsap.fromTo(`.${styles.sectionHeader}`, 
+        { opacity: 0, y: 30 },
+        {
+          scrollTrigger: {
+            trigger: `.${styles.sectionHeader}`,
+            start: "top 85%"
+          },
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.2
+        }
+      );
+    }
 
-  }, { scope: containerRef });
+  }, { scope: containerRef, dependencies: [programs, features, events, news, testimonials] });
 
   return (
     <div ref={containerRef}>
+      {/* Top Banner Area */}
+      <section className={styles.topBanner}>
+        <div className={styles.topBannerImageWrapper}>
+          {/* Example full sized background image */}
+          <div style={{ width: '100%', height: '200px', backgroundColor: 'var(--color-navy-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', position: 'relative' }}>
+            <Image 
+                src="/images/placeholder.svg" 
+                alt="Banner" 
+                fill 
+                style={{ objectFit: 'cover', opacity: 0.5 }} 
+              />
+            <h2 style={{ zIndex: 1, position: 'relative' }}>Welcome to Academy English Center</h2>
+          </div>
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className={styles.hero}>
         <div className={`container ${styles.heroContainer}`}>
@@ -329,7 +356,7 @@ export default function LandingClient({
       </section>
 
       {/* Quick Links Section */}
-      <section style={{ padding: "40px 0", backgroundColor: "#f0f0f8" }}>
+      <section className="quick-links-section" style={{ padding: "40px 0", backgroundColor: "#f0f0f8" }}>
         <div className="container" style={{ display: "flex", justifyContent: "center", gap: "24px", flexWrap: "wrap" }}>
           <Link href="/schedule" className="btn-secondary">View Opening Schedule</Link>
           <Link href="/news" className="btn-secondary">News & Events</Link>
@@ -433,6 +460,36 @@ export default function LandingClient({
                     </span>
                     <h3>{n.title}</h3>
                     {n.excerpt && <p>{n.excerpt}</p>}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Posts Section */}
+      {posts && posts.length > 0 && (
+        <section className={styles.newsSection}>
+          <div className="container">
+            <div className={styles.sectionHeader}>
+              <h2>Latest Posts</h2>
+              <p>Tips, guides, and stories from AEC.</p>
+            </div>
+            <div className={styles.newsGrid}>
+              {posts.map((p) => (
+                <Link key={p.slug} href={`/blog/${p.slug}`} className={styles.newsCard}>
+                  {p.featuredImage && (
+                    <div className={styles.newsImageWrapper}>
+                      <Image src={p.featuredImage} alt={p.title} fill style={{ objectFit: 'cover' }} />
+                    </div>
+                  )}
+                  <div className={styles.newsContent}>
+                    <span className={styles.newsDate} suppressHydrationWarning>
+                      {new Date(p.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                    <h3>{p.title}</h3>
+                    {p.excerpt && <p>{p.excerpt}</p>}
                   </div>
                 </Link>
               ))}

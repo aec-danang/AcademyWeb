@@ -90,7 +90,6 @@ function AuthContent() {
 
   return (
     <div className={styles.container} ref={containerRef}>
-      <style dangerouslySetInnerHTML={{ __html: `body { overflow: hidden; }` }} />
       <div className={styles.loginCard}>
         <Link href="/" className={styles.backHome}>
           <ArrowLeft size={16} strokeWidth={2.5} />
