@@ -5,7 +5,6 @@ import { google } from "googleapis";
 import {
   appendGroupImage,
   appendQuestionImage,
-  CREDENTIALS_PATH,
   firstVideoUrlFromForm,
   inferExamSkill,
   isListeningTitle,
@@ -13,11 +12,10 @@ import {
   mediaTextForStandaloneItem,
   normalizeName,
   optionTextWithImage,
-  TOKEN_PATH,
+  getGoogleAuth
 } from "./form-import-utils";
 
 const PROGRESS_FILE = "import_progress.json";
-const DEFAULT_EXCEL_PATH = "e:/AEC/Quản lý Progress Test (1).xlsx";
 let prismaForDisconnect: { $disconnect: () => Promise<void> } | null = null;
 
 function loadEnvFile() {
@@ -49,20 +47,6 @@ function rowValue(row: Record<string, unknown>, candidates: string[]) {
   return null;
 }
 
-async function getAuth() {
-  if (!fs.existsSync(CREDENTIALS_PATH) || !fs.existsSync(TOKEN_PATH)) {
-    throw new Error(
-      `Missing Google API credentials. Expected credentials at ${CREDENTIALS_PATH} and token at ${TOKEN_PATH}. ` +
-        "You can override them with GOOGLE_CREDENTIALS_PATH and GOOGLE_TOKEN_PATH."
-    );
-  }
-
-  const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, "utf8"));
-  const { client_secret, client_id, redirect_uris } = credentials.installed;
-  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-  oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH, "utf8")));
-  return oAuth2Client;
-}
 
 async function getAllDriveForms(auth: any) {
   const drive = google.drive({ version: "v3", auth });
@@ -257,7 +241,7 @@ async function importForm(prisma: any, auth: any, formId: string, rowData: Recor
 async function main() {
   loadEnvFile();
   console.log("Authenticating...");
-  const auth = await getAuth();
+  const auth = await getGoogleAuth();
   const { prisma } = await import("../src/lib/prisma");
   prismaForDisconnect = prisma;
 
@@ -267,7 +251,16 @@ async function main() {
   }
 
   const driveForms = await getAllDriveForms(auth);
-  const excelPath = process.env.PROGRESS_TEST_EXCEL_PATH || DEFAULT_EXCEL_PATH;
+  
+  // Try taking the excel path from the command line argument first, then the ENV var.
+  const excelPath = process.argv[2] || process.env.PROGRESS_TEST_EXCEL_PATH;
+  
+  if (!excelPath || !fs.existsSync(excelPath)) {
+    console.error(`\n[ERROR] Missing or invalid Excel file path.`);
+    console.error(`Usage: npx tsx scripts/import-forms.ts <path-to-excel-file>`);
+    console.error(`Example: npx tsx scripts/import-forms.ts ./forms.xlsx\n`);
+    process.exit(1);
+  }
 
   console.log(`Reading excel file: ${excelPath}`);
   const workbook = xlsx.readFile(excelPath);

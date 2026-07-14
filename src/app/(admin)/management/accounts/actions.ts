@@ -32,8 +32,8 @@ async function requireAdmin() {
 }
 
 function normalizeRole(role: string): AccountRole {
-  if (role === "TEACHER" || role === "ADMIN") {
-    return role;
+  if (role === "TEACHER" || role === "ADMIN" || role === "STUDENT") {
+    return role as AccountRole;
   }
 
   return "USER";

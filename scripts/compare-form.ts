@@ -2,21 +2,11 @@ import { google } from 'googleapis';
 import 'dotenv/config';
 import * as fs from 'fs';
 import { prisma } from '../src/lib/prisma';
-
-const TOKEN_PATH = "e:/AEC/google-form-import-test/token.json";
-const CREDENTIALS_PATH = "e:/AEC/google-form-import-test/credentials.json";
-
-async function getAuth() {
-  const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, "utf8"));
-  const { client_secret, client_id, redirect_uris } = credentials.installed;
-  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-  oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH, "utf8")));
-  return oAuth2Client;
-}
+import { getGoogleAuth } from './form-import-utils';
 
 async function main() {
-  const auth = await getAuth();
-  const formId = '1wvUD9SqljGpbhVZmfCYl3woW90dNQGRMSKyq1LCBLos';
+  const auth = await getGoogleAuth();
+  const formId = process.argv[2] || '1wvUD9SqljGpbhVZmfCYl3woW90dNQGRMSKyq1LCBLos';
   
   const forms = google.forms({ version: 'v1', auth });
   const res = await forms.forms.get({ formId });

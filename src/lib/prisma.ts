@@ -9,10 +9,10 @@ let prisma: PrismaClient;
 if (globalForPrisma.prisma) {
   prisma = globalForPrisma.prisma;
 } else {
-  const connectionString = process.env.DATABASE_URL;
+  const connectionString = process.env.NEON_DATABASE_URL;
 
   if (!connectionString) {
-    throw new Error("DATABASE_URL is not set. Add it to your .env file before using Prisma.");
+    throw new Error("NEON_DATABASE_URL is not set. Add it to your .env file before using Prisma.");
   }
 
   const pool = new Pool({ connectionString });

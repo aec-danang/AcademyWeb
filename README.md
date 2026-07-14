@@ -2,6 +2,12 @@
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Tech Stack
+- **Hosting:** Vercel
+- **Database:** Neon (Serverless PostgreSQL)
+- **Storage:** Cloudflare R2
+- **Version Control:** GitHub
+
 ## Getting Started
 
 First, run the development server:

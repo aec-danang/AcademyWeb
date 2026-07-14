@@ -37,6 +37,18 @@ export default function Footer({ sponsors = [] }: { sponsors?: Sponsor[] }) {
               <span className={styles.icon}><Mail size={18} /></span>
               <span>info@academy.edu.vn</span>
             </div>
+            <div style={{ marginTop: '16px', borderRadius: '8px', overflow: 'hidden' }}>
+              <iframe 
+                src="https://maps.google.com/maps?q=98%20Le%20Dinh%20Ly,%20Da%20Nang&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                width="100%" 
+                height="150" 
+                style={{ border: 0 }} 
+                allowFullScreen={true} 
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Academy English Center Map"
+              ></iframe>
+            </div>
           </div>
           
           <div>
