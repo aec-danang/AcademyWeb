@@ -10,18 +10,12 @@ export const metadata: Metadata = {
 export const revalidate = 60; // Revalidate cache every 60 seconds
 
 export default async function LandingPage() {
-  const programs = await prisma.siteProgram.findMany({
-    where: { published: true },
-    orderBy: { order: 'asc' }
-  });
-
-  const features = await prisma.siteFeature.findMany({
-    where: { published: true },
-    orderBy: { order: 'asc' }
-  });
+  const programs: any[] = []; // await prisma.siteProgram.findMany({ where: { published: true }, orderBy: { order: 'asc' } });
+  
+  const features: any[] = []; // await prisma.siteFeature.findMany({ where: { published: true }, orderBy: { order: 'asc' } });
 
   const settingsArray = await prisma.siteSetting.findMany();
-  const settings = settingsArray.reduce((acc, curr) => {
+  const settings = settingsArray.reduce((acc: Record<string, string>, curr: any) => {
     acc[curr.key] = curr.value;
     return acc;
   }, {} as Record<string, string>);

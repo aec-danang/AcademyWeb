@@ -15,8 +15,27 @@ function loadLocalEnvFile() {
 
 loadLocalEnvFile();
 
-export const TOKEN_PATH = process.env.GOOGLE_TOKEN_PATH || "e:/AEC/google-form-import-test/token.json";
-export const CREDENTIALS_PATH = process.env.GOOGLE_CREDENTIALS_PATH || "e:/AEC/google-form-import-test/credentials.json";
+export const TOKEN_PATH = process.env.GOOGLE_TOKEN_PATH || join(process.cwd(), "token.json");
+export const CREDENTIALS_PATH = process.env.GOOGLE_CREDENTIALS_PATH || join(process.cwd(), "credentials.json");
+
+export async function getGoogleAuth() {
+  if (!fs.existsSync(CREDENTIALS_PATH) || !fs.existsSync(TOKEN_PATH)) {
+    throw new Error(
+      `Missing Google API credentials. Expected credentials at ${CREDENTIALS_PATH} and token at ${TOKEN_PATH}. ` +
+        "You can configure them by placing credentials.json and token.json in the project root, or by setting GOOGLE_CREDENTIALS_PATH and GOOGLE_TOKEN_PATH in your .env file."
+    );
+  }
+
+  const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, "utf8"));
+  const { client_secret, client_id, redirect_uris } = credentials.installed;
+  
+  // Dynamic import googleapis here so it's not a hard dependency for non-auth utils
+  const { google } = await import("googleapis");
+  
+  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+  oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH, "utf8")));
+  return oAuth2Client;
+}
 
 const SURVEY_KEYWORDS = [
   "họ và tên",
