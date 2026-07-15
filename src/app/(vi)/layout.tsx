@@ -16,21 +16,21 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Admin Dashboard | Academy English Center",
-  description: "Admin dashboard for Academy English Center",
+  title: "Academy English Center | AEC Da Nang",
+  description: "Learn English. Build Confidence. Become a Global Citizen. Academy English Center provides high-quality English programs for kids, teens, IELTS learners, working adults, and corporate teams in Da Nang.",
 };
 
 import { ThemeProvider } from "@/lib/contexts/ThemeProvider";
 import { SessionProviderWrapper } from "@/lib/contexts/SessionProviderWrapper";
 import { Toaster } from "@/components/ui/sonner";
 
-export default function AdminRootLayout({
+export default function ViLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${montserrat.variable} ${inter.variable}`} suppressHydrationWarning>
+    <html lang="vi" className={`${montserrat.variable} ${inter.variable}`} suppressHydrationWarning>
       <body className={montserrat.className} suppressHydrationWarning>
         <SessionProviderWrapper>
           <ThemeProvider>

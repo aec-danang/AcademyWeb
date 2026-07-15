@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat, Inter } from "next/font/google";
 import "../globals.css";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -26,29 +24,20 @@ import { ThemeProvider } from "@/lib/contexts/ThemeProvider";
 import { SessionProviderWrapper } from "@/lib/contexts/SessionProviderWrapper";
 import { Toaster } from "@/components/ui/sonner";
 
-export default async function LocaleLayout({
+export default function EnLayout({
   children,
-  params
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{locale: string}>;
 }>) {
-  const { locale } = await params;
-  // Providing all messages to the client
-  // side is the easiest way to get started
-  const messages = await getMessages();
-
   return (
-    <html lang={locale} className={`${montserrat.variable} ${inter.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${montserrat.variable} ${inter.variable}`} suppressHydrationWarning>
       <body className={montserrat.className} suppressHydrationWarning>
-        <NextIntlClientProvider messages={messages}>
         <SessionProviderWrapper>
           <ThemeProvider>
             {children}
             <Toaster />
           </ThemeProvider>
         </SessionProviderWrapper>
-        </NextIntlClientProvider>
       </body>
     </html>
   );
