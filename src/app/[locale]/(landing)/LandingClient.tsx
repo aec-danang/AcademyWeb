@@ -85,20 +85,22 @@ export default function LandingClient({
     }, "-=0.8");
 
     // 2. Programs Section (ScrollTrigger Batching)
-    ScrollTrigger.batch(`.${styles.programCard}`, {
-      onEnter: (batch) => gsap.fromTo(batch, 
-        { opacity: 0, y: 60 }, 
-        { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power4.out", overwrite: true }
-      ),
-      start: "top 85%"
-    });
+    if (programs && programs.length > 0) {
+      ScrollTrigger.batch(`.${styles.programCard}`, {
+        onEnter: (batch) => gsap.fromTo(batch, 
+          { opacity: 0, y: 60 }, 
+          { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power4.out", overwrite: true }
+        ),
+        start: "top 85%"
+      });
+    }
 
     // 3. Quick Links Section
-    gsap.fromTo("section:nth-of-type(3) .btn-secondary", 
+    gsap.fromTo("#quick-links .btn-secondary", 
       { y: 20, opacity: 0 },
       {
         scrollTrigger: {
-          trigger: `section:nth-of-type(3)`,
+          trigger: `#quick-links`,
           start: "top 85%"
         },
         y: 0,
@@ -175,20 +177,22 @@ export default function LandingClient({
     });
 
     // 8. Features Section
-    gsap.fromTo(`.${styles.featuresGrid} > div`,
-      { opacity: 0, y: 50 },
-      {
-        scrollTrigger: {
-          trigger: `.${styles.featuresSection}`,
-          start: "top 80%"
-        },
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: "power4.out"
-      }
-    );
+    if (features && features.length > 0) {
+      gsap.fromTo(`.${styles.featuresGrid} > div`,
+        { opacity: 0, y: 50 },
+        {
+          scrollTrigger: {
+            trigger: `.${styles.featuresSection}`,
+            start: "top 80%"
+          },
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.2,
+          ease: "power4.out"
+        }
+      );
+    }
 
     // 9. Events, News & Testimonials Animations
     gsap.fromTo(`.${styles.sectionHeader}`, 
@@ -329,7 +333,7 @@ export default function LandingClient({
       </section>
 
       {/* Quick Links Section */}
-      <section style={{ padding: "40px 0", backgroundColor: "#f0f0f8" }}>
+      <section id="quick-links" style={{ padding: "40px 0", backgroundColor: "#f0f0f8" }}>
         <div className="container" style={{ display: "flex", justifyContent: "center", gap: "24px", flexWrap: "wrap" }}>
           <Link href="/schedule" className="btn-secondary">View Opening Schedule</Link>
           <Link href="/news" className="btn-secondary">News & Events</Link>

@@ -20,6 +20,7 @@ import {
   UserCircle,
 } from "lucide-react";
 import styles from "./elearning.module.css";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 type SidebarUser = {
   name: string | null;
@@ -120,6 +121,7 @@ export function ElearningSidebar({ user }: { user: SidebarUser }) {
       </nav>
 
       <div className={styles.sidebarFooter}>
+        <LanguageSwitcher />
         <Link className={styles.navLink} href="/api/auth/signout">
           <LogOut size={20} />
           Logout

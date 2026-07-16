@@ -20,7 +20,7 @@ export default function Footer({ sponsors = [] }: { sponsors?: Sponsor[] }) {
         <div className={styles.footerTop}>
           <div>
             <Link href="/" className={styles.logo}>
-              <Image src="/logos/aec/aec-logo-reverse-horizontal.png" alt="AEC Academy Logo" width={180} height={48} style={{ objectFit: 'contain' }} />
+              <Image src="/logos/aec/aec-logo-reverse-horizontal.png" alt="AEC Academy Logo" width={180} height={48} style={{ objectFit: 'contain', height: 'auto' }} />
             </Link>
             <p className={styles.aboutText}>
               Educating people through English so they become successful global citizens responsible toward themselves and the community.
