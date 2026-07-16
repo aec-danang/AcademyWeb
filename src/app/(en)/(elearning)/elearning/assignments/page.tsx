@@ -30,7 +30,7 @@ export default async function AssignmentsPage() {
 
   return (
     <StudentAssignmentsBoard
-      assignments={assignments.map((assignment) => ({
+      assignments={assignments.map((assignment: any) => ({
         id: assignment.id,
         title: assignment.title,
         description: assignment.description,

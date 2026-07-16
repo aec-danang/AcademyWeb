@@ -12,7 +12,7 @@ export async function getCurrentUser() {
   if (!email) {
     // --- MOCK FOR E-LEARNING DEV ---
     // MẸO: Đổi giá trị TEST_ROLE thành "TEACHER" hoặc "STUDENT" để test các chức năng tương ứng
-    let TEST_ROLE: AppRole = "TEACHER"; 
+    const TEST_ROLE: AppRole = "TEACHER"; 
     
     return {
       id: TEST_ROLE === "TEACHER" ? "mock-teacher-id" : "mock-student-id",
