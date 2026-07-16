@@ -79,7 +79,7 @@ async function reimport() {
 
   console.log("Deleting old quiz questions...");
   const quizQuestions = await prisma.quizQuestion.findMany({ where: { quizId } });
-  const questionIds = quizQuestions.map((qq) => qq.questionId);
+  const questionIds = quizQuestions.map((qq: any) => qq.questionId);
 
   await prisma.quizQuestion.deleteMany({ where: { quizId } });
   await prisma.question.deleteMany({ where: { id: { in: questionIds } } });

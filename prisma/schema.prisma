@@ -120,18 +120,21 @@ model MenuItem {
 }
 
 model Testimonial {
-  id         String   @id @default(cuid())
-  authorName String
-  authorRole String?
-  content    String
-  avatarUrl  String?
-  rating     Int      @default(5)
-  published  Boolean  @default(true)
-  order      Int      @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id])
+  id           String   @id @default(cuid())
+  authorName   String
+  authorRole   String?
+  content      String
+  avatarUrl    String?
+  rating       Int      @default(5)
+  published    Boolean  @default(true)
+  order        Int      @default(0)
+  score        String?
+  isHallOfFame Boolean  @default(false)
+  isFeatured   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id])
 
   @@schema("public")
 }
@@ -621,4 +624,33 @@ model ActivityLog {
   actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
 
   @@schema("elearning")
+}
+
+model SiteProgram {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  content     String?
+  iconType    String
+  iconValue   String
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@schema("public")
+}
+
+model SiteFeature {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  iconValue   String
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@schema("public")
 }

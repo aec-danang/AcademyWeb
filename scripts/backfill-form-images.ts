@@ -91,7 +91,7 @@ function optionMatches(dbText: string, googleValue: string) {
 }
 
 function findLinkForItem(quiz: QuizWithQuestions, formIndex: number, title: string, usedQuestionIds: Set<string>) {
-  const byOrder = quiz.questions.find((link) => (
+  const byOrder = quiz.questions.find((link: any) => (
     !usedQuestionIds.has(link.questionId) &&
     (link.order === formIndex || link.question.sourceOrder === formIndex)
   ));
@@ -100,7 +100,7 @@ function findLinkForItem(quiz: QuizWithQuestions, formIndex: number, title: stri
   const normalizedTitle = normalizeText(title);
   if (!normalizedTitle) return null;
 
-  return quiz.questions.find((link) => {
+  return quiz.questions.find((link: any) => {
     if (usedQuestionIds.has(link.questionId)) return false;
     const current = normalizeText(link.question.text).split("[image:")[0].trim();
     return current === normalizedTitle || current.startsWith(`${normalizedTitle} `);
@@ -130,7 +130,7 @@ async function updateOptionImages(prisma: any, auth: any, link: QuizWithQuestion
 
   for (const googleOption of options) {
     if (!hasGoogleImage(googleOption.image)) continue;
-    const dbOption = link.question.options.find((option) => (
+    const dbOption = link.question.options.find((option: any) => (
       !usedOptionIds.has(option.id) &&
       optionMatches(option.text, googleOption.value || "")
     ));
@@ -165,7 +165,8 @@ async function processQuiz(prisma: any, auth: any, forms: any, quiz: QuizWithQue
       formId,
       error: error?.message || String(error),
       formQuestionImages: 0,
-      dbQuestionImages: quiz.questions.filter((link) => hasImageTag(link.question.text)).length,
+      formOptionImages: 0,
+      dbQuestionImages: quiz.questions.filter((link: any) => hasImageTag(link.question.text)).length,
       questionUpdates: 0,
       optionUpdates: 0,
       unmapped: [],
@@ -207,9 +208,9 @@ async function processQuiz(prisma: any, auth: any, forms: any, quiz: QuizWithQue
     optionUpdates += await updateOptionImages(prisma, auth, link, choiceOptions, apply);
   }
 
-  const dbQuestionImages = quiz.questions.filter((link) => hasImageTag(link.question.text)).length;
+  const dbQuestionImages = quiz.questions.filter((link: any) => hasImageTag(link.question.text)).length;
   const dbOptionImages = quiz.questions.reduce(
-    (sum, link) => sum + link.question.options.filter((option) => hasImageTag(option.text)).length,
+    (sum: any, link: any) => sum + link.question.options.filter((option: any) => hasImageTag(option.text)).length,
     0,
   );
 
