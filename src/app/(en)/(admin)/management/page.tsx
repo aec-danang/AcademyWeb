@@ -200,7 +200,7 @@ export default async function AdminDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recentAccounts.map((account) => (
+                  {recentAccounts.map((account: any) => (
                     <TableRow key={account.id} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group cursor-pointer">
                       <TableCell className="font-semibold text-slate-900 dark:text-slate-200 pl-8 py-5">
                         <div className="flex flex-col">
