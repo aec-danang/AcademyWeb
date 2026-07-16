@@ -31,14 +31,14 @@ export default async function ClassroomsPage() {
             <input name="classCode" placeholder="Enter class code, e.g. INT-704" style={{ minWidth: 240 }} />
             <select name="classSectionId">
               <option value="">Or choose a class</option>
-              {availableClasses.map((classSection) => <option key={classSection.id} value={classSection.id}>{classSection.code} - {classSection.course.title}</option>)}
+              {availableClasses.map((classSection: any) => <option key={classSection.id} value={classSection.id}>{classSection.code} - {classSection.course.title}</option>)}
             </select>
             <button className="btn-primary" type="submit">Request</button>
           </form>
         </div>
       )}
 
-      {classes.map((classSection) => (
+      {classes.map((classSection: any) => (
         <div className={styles.panel} key={classSection.id}>
           <div className={styles.panelHeader}>
             <h3 style={{ margin: 0 }}>{classSection.name}</h3>
@@ -52,7 +52,7 @@ export default async function ClassroomsPage() {
           <table className={styles.table}>
             <thead><tr><th>Student</th><th>Email</th><th>Status</th></tr></thead>
             <tbody>
-              {classSection.enrollments.map((enrollment) => (
+              {classSection.enrollments.map((enrollment: any) => (
                 <tr key={enrollment.id}>
                   <td>{enrollment.student.name || "Unknown"}</td>
                   <td>{enrollment.student.email}</td>
