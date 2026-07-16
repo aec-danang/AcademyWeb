@@ -8,7 +8,7 @@ import { mockCourses } from "../../mock-data";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import styles from "../../../elearning.module.css";
+import styles from "../../../../elearning.module.css";
 
 export default function CourseStatsPage({ params }: { params: Promise<{ courseId: string }> }) {
   const resolvedParams = use(params);

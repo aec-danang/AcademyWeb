@@ -10,7 +10,7 @@ import { notFound } from "next/navigation";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
-import styles from "../../../elearning.module.css";
+import styles from "../../../../elearning.module.css";
 import { Badge } from "@/components/ui/badge";
 
 export default function CourseBuilderPage({ params }: { params: Promise<{ courseId: string }> }) {

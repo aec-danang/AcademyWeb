@@ -12,7 +12,7 @@ import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import styles from "../../../../elearning.module.css";
+import styles from "../../../../../elearning.module.css";
 
 export default function LessonPage({ params }: { params: Promise<{ courseId: string; lessonId: string }> }) {
   const resolvedParams = use(params);
