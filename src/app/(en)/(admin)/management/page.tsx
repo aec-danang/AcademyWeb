@@ -257,7 +257,7 @@ export default async function AdminDashboard() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-slate-200 dark:divide-slate-800">
-                {recentLeads.map((lead) => (
+                {recentLeads.map((lead: any) => (
                   <div key={lead.id} className="p-5 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-semibold text-slate-900 dark:text-slate-100">{lead.name}</h4>
