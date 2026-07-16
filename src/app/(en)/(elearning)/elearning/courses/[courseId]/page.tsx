@@ -45,8 +45,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
   if (!course) notFound();
 
-  const hasAccess = user.role === "ADMIN"
-    || course.classes.some((classSection) => classSection.teacherId === user.id)
+  const hasAccess = course.classes.some((classSection) => classSection.teacherId === user.id)
     || course.classes.some((classSection) => classSection.enrollments.some((enrollment) => enrollment.userId === user.id && enrollment.status === "ACTIVE"));
 
   if (!hasAccess) notFound();

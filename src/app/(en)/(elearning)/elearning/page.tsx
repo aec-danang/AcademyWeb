@@ -201,7 +201,7 @@ export default async function ElearningDashboard() {
             : `/elearning/exercises/${firstInProgressAttempt.quiz.id}`,
           eyebrow: "Continue attempt",
           title: firstInProgressAttempt.quiz.title,
-          meta: `${firstInProgressAttempt.quiz.classSection.code} | Started ${formatDateTime(firstInProgressAttempt.startedAt)}`,
+          meta: `${firstInProgressAttempt.quiz.classSection?.code ?? ""} | Started ${formatDateTime(firstInProgressAttempt.startedAt)}`,
           action: "Resume now",
           icon: <PlayCircle size={22} />,
         }
@@ -210,7 +210,7 @@ export default async function ElearningDashboard() {
             href: "/elearning/assignments",
             eyebrow: "Next assignment",
             title: pendingAssignments[0].title,
-            meta: `${pendingAssignments[0].classSection.code} | Due ${formatDate(pendingAssignments[0].dueAt)}`,
+            meta: `${pendingAssignments[0].classSection?.code ?? ""} | Due ${formatDate(pendingAssignments[0].dueAt)}`,
             action: "Open assignments",
             icon: <ListTodo size={22} />,
           }
@@ -255,7 +255,7 @@ export default async function ElearningDashboard() {
         key: `assignment-${assignment.id}`,
         href: "/elearning/assignments",
         title: assignment.title,
-        meta: `${assignment.classSection.code} | ${assignment.classSection.course.title}`,
+        meta: `${assignment.classSection?.code ?? ""} | ${assignment.classSection?.course?.title ?? ""}`,
         due: assignment.dueAt ? `Due ${formatDateTime(assignment.dueAt)}` : "No deadline",
         badge: "Assignment",
         icon: <ListTodo size={18} />,
@@ -264,7 +264,7 @@ export default async function ElearningDashboard() {
         key: `quiz-${quiz.id}`,
         href: `/elearning/exercises/${quiz.id}`,
         title: quiz.title,
-        meta: `${quiz.program?.code || "General"} | ${quiz.classSection.code}`,
+        meta: `${quiz.program?.code || "General"} | ${quiz.classSection?.code ?? ""}`,
         due: quiz.timeLimit ? `${quiz.timeLimit} min` : "No time limit",
         badge: "Quiz",
         icon: <ClipboardList size={18} />,
@@ -293,7 +293,7 @@ export default async function ElearningDashboard() {
         key: `submission-${submission.id}`,
         date: submission.submittedAt,
         title: "Submitted assignment",
-        detail: `${submission.assignment.title} | ${submission.assignment.classSection.code}`,
+        detail: `${submission.assignment.title} | ${submission.assignment.classSection?.code ?? ""}`,
         href: "/elearning/assignments",
         icon: <CheckCircle2 size={16} />,
       })),
@@ -557,7 +557,7 @@ export default async function ElearningDashboard() {
         href: "/elearning/scores",
         eyebrow: "Grade next",
         title: submissionsToGrade[0].assignment.title,
-        meta: `${submissionsToGrade[0].student.name || submissionsToGrade[0].student.email} | ${submissionsToGrade[0].assignment.classSection.code}`,
+        meta: `${submissionsToGrade[0].student.name || submissionsToGrade[0].student.email} | ${submissionsToGrade[0].assignment.classSection?.code ?? ""}`,
         icon: <CheckSquare size={22} />,
       }
     : pendingEnrollmentRequests[0]
@@ -638,7 +638,7 @@ export default async function ElearningDashboard() {
                   <div className={styles.taskIcon}><FileText size={18} /></div>
                   <div>
                     <strong>{submission.assignment.title}</strong>
-                    <p>{submission.student.name || submission.student.email} | {submission.assignment.classSection.code}</p>
+                    <p>{submission.student.name || submission.student.email} | {submission.assignment.classSection?.code ?? ""}</p>
                   </div>
                   <span>Grade</span>
                 </Link>

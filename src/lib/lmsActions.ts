@@ -1383,7 +1383,7 @@ export async function startAttemptAction(formData: FormData) {
   });
   if (!quiz) return;
 
-  const isEnrolled = quiz.classSection.enrollments.some(
+  const isEnrolled = quiz.classSection?.enrollments?.some(
     (enrollment) => enrollment.userId === actor.id && enrollment.status === "ACTIVE",
   );
   if ((!quiz.isOpenQuiz && !isEnrolled) || quiz.attempts.length >= quiz.attemptLimit) return;

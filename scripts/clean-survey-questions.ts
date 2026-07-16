@@ -14,7 +14,7 @@ async function cleanSurveyQuestions() {
 
   console.log(`Tim thay ${questions.length} cau hoi.`);
 
-  const toDelete = questions.filter(q => {
+  const toDelete = questions.filter((q: any) => {
     const text = q.text?.toLowerCase() || "";
     return surveyKeywords.some(keyword => text.includes(keyword));
   });
@@ -22,7 +22,7 @@ async function cleanSurveyQuestions() {
   console.log(`Phat hien ${toDelete.length} cau hoi khao sat can xoa.`);
 
   if (toDelete.length > 0) {
-    const idsToDelete = toDelete.map(q => q.id);
+    const idsToDelete = toDelete.map((q: any) => q.id);
 
     // Xoa lien ket trong QuizQuestion
     const deletedQuizQuestions = await prisma.quizQuestion.deleteMany({

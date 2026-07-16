@@ -42,8 +42,8 @@ export default async function AssignmentsPage() {
         attachmentUrl: assignment.attachmentUrl,
         attachmentName: assignment.attachmentName,
         dueAt: assignment.dueAt?.toISOString() || null,
-        classCode: assignment.classSection.code,
-        courseTitle: assignment.classSection.course.title,
+        classCode: assignment.classSection?.code ?? "",
+        courseTitle: assignment.classSection?.course?.title ?? "",
         submission: assignment.submissions[0]
           ? {
               id: assignment.submissions[0].id,

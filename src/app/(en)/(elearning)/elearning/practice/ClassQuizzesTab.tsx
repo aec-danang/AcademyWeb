@@ -125,9 +125,9 @@ export async function ClassQuizzesTab({ searchParams }: Props) {
       unit: quiz.unit || "",
       programCode: quiz.program?.code || "General",
       programName: quiz.program?.name || "General",
-      courseId: quiz.classSection.course.id,
-      courseTitle: quiz.classSection.course.title,
-      classCode: quiz.classSection.code,
+      courseId: quiz.classSection?.course.id ?? "",
+      courseTitle: quiz.classSection?.course.title ?? "",
+      classCode: quiz.classSection?.code ?? "",
       questionCount: quiz.questions.length,
       timeLimit: quiz.timeLimit,
       attemptCount: quiz.attempts.length,
@@ -144,8 +144,8 @@ export async function ClassQuizzesTab({ searchParams }: Props) {
         quiz.program?.code,
         quiz.program?.name,
         quiz.unit,
-        quiz.classSection.code,
-        quiz.classSection.course.title,
+        quiz.classSection?.code,
+        quiz.classSection?.course.title,
       ].filter(Boolean).join(" ").toLowerCase(),
     };
   });
