@@ -70,7 +70,7 @@ export default async function CourseDetailPage({ params }: Props) {
       <div style={{ marginTop: "2rem" }}>
         <h2 style={{ marginBottom: "1rem", color: "var(--color-navy)" }}>Course Syllabus</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {course.lessons.map((lesson, index) => {
+          {course.lessons.map((lesson: any, index: number) => {
             const skill = extractMetadataValue(lesson.content, "Skill");
             const level = extractMetadataValue(lesson.content, "Level");
             const contentType = extractMetadataValue(lesson.content, "Content Type");

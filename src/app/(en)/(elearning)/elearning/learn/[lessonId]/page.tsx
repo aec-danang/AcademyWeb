@@ -158,7 +158,7 @@ export default async function LearningPage({ params }: Props) {
         <div style={{ width: "300px", display: "flex", flexDirection: "column", gap: "1rem" }}>
           <div className={styles.panel} style={{ flex: 1, overflowY: "auto", padding: "1rem" }}>
             <h4 style={{ display: "flex", alignItems: "center", gap: "0.5rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "0.5rem", marginBottom: "1rem" }}><Menu size={16} /> Syllabus</h4>
-            {lesson.course.lessons.map((item) => (
+            {lesson.course.lessons.map((item: any) => (
               <Link key={item.id} href={`/elearning/learn/${item.id}`} style={{ textDecoration: "none" }}>
                 <div style={{ fontSize: "0.875rem", padding: "0.5rem", color: item.id === lesson.id ? "var(--color-orange)" : "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: item.id === lesson.id ? 600 : 400 }}>
                   {item.order < lesson.order ? <CheckCircle size={14} color="#166534" /> : <span style={{ width: 14 }} />}
