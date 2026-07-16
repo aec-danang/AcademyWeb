@@ -45,8 +45,8 @@ export default async function CourseDetailPage({ params }: Props) {
 
   if (!course) notFound();
 
-  const hasAccess = course.classes.some((classSection) => classSection.teacherId === user.id)
-    || course.classes.some((classSection) => classSection.enrollments.some((enrollment) => enrollment.userId === user.id && enrollment.status === "ACTIVE"));
+  const hasAccess = course.classes.some((classSection: any) => classSection.teacherId === user.id)
+    || course.classes.some((classSection: any) => classSection.enrollments.some((enrollment: any) => enrollment.userId === user.id && enrollment.status === "ACTIVE"));
 
   if (!hasAccess) notFound();
 

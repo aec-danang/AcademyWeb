@@ -113,8 +113,8 @@ export default async function LearningPage({ params }: Props) {
   if (!lesson) notFound();
 
   const hasAccess = user.role === "ADMIN"
-    || lesson.course.classes.some((classSection) => classSection.teacherId === user.id)
-    || lesson.course.classes.some((classSection) => classSection.enrollments.some((enrollment) => enrollment.userId === user.id && enrollment.status === "ACTIVE"));
+    || lesson.course.classes.some((classSection: any) => classSection.teacherId === user.id)
+    || lesson.course.classes.some((classSection: any) => classSection.enrollments.some((enrollment: any) => enrollment.userId === user.id && enrollment.status === "ACTIVE"));
   if (!hasAccess) notFound();
 
   const { body, metadata } = splitLessonContent(lesson.content);
