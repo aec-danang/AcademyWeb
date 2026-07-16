@@ -67,6 +67,7 @@ export function AppSidebar() {
             height={36}
             className="object-contain hidden dark:block"
             priority
+            style={{ height: 'auto' }}
           />
           <Image
             src="/logos/aec/aec-logo-horizontal.png"
@@ -75,6 +76,7 @@ export function AppSidebar() {
             height={36}
             className="object-contain block dark:hidden"
             priority
+            style={{ height: 'auto' }}
           />
         </Link>
       </SidebarHeader>
