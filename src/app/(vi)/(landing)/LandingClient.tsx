@@ -87,7 +87,7 @@ export default function LandingClient({
     }, "-=0.8");
 
     // 2. Programs Section (ScrollTrigger Batching)
-    if (programs.length > 0) {
+    if (programs && programs.length > 0) {
       ScrollTrigger.batch(`.${styles.programCard}`, {
         onEnter: (batch) => gsap.fromTo(batch, 
           { opacity: 0, y: 60 }, 
@@ -181,7 +181,7 @@ export default function LandingClient({
     });
 
     // 8. Features Section
-    if (features.length > 0) {
+    if (features && features.length > 0) {
       gsap.fromTo(`.${styles.featuresGrid} > div`,
         { opacity: 0, y: 50 },
         {

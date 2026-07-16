@@ -115,6 +115,10 @@ section {
   padding: var(--section-padding) 0;
 }
 
+section[aria-label="Notifications alt+T"] {
+  padding: 0 !important;
+}
+
 @media(max-width: 768px) {
   section {
     padding: 48px 0;

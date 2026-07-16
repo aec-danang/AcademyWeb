@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
+import { StudentDashboardView, TeacherDashboardView } from "./DashboardView";
 
 export const dynamic = "force-dynamic";
 
@@ -333,143 +334,16 @@ export default async function ElearningDashboard() {
     const latestGrade = grades[0];
     const latestAttempt = recentAttempts[0];
 
-    return (
-      <div className={styles.dashboardShell}>
-        <section className={styles.dashboardHero}>
-          <div className={styles.dashboardHeroCopy}>
-            <span className={styles.cockpitEyebrow}><Sparkles size={16} /> Student dashboard</span>
-            <h1>{user.name || "Student"}, start with one thing.</h1>
-            <p>Your dashboard now prioritizes the next useful action, then keeps progress and recent feedback close by.</p>
-          </div>
-          <Link href={continueLearning.href} className={styles.dashboardPrimaryAction}>
-            <div className={styles.dashboardActionIcon}>{continueLearning.icon}</div>
-            <span>{continueLearning.eyebrow}</span>
-            <strong>{continueLearning.title}</strong>
-            <p>{continueLearning.meta}</p>
-            <em>{continueLearning.action} <ArrowRight size={16} /></em>
-          </Link>
-        </section>
-
-        <section className={styles.dashboardStats} aria-label="Learning status">
-          <div>
-            <span>Progress</span>
-            <strong>{overallProgress}%</strong>
-            <p>{finishedLearningItems}/{totalLearningItems || 0} done</p>
-          </div>
-          <div>
-            <span>Pending</span>
-            <strong>{pendingAssignments.length + taskCards.filter((task) => task.badge !== "Assignment").length}</strong>
-            <p>Assignments, quizzes, tests</p>
-          </div>
-          <div>
-            <span>Average</span>
-            <strong>{averageScore === null ? "-" : averageScore.toFixed(1)}</strong>
-            <p>{averageScore === null ? "No scores yet" : scoreTone(averageScore)}</p>
-          </div>
-        </section>
-
-        <section className={styles.actionHub} aria-label="Quick actions">
-          {studentActions.map((action) => (
-            <Link href={action.href} className={styles.actionHubItem} key={action.title}>
-              <div>{action.icon}</div>
-              <strong>{action.title}</strong>
-              <p>{action.detail}</p>
-              <ArrowRight size={16} />
-            </Link>
-          ))}
-        </section>
-
-        <section className={styles.dashboardMain}>
-          <div className={styles.dashboardPanel}>
-            <div className={styles.dashboardPanelHeader}>
-              <div>
-                <span className={styles.cockpitEyebrow}><ListTodo size={16} /> Needs attention</span>
-                <h2>Do next</h2>
-              </div>
-              <Link href="/elearning/practice">Open practice</Link>
-            </div>
-            {taskCards.length > 0 ? (
-              <div className={styles.focusList}>
-                {taskCards.slice(0, 5).map((task) => (
-                  <Link href={task.href} key={task.key} className={styles.focusItem}>
-                    <div className={styles.taskIcon}>{task.icon}</div>
-                    <div>
-                      <strong>{task.title}</strong>
-                      <p>{task.meta}</p>
-                    </div>
-                    <span>{task.due}</span>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className={styles.emptyStateInline}>
-                <CheckCircle2 size={32} />
-                <p>You are caught up. New work will appear here when it is published.</p>
-              </div>
-            )}
-          </div>
-
-          <aside className={styles.dashboardPanel}>
-            <div className={styles.dashboardPanelHeader}>
-              <div>
-                <span className={styles.cockpitEyebrow}><Target size={16} /> Snapshot</span>
-                <h2>Progress pulse</h2>
-              </div>
-              <Link href="/elearning/scores">Scores</Link>
-            </div>
-            <div className={styles.progressPulse}>
-              <div className={styles.progressRing} style={{ background: `conic-gradient(#10b981 ${overallProgress * 3.6}deg, #e2e8f0 0deg)` }}>
-                <strong>{overallProgress}%</strong>
-              </div>
-              <div>
-                <strong>{latestGrade ? scoreLabel(latestGrade.score) : "No grade"}</strong>
-                <p>{latestGrade?.assignment?.title || latestGrade?.quiz?.title || "Complete a quiz to start your score history."}</p>
-              </div>
-            </div>
-            {latestAttempt ? (
-              <Link
-                href={latestAttempt.quiz.isPracticeTest ? `/elearning/tests/${latestAttempt.quizId}` : `/elearning/exercises/${latestAttempt.quizId}?attempt=${latestAttempt.id}`}
-                className={styles.snapshotRow}
-              >
-                <ClipboardList size={18} />
-                <div>
-                  <strong>{latestAttempt.quiz.title}</strong>
-                  <p>{latestAttempt.status === "IN_PROGRESS" ? "In progress" : `Score ${scoreLabel(latestAttempt.score)}`}</p>
-                </div>
-              </Link>
-            ) : null}
-          </aside>
-        </section>
-
-        <section className={styles.dashboardPanel}>
-          <div className={styles.dashboardPanelHeader}>
-            <div>
-              <span className={styles.cockpitEyebrow}><Activity size={16} /> Recent movement</span>
-              <h2>Activity</h2>
-            </div>
-          </div>
-          {timeline.length > 0 ? (
-            <div className={styles.timelineList}>
-              {timeline.slice(0, 5).map((item) => (
-                <Link href={item.href} key={item.key} className={styles.timelineItem}>
-                  <div className={styles.timelineIcon}>{item.icon}</div>
-                  <div>
-                    <strong>{item.title}</strong>
-                    <p>{item.detail}</p>
-                  </div>
-                  <time>{formatDateTime(item.date)}</time>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className={styles.emptyStateInline}>
-              <Activity size={32} />
-              <p>Your quiz attempts, submissions, and new grades will appear here.</p>
-            </div>
-          )}
-        </section>
-      </div>
-    );
+    return <StudentDashboardView 
+      user={user} 
+      enrollments={enrollments} 
+      assignments={assignments} 
+      quizzes={quizzes} 
+      practiceTests={practiceTests} 
+      recentAttempts={recentAttempts} 
+      grades={grades} 
+      recentSubmissions={recentSubmissions} 
+    />;
   }
 
   const teacherScopedWhere = user.role === "TEACHER" ? { classSection: { teacherId: user.id } } : {};
@@ -576,178 +450,11 @@ export default async function ElearningDashboard() {
           icon: <Users size={22} />,
         };
 
-  return (
-    <div className={styles.dashboardShell}>
-      <section className={`${styles.dashboardHero} ${styles.dashboardHeroTeacher}`}>
-        <div className={styles.dashboardHeroCopy}>
-          <span className={styles.cockpitEyebrow}><Activity size={16} /> {user.role === "ADMIN" ? "Admin dashboard" : "Teacher dashboard"}</span>
-          <h1>Control the classroom flow.</h1>
-          <p>Queues, class health, and creation tools are grouped around what needs a decision now.</p>
-        </div>
-        <Link href={primaryTeacherAction.href} className={styles.dashboardPrimaryAction}>
-          <div className={styles.dashboardActionIcon}>{primaryTeacherAction.icon}</div>
-          <span>{primaryTeacherAction.eyebrow}</span>
-          <strong>{primaryTeacherAction.title}</strong>
-          <p>{primaryTeacherAction.meta}</p>
-          <em>Open <ArrowRight size={16} /></em>
-        </Link>
-      </section>
-
-      <section className={styles.dashboardStats} aria-label="Teaching status">
-        <div>
-          <span>Classes</span>
-          <strong>{classes.filter((classSection) => classSection.status === "ACTIVE").length}</strong>
-          <p>{classes.length} total</p>
-        </div>
-        <div>
-          <span>Students</span>
-          <strong>{activeStudentIds.size}</strong>
-          <p>Active learners</p>
-        </div>
-        <div>
-          <span>Queue</span>
-          <strong>{submissionsToGrade.length + pendingEnrollmentRequests.length}</strong>
-          <p>Needs action</p>
-        </div>
-      </section>
-
-      <section className={styles.actionHub} aria-label="Teaching actions">
-        {actionCards.slice(0, 4).map((action) => (
-          <Link href={action.href} key={action.label} className={styles.actionHubItem}>
-            <div>{action.icon}</div>
-            <strong>{action.label}</strong>
-            <p>{action.detail}</p>
-            <ArrowRight size={16} />
-          </Link>
-        ))}
-      </section>
-
-      <section className={styles.dashboardMain}>
-        <div className={styles.dashboardPanel}>
-          <div className={styles.dashboardPanelHeader}>
-            <div>
-              <span className={styles.cockpitEyebrow}><CheckSquare size={16} /> Decision queue</span>
-              <h2>Needs review</h2>
-            </div>
-            <Link href="/elearning/scores">Scores</Link>
-          </div>
-          {submissionsToGrade.length > 0 || pendingEnrollmentRequests.length > 0 ? (
-            <div className={styles.focusList}>
-              {submissionsToGrade.slice(0, 4).map((submission) => (
-                <Link href="/elearning/scores" key={submission.id} className={styles.focusItem}>
-                  <div className={styles.taskIcon}><FileText size={18} /></div>
-                  <div>
-                    <strong>{submission.assignment.title}</strong>
-                    <p>{submission.student.name || submission.student.email} | {submission.assignment.classSection?.code ?? ""}</p>
-                  </div>
-                  <span>Grade</span>
-                </Link>
-              ))}
-              {pendingEnrollmentRequests.slice(0, 3).map((enrollment) => (
-                <Link href="/elearning/classrooms" key={enrollment.id} className={styles.focusItem}>
-                  <div className={styles.taskIcon}><UserPlus size={18} /></div>
-                  <div>
-                    <strong>{enrollment.student.name || enrollment.student.email || "Unnamed student"}</strong>
-                    <p>{enrollment.classSection.code} | {enrollment.classSection.course.title}</p>
-                  </div>
-                  <span>Approve</span>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className={styles.emptyStateInline}>
-              <CheckCircle2 size={32} />
-              <p>No enrollment or grading decisions are waiting.</p>
-            </div>
-          )}
-        </div>
-
-        <aside className={styles.dashboardPanel}>
-          <div className={styles.dashboardPanelHeader}>
-            <div>
-              <span className={styles.cockpitEyebrow}><Award size={16} /> Score pulse</span>
-              <h2>Latest results</h2>
-            </div>
-            <Link href="/elearning/scores">All</Link>
-          </div>
-          <div className={styles.teacherPulse}>
-            <strong>{average === null ? "-" : average.toFixed(1)}</strong>
-            <p>Average from recent grades</p>
-          </div>
-          {grades.slice(0, 3).map((grade) => (
-            <Link href="/elearning/scores" key={grade.id} className={styles.snapshotRow}>
-              <Award size={18} />
-              <div>
-                <strong>{grade.assignment?.title || grade.quiz?.title || "Manual grade"}</strong>
-                <p>{grade.student.name || grade.student.email} | {scoreLabel(grade.score)}</p>
-              </div>
-            </Link>
-          ))}
-        </aside>
-      </section>
-
-      <section className={styles.dashboardMain}>
-        <div className={styles.dashboardPanel}>
-          <div className={styles.dashboardPanelHeader}>
-            <div>
-              <span className={styles.cockpitEyebrow}><BookOpen size={16} /> Classes</span>
-              <h2>Current classrooms</h2>
-            </div>
-            <Link href="/elearning/courses/new">New class</Link>
-          </div>
-          {classes.length > 0 ? (
-            <div className={styles.focusList}>
-              {classes.slice(0, 5).map((classSection) => {
-                const activeCount = classSection.enrollments.filter((enrollment) => enrollment.status === "ACTIVE").length;
-                const requestCount = classSection.enrollments.filter((enrollment) => enrollment.status === "REQUESTED").length;
-                return (
-                  <Link href={`/elearning/courses/${classSection.courseId}`} key={classSection.id} className={styles.focusItem}>
-                    <div className={styles.taskIcon}><Users size={18} /></div>
-                    <div>
-                      <strong>{classSection.name}</strong>
-                      <p>{classSection.code} | {classSection.course.title}</p>
-                    </div>
-                    <span>{activeCount} / {requestCount}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          ) : (
-            <div className={styles.emptyStateInline}>
-              <AlertCircle size={32} />
-              <p>No classes found. Create a class to start enrolling students.</p>
-            </div>
-          )}
-        </div>
-
-        <aside className={styles.dashboardPanel}>
-          <div className={styles.dashboardPanelHeader}>
-            <div>
-              <span className={styles.cockpitEyebrow}><Activity size={16} /> Activity</span>
-              <h2>Recent movement</h2>
-            </div>
-          </div>
-          {recentActivity.length > 0 ? (
-            <div className={styles.timelineList}>
-              {recentActivity.slice(0, 5).map((activity) => (
-                <Link href={activityHref(activity.entityType)} key={activity.id} className={styles.timelineItem}>
-                  <div className={styles.timelineIcon}><Activity size={16} /></div>
-                  <div>
-                    <strong>{activity.action.replaceAll("_", " ").toLowerCase()}</strong>
-                    <p>{activity.entityType} | {activity.actor?.name || activity.actor?.email || "System"}</p>
-                  </div>
-                  <time>{formatDateTime(activity.createdAt)}</time>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className={styles.emptyStateInline}>
-              <Activity size={32} />
-              <p>Activity logs will appear here as the LMS is used.</p>
-            </div>
-          )}
-        </aside>
-      </section>
-    </div>
-  );
+  return <TeacherDashboardView 
+    user={user} 
+    classes={classes} 
+    submissions={submissions} 
+    grades={grades} 
+    recentActivity={recentActivity} 
+  />;
 }
