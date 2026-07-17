@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Academy English Center - Learn English in Da Nang",
-  description: "High-quality English training for kids, teens, and adults in Da Nang.",
+  title: "Academy English Center - Học tiếng Anh tại Đà Nẵng",
+  description: "Đào tạo tiếng Anh chất lượng cao cho trẻ em, thanh thiếu niên và người lớn tại Đà Nẵng.",
 };
 
 export const revalidate = 60; // Revalidate cache every 60 seconds

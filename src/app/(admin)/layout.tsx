@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Montserrat, Inter } from "next/font/google";
-import "../../globals.css";
+import { Toaster } from "@/components/ui/sonner";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import "../globals.css"; // Admin-specific overrides if needed
 
 const montserrat = Montserrat({
   subsets: ["latin"],
