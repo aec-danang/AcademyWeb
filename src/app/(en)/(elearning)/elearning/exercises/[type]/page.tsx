@@ -208,7 +208,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
   const reviewMode = Boolean(reviewAttempt);
   const canTakeQuiz = user.role === "STUDENT" || user.role === "TEACHER" || user.role === "ADMIN";
   const canAnswer = canTakeQuiz && !reviewMode && attemptCount < quiz.attemptLimit;
-  const reviewAnswerMap = new Map(reviewAttempt?.answers.map((answer: any) => [answer.questionId, answer]) || []);
+  const reviewAnswerMap = new Map<string, any>(reviewAttempt?.answers.map((answer: any) => [answer.questionId, answer]) || []);
   const totalPoints = quiz.questions.reduce((sum: number, link: any) => sum + link.points, 0);
   const reviewedQuestions = quiz.questions.map((link: any, index: number) => {
     const answer = reviewAnswerMap.get(link.question.id);
