@@ -204,13 +204,13 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
 
   const attemptCount = quiz.attempts.length;
   const selectedAttemptId = resolvedSearchParams?.attempt;
-  const reviewAttempt = selectedAttemptId ? quiz.attempts.find((attempt) => attempt.id === selectedAttemptId) || null : null;
+  const reviewAttempt = selectedAttemptId ? quiz.attempts.find((attempt: any) => attempt.id === selectedAttemptId) || null : null;
   const reviewMode = Boolean(reviewAttempt);
   const canTakeQuiz = user.role === "STUDENT" || user.role === "TEACHER" || user.role === "ADMIN";
   const canAnswer = canTakeQuiz && !reviewMode && attemptCount < quiz.attemptLimit;
-  const reviewAnswerMap = new Map(reviewAttempt?.answers.map((answer) => [answer.questionId, answer]) || []);
-  const totalPoints = quiz.questions.reduce((sum, link) => sum + link.points, 0);
-  const reviewedQuestions = quiz.questions.map((link, index) => {
+  const reviewAnswerMap = new Map(reviewAttempt?.answers.map((answer: any) => [answer.questionId, answer]) || []);
+  const totalPoints = quiz.questions.reduce((sum: number, link: any) => sum + link.points, 0);
+  const reviewedQuestions = quiz.questions.map((link: any, index: number) => {
     const answer = reviewAnswerMap.get(link.question.id);
     const isBlank = !answer || (!answer.optionId && !hasAnswerText(answer.answerText));
     const state: QuestionState = isBlank
@@ -222,21 +222,21 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
           : "pending";
     return { link, answer, index: index + 1, state };
   });
-  const scoredReviewedQuestions = reviewedQuestions.filter((item) => item.link.points > 0);
-  const correctCount = scoredReviewedQuestions.filter((item) => item.state === "correct").length;
-  const wrongCount = scoredReviewedQuestions.filter((item) => item.state === "wrong").length;
-  const blankCount = scoredReviewedQuestions.filter((item) => item.state === "blank").length;
-  const pendingCount = scoredReviewedQuestions.filter((item) => item.state === "pending").length;
-  const awardedPoints = reviewAttempt?.answers.reduce((sum, answer) => sum + (answer.pointsAwarded || 0), 0) || 0;
+  const scoredReviewedQuestions = reviewedQuestions.filter((item: any) => item.link.points > 0);
+  const correctCount = scoredReviewedQuestions.filter((item: any) => item.state === "correct").length;
+  const wrongCount = scoredReviewedQuestions.filter((item: any) => item.state === "wrong").length;
+  const blankCount = scoredReviewedQuestions.filter((item: any) => item.state === "blank").length;
+  const pendingCount = scoredReviewedQuestions.filter((item: any) => item.state === "pending").length;
+  const awardedPoints = reviewAttempt?.answers.reduce((sum: number, answer: any) => sum + (answer.pointsAwarded || 0), 0) || 0;
   const scoreValue = reviewAttempt?.score ?? (reviewAttempt ? awardedPoints : null);
   const scorePercent = reviewAttempt && totalPoints > 0 ? Math.round(((scoreValue || 0) / totalPoints) * 100) : 0;
   const sectionGroups = quiz.sections
-    .map((section) => ({
+    .map((section: any) => ({
       section,
-      links: quiz.questions.filter((link) => link.sectionId === section.id),
+      links: quiz.questions.filter((link: any) => link.sectionId === section.id),
     }))
-    .filter((group) => group.links.length > 0);
-  const unsectionedQuestions = quiz.questions.filter((link) => !link.sectionId);
+    .filter((group: any) => group.links.length > 0);
+  const unsectionedQuestions = quiz.questions.filter((link: any) => !link.sectionId);
   type QuestionLink = NonNullable<typeof quiz>["questions"][number];
 
   function renderQuestion(link: QuestionLink, questionNumber: number) {
@@ -460,7 +460,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
             </div>
           </div>
           <div className={styles.reviewAttemptList}>
-            {quiz.attempts.map((attempt) => (
+            {quiz.attempts.map((attempt: any) => (
               <Link
                 href={`/elearning/exercises/${quiz.id}?attempt=${attempt.id}`}
                 key={attempt.id}
@@ -490,7 +490,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
             <h2>Question map</h2>
             <p>Jump to any question and inspect the result.</p>
             <div>
-              {reviewedQuestions.map((item) => (
+              {reviewedQuestions.map((item: any) => (
                 <a
                   href={`#question-${item.link.question.id}`}
                   key={item.link.id}
@@ -503,32 +503,32 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
             </div>
           </ReviewQuestionMap>
           <div className={styles.reviewQuestionList}>
-            {sectionGroups.map((group) => (
+            {sectionGroups.map((group: any) => (
               <section key={group.section.id} className={styles.reviewSection}>
                 <h2>{group.section.title}</h2>
                 {group.section.instructions ? <div className={styles.reviewQuestionText}>{parseMediaTags(group.section.instructions)}</div> : null}
                 {group.section.passage ? <div className={styles.reviewPassage}>{group.section.passage}</div> : null}
                 {group.section.audioUrl ? renderMediaSource(group.section.audioUrl) : null}
-                {group.links.map((link) => renderQuestion(link, quiz.questions.findIndex((item) => item.id === link.id) + 1))}
+                {group.links.map((link: any) => renderQuestion(link, quiz.questions.findIndex((item: any) => item.id === link.id) + 1))}
               </section>
             ))}
-            {unsectionedQuestions.map((link) => renderQuestion(link, quiz.questions.findIndex((item) => item.id === link.id) + 1))}
+            {unsectionedQuestions.map((link: any) => renderQuestion(link, quiz.questions.findIndex((item: any) => item.id === link.id) + 1))}
           </div>
         </div>
       ) : (
         <form id={`quiz-form-${quiz.id}`} action={submitQuizAttemptAction}>
           <input type="hidden" name="quizId" value={quiz.id} />
           <div className={styles.reviewQuestionList}>
-            {sectionGroups.map((group) => (
+            {sectionGroups.map((group: any) => (
               <section key={group.section.id} className={styles.reviewSection}>
                 <h2>{group.section.title}</h2>
                 {group.section.instructions ? <div className={styles.reviewQuestionText}>{parseMediaTags(group.section.instructions)}</div> : null}
                 {group.section.passage ? <div className={styles.reviewPassage}>{group.section.passage}</div> : null}
                 {group.section.audioUrl ? renderMediaSource(group.section.audioUrl) : null}
-                {group.links.map((link) => renderQuestion(link, quiz.questions.findIndex((item) => item.id === link.id) + 1))}
+                {group.links.map((link: any) => renderQuestion(link, quiz.questions.findIndex((item: any) => item.id === link.id) + 1))}
               </section>
             ))}
-            {unsectionedQuestions.map((link) => renderQuestion(link, quiz.questions.findIndex((item) => item.id === link.id) + 1))}
+            {unsectionedQuestions.map((link: any) => renderQuestion(link, quiz.questions.findIndex((item: any) => item.id === link.id) + 1))}
           </div>
           {canAnswer && (
             <div className={styles.reviewSubmitBar}>
