@@ -103,10 +103,10 @@ export async function ClassQuizzesTab({ searchParams }: Props) {
     },
   });
 
-  const cards = quizzes.map((quiz) => {
-    const inProgressAttempt = quiz.attempts.find((attempt) => attempt.status === "IN_PROGRESS") || null;
-    const completedAttempts = quiz.attempts.filter((attempt) => attempt.status !== "IN_PROGRESS");
-    const bestScore = completedAttempts.reduce<number | null>((best, attempt) => {
+  const cards = quizzes.map((quiz: any) => {
+    const inProgressAttempt = quiz.attempts.find((attempt: any) => attempt.status === "IN_PROGRESS") || null;
+    const completedAttempts = quiz.attempts.filter((attempt: any) => attempt.status !== "IN_PROGRESS");
+    const bestScore = completedAttempts.reduce((best: any, attempt: any) => {
       if (attempt.score === null) return best;
       return best === null ? attempt.score : Math.max(best, attempt.score);
     }, null);
