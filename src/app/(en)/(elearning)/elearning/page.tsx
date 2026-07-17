@@ -181,20 +181,20 @@ export default async function ElearningDashboard() {
       }),
     ]);
 
-    const pendingAssignments = assignments.filter((assignment) => assignment.submissions.length === 0);
+    const pendingAssignments = assignments.filter((assignment: any) => assignment.submissions.length === 0);
     const submittedAssignments = assignments.length - pendingAssignments.length;
-    const completedQuizzes = quizzes.filter((quiz) => quiz.attempts.some((attempt) => attempt.status !== "IN_PROGRESS")).length;
-    const completedPracticeTests = practiceTests.filter((test) => test.attempts.some((attempt) => attempt.status !== "IN_PROGRESS")).length;
+    const completedQuizzes = quizzes.filter((quiz: any) => quiz.attempts.some((attempt: any) => attempt.status !== "IN_PROGRESS")).length;
+    const completedPracticeTests = practiceTests.filter((test: any) => test.attempts.some((attempt: any) => attempt.status !== "IN_PROGRESS")).length;
     const availableQuizCount = quizzes.length + practiceTests.length;
     const finishedLearningItems = submittedAssignments + completedQuizzes + completedPracticeTests;
     const totalLearningItems = assignments.length + availableQuizCount;
     const overallProgress = totalLearningItems ? Math.round((finishedLearningItems / totalLearningItems) * 100) : 0;
-    const averageScore = grades.length ? grades.reduce((sum, grade) => sum + grade.score, 0) / grades.length : null;
+    const averageScore = grades.length ? grades.reduce((sum: number, grade: any) => sum + grade.score, 0) / grades.length : null;
 
-    const firstInProgressAttempt = recentAttempts.find((attempt) => attempt.status === "IN_PROGRESS");
-    const nextQuiz = quizzes.find((quiz) => quiz.attempts.length === 0);
-    const nextPracticeTest = practiceTests.find((test) => test.attempts.length === 0);
-    const nextLesson = enrollments.flatMap((enrollment) => enrollment.classSection.course.lessons)[0];
+    const firstInProgressAttempt = recentAttempts.find((attempt: any) => attempt.status === "IN_PROGRESS");
+    const nextQuiz = quizzes.find((quiz: any) => quiz.attempts.length === 0);
+    const nextPracticeTest = practiceTests.find((test: any) => test.attempts.length === 0);
+    const nextLesson = enrollments.flatMap((enrollment: any) => enrollment.classSection.course.lessons)[0];
     const continueLearning = firstInProgressAttempt
       ? {
           href: firstInProgressAttempt.quiz.isPracticeTest
@@ -252,7 +252,7 @@ export default async function ElearningDashboard() {
                 };
 
     const taskCards = [
-      ...pendingAssignments.slice(0, 4).map((assignment) => ({
+      ...pendingAssignments.slice(0, 4).map((assignment: any) => ({
         key: `assignment-${assignment.id}`,
         href: "/elearning/assignments",
         title: assignment.title,
@@ -261,7 +261,7 @@ export default async function ElearningDashboard() {
         badge: "Assignment",
         icon: <ListTodo size={18} />,
       })),
-      ...quizzes.filter((quiz) => quiz.attempts.length === 0).slice(0, 3).map((quiz) => ({
+      ...quizzes.filter((quiz: any) => quiz.attempts.length === 0).slice(0, 3).map((quiz: any) => ({
         key: `quiz-${quiz.id}`,
         href: `/elearning/exercises/${quiz.id}`,
         title: quiz.title,
@@ -270,7 +270,7 @@ export default async function ElearningDashboard() {
         badge: "Quiz",
         icon: <ClipboardList size={18} />,
       })),
-      ...practiceTests.filter((test) => test.attempts.length === 0).slice(0, 3).map((test) => ({
+      ...practiceTests.filter((test: any) => test.attempts.length === 0).slice(0, 3).map((test: any) => ({
         key: `test-${test.id}`,
         href: `/elearning/tests/${test.id}`,
         title: test.title,
@@ -282,7 +282,7 @@ export default async function ElearningDashboard() {
     ].slice(0, 6);
 
     const timeline = [
-      ...recentAttempts.map((attempt) => ({
+      ...recentAttempts.map((attempt: any) => ({
         key: `attempt-${attempt.id}`,
         date: attempt.submittedAt || attempt.startedAt,
         title: attempt.status === "IN_PROGRESS" ? "Started quiz" : "Completed quiz",
@@ -290,7 +290,7 @@ export default async function ElearningDashboard() {
         href: attempt.quiz.isPracticeTest ? `/elearning/tests/${attempt.quizId}` : `/elearning/exercises/${attempt.quizId}?attempt=${attempt.id}`,
         icon: <ClipboardList size={16} />,
       })),
-      ...recentSubmissions.map((submission) => ({
+      ...recentSubmissions.map((submission: any) => ({
         key: `submission-${submission.id}`,
         date: submission.submittedAt,
         title: "Submitted assignment",
@@ -298,7 +298,7 @@ export default async function ElearningDashboard() {
         href: "/elearning/assignments",
         icon: <CheckCircle2 size={16} />,
       })),
-      ...grades.map((grade) => ({
+      ...grades.map((grade: any) => ({
         key: `grade-${grade.id}`,
         date: grade.createdAt,
         title: "New grade posted",
@@ -395,19 +395,19 @@ export default async function ElearningDashboard() {
   ]);
 
   const activeStudentIds = new Set(
-    classes.flatMap((classSection) => (
+    classes.flatMap((classSection: any) => (
       classSection.enrollments
-        .filter((enrollment) => enrollment.status === "ACTIVE")
-        .map((enrollment) => enrollment.userId)
+        .filter((enrollment: any) => enrollment.status === "ACTIVE")
+        .map((enrollment: any) => enrollment.userId)
     )),
   );
-  const pendingEnrollmentRequests = classes.flatMap((classSection) => (
+  const pendingEnrollmentRequests = classes.flatMap((classSection: any) => (
     classSection.enrollments
-      .filter((enrollment) => enrollment.status === "REQUESTED")
-      .map((enrollment) => ({ ...enrollment, classSection }))
+      .filter((enrollment: any) => enrollment.status === "REQUESTED")
+      .map((enrollment: any) => ({ ...enrollment, classSection }))
   ));
-  const submissionsToGrade = submissions.filter((submission) => submission.status !== "GRADED" && !submission.grade);
-  const average = grades.length ? grades.reduce((sum, grade) => sum + grade.score, 0) / grades.length : null;
+  const submissionsToGrade = submissions.filter((submission: any) => submission.status !== "GRADED" && !submission.grade);
+  const average = grades.length ? grades.reduce((sum: number, grade: any) => sum + grade.score, 0) / grades.length : null;
 
   const actionCards = [
     { href: "/elearning/courses/new", label: "Create class", detail: "Open a new course section", icon: <BookPlus size={18} /> },
