@@ -194,7 +194,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
   if (user.role === "STUDENT") {
     if (!quiz.isPracticeTest && !quiz.isOpenQuiz) {
       const isEnrolled = quiz.classSection?.enrollments.some(
-        (enrollment) => enrollment.userId === user.id && enrollment.status === "ACTIVE"
+        (enrollment: any) => enrollment.userId === user.id && enrollment.status === "ACTIVE"
       );
       if (!isEnrolled) canView = false;
     }
