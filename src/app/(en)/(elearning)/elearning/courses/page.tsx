@@ -28,7 +28,7 @@ export default async function CoursesPage() {
       </div>
 
       <div className={styles.courseGrid}>
-        {courses.map((course) => (
+        {courses.map((course: any) => (
           <Link href={`/elearning/courses/${course.id}`} key={course.id} style={{ textDecoration: "none", color: "inherit" }}>
             <div className={styles.courseCard}>
               <div className={styles.courseImage}><BookOpen size={48} opacity={0.5} /></div>
@@ -37,7 +37,7 @@ export default async function CoursesPage() {
                 <p>{course.description}</p>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", marginBottom: "0.75rem", color: "var(--text-muted)" }}>
                   <span>{course.lessons.length} lessons</span>
-                  <span>{course.classes.reduce((sum, classSection) => sum + classSection.enrollments.length, 0)} enrolled</span>
+                  <span>{course.classes.reduce((sum: number, classSection: any) => sum + classSection.enrollments.length, 0)} enrolled</span>
                 </div>
                 <div className={styles.progressBar} aria-hidden="true"><div className={styles.progressFill} style={{ width: course.lessons.length > 0 ? "100%" : "0%" }} /></div>
                 <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--color-orange)", fontWeight: 500 }}>
