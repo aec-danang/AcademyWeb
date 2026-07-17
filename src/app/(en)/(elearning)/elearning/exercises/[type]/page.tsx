@@ -253,8 +253,8 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
         : reviewAnswer.isCorrect === false
           ? "wrong"
           : "pending";
-    const correctOptions = question.options.filter((option) => option.isCorrect);
-    const correctOptionText = correctOptions.map((option) => `${option.label ? `${option.label}. ` : ""}${option.text}`).join(", ");
+    const correctOptions = question.options.filter((option: any) => option.isCorrect);
+    const correctOptionText = correctOptions.map((option: any) => `${option.label ? `${option.label}. ` : ""}${option.text}`).join(", ");
     const studentOptionText = reviewAnswer?.option
       ? `${reviewAnswer.option.label ? `${reviewAnswer.option.label}. ` : ""}${reviewAnswer.option.text}`
       : null;
@@ -280,7 +280,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
 
         {isMultipleChoice && (
           <div className={styles.reviewOptions}>
-            {question.options.map((option) => {
+            {question.options.map((option: any) => {
               const wasSelected = reviewAnswer?.optionId === option.id;
               const isCorrectOption = option.isCorrect;
               const optionClass = reviewMode
@@ -317,7 +317,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
           <div className={styles.reviewTextAnswerBlock}>
             {question.options.length > 0 && (
               <div className={styles.quizBadgeRow}>
-                {question.options.map((option) => (
+                {question.options.map((option: any) => (
                   <span key={option.id}>
                     {option.label ? `${option.label}. ` : ""}
                     {option.text}
@@ -327,7 +327,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
             )}
             {rows.length > 0 && (
               <div className={styles.reviewGridRows}>
-                {rows.map((row) => <span key={`${question.id}-${row.order}`}>{row.label}</span>)}
+                {rows.map((row: any) => <span key={`${question.id}-${row.order}`}>{row.label}</span>)}
               </div>
             )}
             <textarea
