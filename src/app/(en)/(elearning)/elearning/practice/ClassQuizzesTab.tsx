@@ -103,7 +103,30 @@ export async function ClassQuizzesTab({ searchParams }: Props) {
     },
   });
 
-  const cards = quizzes.map((quiz: any) => {
+  type QuizCard = {
+    id: string;
+    title: string;
+    description: string | null;
+    unit: string;
+    programCode: string;
+    programName: string;
+    courseId: string;
+    courseTitle: string;
+    classCode: string;
+    questionCount: number;
+    timeLimit: number | null;
+    attemptCount: number;
+    attemptLimit: number;
+    bestScore: number | null;
+    lastAttemptAt: Date | null;
+    status: QuizStatus;
+    progress: number;
+    isOpenQuiz: boolean;
+    createdAt: Date;
+    searchText: string;
+  };
+
+  const cards: QuizCard[] = quizzes.map((quiz: any) => {
     const inProgressAttempt = quiz.attempts.find((attempt: any) => attempt.status === "IN_PROGRESS") || null;
     const completedAttempts = quiz.attempts.filter((attempt: any) => attempt.status !== "IN_PROGRESS");
     const bestScore = completedAttempts.reduce((best: any, attempt: any) => {
