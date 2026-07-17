@@ -31,15 +31,15 @@ export async function PracticeTestsTab({ searchParams }: { searchParams?: Promis
     },
   });
 
-  const filteredTests = tests.filter((test) => {
+  const filteredTests = tests.filter((test: any) => {
     if (!q) return true;
     const searchString = `${test.title} ${test.program?.name || ""} ${test.program?.code || ""} ${test.unit || ""}`.toLowerCase();
     return searchString.includes(q);
   });
 
   const programs = await prisma.program.findMany({ orderBy: { code: 'asc' } });
-  const programOptions = programs.filter((p) => tests.some((t) => t.programId === p.id) || p.id === program);
-  const allUnits = Array.from(new Set(tests.map((t) => t.unit).filter(Boolean))) as string[];
+  const programOptions = programs.filter((p: any) => tests.some((t: any) => t.programId === p.id) || p.id === program);
+  const allUnits = Array.from(new Set(tests.map((t: any) => t.unit).filter(Boolean))) as string[];
   const unitOptions = allUnits.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
   return (
