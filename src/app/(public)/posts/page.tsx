@@ -32,7 +32,7 @@ export default async function BlogPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => (
-            <Link key={post.slug} href={`/blog/${post.slug}`} className="block text-inherit no-underline hover:opacity-90 transition-opacity">
+            <Link key={post.slug} href={`/posts/${post.slug}`} className="block text-inherit no-underline hover:opacity-90 transition-opacity">
               <Card className="h-full flex flex-col p-6 hover:shadow-lg transition-shadow">
                 {post.featuredImage && (
                   <div className="relative w-full h-48 mb-4 -mx-6 -mt-6">

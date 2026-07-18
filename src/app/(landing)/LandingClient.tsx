@@ -249,6 +249,16 @@ export default function LandingClient({
         </div>
       </section>
 
+      {/* About Section */}
+      <section style={{ padding: "80px 0", backgroundColor: "var(--color-white)" }}>
+        <div className="container" style={{ textAlign: "center", maxWidth: "800px" }}>
+          <h2 style={{ fontSize: "var(--text-3xl)", marginBottom: "24px", color: "var(--color-navy)" }}>About Academy English Center</h2>
+          <p style={{ fontSize: "var(--text-lg)", lineHeight: 1.8, color: "var(--color-navy-light)" }}>
+            Founded in 2006, Academy English Center (AEC) has been a leading English education center in Da Nang. We provide high-quality, international-standard English training to help learners become confident global citizens.
+          </p>
+        </div>
+      </section>
+
       {/* Bento Box: Why Choose AEC & Mission/Vision */}
       <section className={styles.bentoSection}>
         <div className="container">
@@ -343,9 +353,8 @@ export default function LandingClient({
       {/* Quick Links Section */}
       <section className="quick-links-section" style={{ padding: "40px 0", backgroundColor: "var(--color-white)", borderBottom: "1px solid #f0f0f8" }}>
         <div className="container" style={{ display: "flex", justifyContent: "center", gap: "24px", flexWrap: "wrap" }}>
-          <Link href="/schedule" className="btn-secondary">View Opening Schedule</Link>
           <Link href="/news" className="btn-secondary">News & Events</Link>
-          <Link href="/blog" className="btn-secondary">Our Blog</Link>
+          <Link href="/posts" className="btn-secondary">Our Blog</Link>
         </div>
       </section>
 
@@ -419,7 +428,7 @@ export default function LandingClient({
             </div>
             <div className={styles.newsGrid}>
               {posts.map((p) => (
-                <Link key={p.slug} href={`/blog/${p.slug}`} className={styles.newsCard} style={{ backgroundColor: '#f0f0f8' }}>
+                <Link key={p.slug} href={`/posts/${p.slug}`} className={styles.newsCard} style={{ backgroundColor: '#f0f0f8' }}>
                   {p.featuredImage && (
                     <div className={styles.newsImageWrapper}>
                       <Image src={p.featuredImage} alt={p.title} fill style={{ objectFit: 'cover' }} />

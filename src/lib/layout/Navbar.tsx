@@ -18,8 +18,9 @@ export default function Navbar() {
 
   const navItems = [
     { href: "/programs", label: "Chương trình" },
-    { href: "/about", label: "Giới thiệu" },
     { href: "/teachers", label: "Giáo viên" },
+    { href: "/news", label: "Tin tức & Sự kiện" },
+    { href: "/posts", label: "Blog" },
     { href: "/contact", label: "Liên hệ" },
   ];
 

@@ -42,7 +42,7 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <div className="min-h-screen p-8 max-w-4xl mx-auto">
       <div className="mb-8">
-        <Link href="/blog" className="inline-flex items-center text-orange-600 hover:text-orange-700 transition-colors">
+        <Link href="/posts" className="inline-flex items-center text-orange-600 hover:text-orange-700 transition-colors">
           <ArrowLeft size={20} className="mr-2" />
           Back to Blog
         </Link>

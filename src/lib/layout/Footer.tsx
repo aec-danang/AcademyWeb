@@ -54,7 +54,8 @@ export default function Footer({ sponsors = [] }: { sponsors?: Sponsor[] }) {
           <div>
             <h4 className={styles.title}>Quick Links</h4>
             <ul className={styles.links}>
-              <li><Link href="/about">About Us</Link></li>
+              <li><Link href="/news">News & Events</Link></li>
+              <li><Link href="/posts">Our Blog</Link></li>
               <li><Link href="/#teachers">Our Teachers</Link></li>
               <li><Link href="/contact">Contact Us</Link></li>
               <li><Link href="/contact#register">Placement Test</Link></li>
