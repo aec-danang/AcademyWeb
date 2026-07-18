@@ -69,7 +69,7 @@ export default function LandingClient({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    // 1. Hero Section Animation (Runs on load)
+    // 1. Hero Section Animation
     const heroTl = gsap.timeline();
     heroTl.from(`.${styles.heroContent} > *`, {
       y: 40,
@@ -79,81 +79,22 @@ export default function LandingClient({
       ease: "power4.out",
       delay: 0.1
     })
-    .from(`.${styles.heroImage}`, {
-      x: 40,
+    .from(`.${styles.visualShape1}, .${styles.visualShape2}, .${styles.visualShape3}`, {
+      scale: 0.5,
       opacity: 0,
-      duration: 1.2,
+      duration: 1.5,
+      stagger: 0.2,
       ease: "power4.out"
-    }, "-=0.8");
-
-    // 2. Programs Section (ScrollTrigger Batching)
-    if (programs && programs.length > 0) {
-      ScrollTrigger.batch(`.${styles.programCard}`, {
-        onEnter: (batch) => gsap.fromTo(batch, 
-          { opacity: 0, y: 60 }, 
-          { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power4.out", overwrite: true }
-        ),
-        start: "top 85%"
-      });
-    }
-
-    // 3. Quick Links Section
-    if (document.querySelector('.quick-links-section')) {
-      gsap.fromTo(".quick-links-section .btn-secondary", 
-      { y: 20, opacity: 0 },
-      {
-        scrollTrigger: {
-          trigger: `.quick-links-section`,
-          start: "top 85%"
-        },
-        y: 0,
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: "power4.out"
-      }
-    );
-    }
-
-    // 4. Why Choose AEC Section
-    ScrollTrigger.batch(`.${styles.whyGrid} > div`, {
-      onEnter: (batch) => gsap.fromTo(batch,
-        { opacity: 0, y: 60 },
-        { opacity: 1, y: 0, stagger: 0.15, duration: 1, ease: "power4.out", overwrite: true }
-      ),
-      start: "top 85%"
-    });
-
-    // 5. Mission/Vision Section
-    gsap.from(`.${styles.mvCard}`, {
-      scrollTrigger: {
-        trigger: `.${styles.missionVision}`,
-        start: "top 80%"
-      },
-      y: 50,
+    }, "-=0.8")
+    .from(`.${styles.glassCard}`, {
+      y: 30,
       opacity: 0,
       duration: 1,
       stagger: 0.2,
-      ease: "power4.out"
-    });
+      ease: "back.out(1.5)"
+    }, "-=1");
 
-    // 6. CTA Section
-    gsap.fromTo(`.${styles.ctaSection} .container > *`, 
-      { y: 40, opacity: 0 },
-      {
-        scrollTrigger: {
-          trigger: `.${styles.ctaSection}`,
-          start: "top 85%"
-        },
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        stagger: 0.15,
-        ease: "power4.out"
-      }
-    );
-
-    // 7. Stats Section Counter
+    // 2. Stats Section Counter
     const statElements = gsap.utils.toArray<HTMLElement>(`.${styles.statNumber}`);
     statElements.forEach((el) => {
       const text = el.innerText;
@@ -172,7 +113,7 @@ export default function LandingClient({
         ease: "power2.out",
         scrollTrigger: {
           trigger: `.${styles.statsSection}`,
-          start: "top 85%",
+          start: "top 90%",
         },
         onUpdate: () => {
           el.innerText = prefix + Math.floor(counter.val).toLocaleString() + suffix;
@@ -180,97 +121,115 @@ export default function LandingClient({
       });
     });
 
-    // 8. Features Section
-    if (features && features.length > 0) {
-      gsap.fromTo(`.${styles.featuresGrid} > div`,
+    gsap.from(`.${styles.statsGrid}`, {
+      scrollTrigger: { trigger: `.${styles.statsSection}`, start: "top 90%" },
+      y: 40,
+      opacity: 0,
+      duration: 1,
+      ease: "power4.out"
+    });
+
+    // 3. Bento Box (Why Choose AEC / Features)
+    ScrollTrigger.batch(`.${styles.bentoGrid} > div`, {
+      onEnter: (batch) => gsap.fromTo(batch,
         { opacity: 0, y: 50 },
-        {
-          scrollTrigger: {
-            trigger: `.${styles.featuresSection}`,
-            start: "top 80%"
-          },
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.2,
-          ease: "power4.out"
-        }
-      );
+        { opacity: 1, y: 0, stagger: 0.15, duration: 1, ease: "power4.out", overwrite: true }
+      ),
+      start: "top 85%"
+    });
+
+    // 4. Programs Section
+    if (programs && programs.length > 0) {
+      ScrollTrigger.batch(`.${styles.programCard}`, {
+        onEnter: (batch) => gsap.fromTo(batch, 
+          { opacity: 0, y: 40 }, 
+          { opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: "power4.out", overwrite: true }
+        ),
+        start: "top 85%"
+      });
     }
 
-    // 9. Events, News & Testimonials Animations
+    // 5. Events, News & Testimonials Animations
     const headers = gsap.utils.toArray(`.${styles.sectionHeader}`);
-    if (headers.length > 0) {
-      gsap.fromTo(`.${styles.sectionHeader}`, 
+    headers.forEach(header => {
+      gsap.fromTo(header as HTMLElement, 
         { opacity: 0, y: 30 },
         {
           scrollTrigger: {
-            trigger: `.${styles.sectionHeader}`,
-            start: "top 85%"
+            trigger: header as HTMLElement,
+            start: "top 90%"
           },
           opacity: 1,
           y: 0,
-          duration: 0.8,
-          stagger: 0.2
+          duration: 0.8
         }
       );
-    }
+    });
+
+    // CTA
+    gsap.fromTo(`.${styles.ctaSection} .container > *`, 
+      { y: 40, opacity: 0 },
+      {
+        scrollTrigger: {
+          trigger: `.${styles.ctaSection}`,
+          start: "top 85%"
+        },
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        stagger: 0.15,
+        ease: "power4.out"
+      }
+    );
 
   }, { scope: containerRef, dependencies: [programs, features, events, news, testimonials] });
 
   return (
     <div ref={containerRef}>
-      {/* Top Banner Area */}
-      <section className={styles.topBanner}>
-        <div className={styles.topBannerImageWrapper}>
-          {/* Example full sized background image */}
-          <div style={{ width: '100%', height: '200px', backgroundColor: 'var(--color-navy-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', position: 'relative' }}>
-            <Image 
-                src="/images/placeholder.svg" 
-                alt="Banner" 
-                fill 
-                style={{ objectFit: 'cover', opacity: 0.5 }} 
-              />
-            <h2 style={{ zIndex: 1, position: 'relative' }}>Welcome to Academy English Center</h2>
-          </div>
-        </div>
-      </section>
-
       {/* Hero Section */}
       <section className={styles.hero}>
         <div className={`container ${styles.heroContainer}`}>
           <div className={styles.heroContent}>
-            <h1>Learn English. Build Confidence. Become a Global Citizen.</h1>
-            <p>Academy English Center provides high-quality English programs for kids, teens, IELTS learners, working adults, and corporate teams in Da Nang.</p>
+            <h1>
+              <span className={styles.heroHighlight}>Learn English.</span><br />
+              Build Confidence.<br />
+              Become a <span className={styles.heroHighlight}>Global Citizen.</span>
+            </h1>
+            <p>Academy English Center provides high-quality, international-standard English programs for kids, teens, working adults, and corporate teams in Da Nang.</p>
             <div className={styles.heroButtons}>
               <Link href="#programs" className="btn-primary">Find Your Course</Link>
-              <Link href="/contact#register" className="btn-secondary">Book Placement Test</Link>
+              <Link href="/contact#register" className="btn-secondary" style={{ backgroundColor: 'white' }}>Book Placement Test</Link>
             </div>
           </div>
-          <div className={styles.heroImage}>
-            <div className={styles.imageWrapper}>
-              <Image 
-                src="/images/hero.png" 
-                alt="Happy students learning at Academy English Center" 
-                fill 
-                sizes="(max-width: 992px) 100vw, 50vw"
-                style={{ objectFit: "cover" }} 
-                priority
-              />
-              <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(44, 45, 101, 0.1)" }}></div>
-            </div>
-            <div className={styles.badge}>
-              <LucideIcons.Trophy color="var(--color-orange)" size={24} />
+          <div className={styles.heroVisual}>
+            <div className={styles.visualShape1}></div>
+            <div className={styles.visualShape2}></div>
+            <div className={styles.visualShape3}></div>
+            
+            <div className={`${styles.glassCard} ${styles.glassCard1}`}>
+              <div className={styles.glassCardIcon}>
+                <LucideIcons.Trophy size={24} />
+              </div>
               <div>
-                <div style={{ fontSize: "14px", color: "#5f607a", fontWeight: "normal" }}>Founded in</div>
+                <div style={{ fontSize: '12px', color: '#5f607a', fontWeight: 'normal' }}>Founded in</div>
                 <div>2006</div>
+              </div>
+            </div>
+            
+            <div className={`${styles.glassCard} ${styles.glassCard2}`}>
+              <div className={styles.glassCardIcon}>
+                <LucideIcons.Star size={24} />
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: '#5f607a', fontWeight: 'normal' }}>Top Rated</div>
+                <div>English Center</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Stats Section (Overlapping Hero) */}
       <section className={styles.statsSection}>
         <div className="container">
           <div className={styles.statsGrid}>
@@ -290,31 +249,57 @@ export default function LandingClient({
         </div>
       </section>
 
-      {/* Key Features Section */}
-      <section className={styles.featuresSection}>
+      {/* Bento Box: Why Choose AEC & Mission/Vision */}
+      <section className={styles.bentoSection}>
         <div className="container">
           <div className={styles.sectionHeader}>
-            <h2 style={{ color: 'var(--color-white)' }}>Đặc điểm nổi bật</h2>
-            <p style={{ color: '#aeb0cc' }}>What makes Academy English Center stand out.</p>
+            <h2>Why Choose AEC?</h2>
+            <p>Our commitment to your future and development.</p>
           </div>
-          <div className={styles.featuresGrid}>
-            {features.map((feature) => {
-              // Convert kebab-case (e.g. graduation-cap) to PascalCase (GraduationCap)
-              const iconName = feature.iconValue.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
-              // @ts-ignore
-              const Icon = LucideIcons[iconName] || LucideIcons.CheckCircle;
-              return (
-                <div key={feature.id} className={styles.featureItem}>
-                  <div className={styles.featureIconWrapper}>
-                    <Icon size={32} strokeWidth={2} />
-                  </div>
-                  <div className={styles.featureContent}>
-                    <h3>{feature.title}</h3>
-                    <p>{feature.description}</p>
-                  </div>
-                </div>
-              );
-            })}
+          <div className={styles.bentoGrid}>
+            {/* Card 1: Span 2 */}
+            <div className={`${styles.bentoCard} ${styles.bentoCard1}`}>
+              <div className={styles.bentoIcon}>
+                <LucideIcons.GraduationCap size={32} />
+              </div>
+              <div className={styles.bentoContent}>
+                <h3>High-Quality Training</h3>
+                <p>Provide high-quality, diverse, international-standard English training. We ensure every student reaches their full potential with modern methodologies.</p>
+              </div>
+            </div>
+            
+            {/* Card 2 */}
+            <div className={`${styles.bentoCard} ${styles.bentoCard2}`}>
+              <div className={styles.bentoIcon}>
+                <LucideIcons.HeartHandshake size={32} />
+              </div>
+              <div className={styles.bentoContent}>
+                <h3>Soft Skills</h3>
+                <p>Develop soft skills and life values so learners become confident global citizens.</p>
+              </div>
+            </div>
+
+            {/* Card 3 */}
+            <div className={`${styles.bentoCard} ${styles.bentoCard3}`}>
+              <div className={styles.bentoIcon}>
+                <LucideIcons.BookOpen size={32} />
+              </div>
+              <div className={styles.bentoContent}>
+                <h3>Humanistic Education</h3>
+                <p>Maintain professionalism and humanistic values, putting student character first.</p>
+              </div>
+            </div>
+
+            {/* Card 4: Span 2 */}
+            <div className={`${styles.bentoCard} ${styles.bentoCard4}`}>
+              <div className={styles.bentoIcon}>
+                <LucideIcons.Globe2 size={32} />
+              </div>
+              <div className={styles.bentoContent}>
+                <h3>Our Vision & Mission</h3>
+                <p>Build AEC into a dedicated learning community that serves carefully, wholeheartedly, and professionally. We aim to educate people through English so they become successful global citizens responsible toward themselves and the community.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -339,7 +324,7 @@ export default function LandingClient({
                 <Link key={program.id} href={`/programs/${program.slug}`} style={{ display: "block", textDecoration: "none" }}>
                   <Card className={styles.programCard} style={program.iconType === "image" ? { height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" } : undefined}>
                     {program.iconType === "image" ? (
-                      <div style={{ display: "flex", justifyContent: "center", marginBottom: "16px", height: "64px", width: "100%", position: "relative" }}>
+                      <div style={{ display: "flex", justifySelf: "center", marginBottom: "16px", height: "64px", width: "100%", position: "relative" }}>
                         <Image src={program.iconValue} alt={program.title} fill style={{ objectFit: 'contain' }} sizes="200px" />
                       </div>
                     ) : (
@@ -356,55 +341,11 @@ export default function LandingClient({
       </section>
 
       {/* Quick Links Section */}
-      <section className="quick-links-section" style={{ padding: "40px 0", backgroundColor: "#f0f0f8" }}>
+      <section className="quick-links-section" style={{ padding: "40px 0", backgroundColor: "var(--color-white)", borderBottom: "1px solid #f0f0f8" }}>
         <div className="container" style={{ display: "flex", justifyContent: "center", gap: "24px", flexWrap: "wrap" }}>
           <Link href="/schedule" className="btn-secondary">View Opening Schedule</Link>
           <Link href="/news" className="btn-secondary">News & Events</Link>
           <Link href="/blog" className="btn-secondary">Our Blog</Link>
-        </div>
-      </section>
-
-      {/* Why Choose AEC */}
-      <section className={styles.whyChoose}>
-        <div className="container">
-          <div className={styles.sectionHeader}>
-            <h2>Why Choose AEC?</h2>
-            <p>Our commitment to your future.</p>
-          </div>
-          <div className={styles.whyGrid}>
-            <Card>
-              <h3 className="text-orange" style={{ marginBottom: "16px" }}>1. High-Quality Training</h3>
-              <p>Provide high-quality, diverse, international-standard English training.</p>
-            </Card>
-            <Card>
-              <h3 className="text-orange" style={{ marginBottom: "16px" }}>2. Soft Skills & Values</h3>
-              <p>Develop soft skills and life values so learners become confident global citizens.</p>
-            </Card>
-            <Card>
-              <h3 className="text-orange" style={{ marginBottom: "16px" }}>3. Humanistic Education</h3>
-              <p>Maintain professionalism and humanistic education values, putting student needs and character first.</p>
-            </Card>
-            <Card>
-              <h3 className="text-orange" style={{ marginBottom: "16px" }}>4. Dedicated Community</h3>
-              <p>Build a dedicated learning and service community for the future of learners and society.</p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Vision & Mission */}
-      <section className={styles.missionVision}>
-        <div className="container">
-          <div className={styles.mvGrid}>
-            <div className={styles.mvCard}>
-              <h3>Our Vision</h3>
-              <p>Build ACADEMY AEC into a dedicated learning community that serves carefully, wholeheartedly, and professionally for the future of learners and society.</p>
-            </div>
-            <div className={styles.mvCard}>
-              <h3>Our Mission</h3>
-              <p>Educate people through English so they become successful global citizens responsible toward themselves and the community.</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -470,7 +411,7 @@ export default function LandingClient({
 
       {/* Posts Section */}
       {posts && posts.length > 0 && (
-        <section className={styles.newsSection}>
+        <section className={styles.eventsSection} style={{ backgroundColor: 'var(--color-white)' }}>
           <div className="container">
             <div className={styles.sectionHeader}>
               <h2>Latest Posts</h2>
@@ -478,7 +419,7 @@ export default function LandingClient({
             </div>
             <div className={styles.newsGrid}>
               {posts.map((p) => (
-                <Link key={p.slug} href={`/blog/${p.slug}`} className={styles.newsCard}>
+                <Link key={p.slug} href={`/blog/${p.slug}`} className={styles.newsCard} style={{ backgroundColor: '#f0f0f8' }}>
                   {p.featuredImage && (
                     <div className={styles.newsImageWrapper}>
                       <Image src={p.featuredImage} alt={p.title} fill style={{ objectFit: 'cover' }} />
@@ -503,8 +444,8 @@ export default function LandingClient({
         <section className={styles.testimonialsSection}>
           <div className="container">
             <div className={styles.sectionHeader}>
-              <h2 style={{ color: 'var(--color-white)' }}>Hall of Fame</h2>
-              <p style={{ color: '#aeb0cc' }}>Hear from our outstanding achievers.</p>
+              <h2>Hall of Fame</h2>
+              <p>Hear from our outstanding achievers.</p>
             </div>
             <div className={styles.testimonialGrid}>
               {testimonials.map((t) => (
@@ -518,13 +459,13 @@ export default function LandingClient({
                       {t.avatarUrl ? (
                         <Image src={t.avatarUrl} alt={t.authorName} fill style={{ objectFit: 'cover' }} />
                       ) : (
-                        <LucideIcons.User size={24} color="#aeb0cc" />
+                        <LucideIcons.User size={32} color="#f0f0f8" />
                       )}
                     </div>
                     <div className={styles.authorInfo}>
                       <h4>{t.authorName}</h4>
                       {t.score ? (
-                        <span className={styles.authorScore}>{t.score}</span>
+                        <span className={styles.authorScore}>Score: {t.score}</span>
                       ) : (
                         <span className={styles.authorRole}>{t.authorRole || 'Student'}</span>
                       )}
@@ -543,8 +484,8 @@ export default function LandingClient({
           <h2>Not sure which course fits you?</h2>
           <p style={{ fontSize: "var(--text-xl)" }}>Take a placement test and get a personalized learning path.</p>
           <div className={styles.ctaButtons}>
-            <Link href="/contact#register" className="btn-secondary">Book Placement Test</Link>
-            <Link href="/contact" className="btn-dark">Contact Us</Link>
+            <Link href="/contact#register" className="btn-secondary" style={{ backgroundColor: 'white', color: 'var(--color-navy)', border: 'none' }}>Book Placement Test</Link>
+            <Link href="/contact" className="btn-dark" style={{ backgroundColor: 'var(--color-navy-dark)', color: 'white', border: 'none' }}>Contact Us</Link>
           </div>
         </div>
       </section>
