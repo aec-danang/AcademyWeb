@@ -45,7 +45,7 @@ const navItems = [
   { name: "Sponsors", path: "/management/sponsors", icon: FileText },
   { name: "Features", path: "/management/features", icon: Star },
   { name: "Testimonials", path: "/management/testimonials", icon: MessageSquare },
-  { name: "Leads", path: "/management/leads", icon: Target },
+  { name: "Submissions", path: "/management/submissions", icon: Target },
   { name: "Notifications", path: "/management/notifications", icon: Bell },
   { name: "Page Settings", path: "/management/settings", icon: Settings },
 ]

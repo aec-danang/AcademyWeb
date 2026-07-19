@@ -49,6 +49,12 @@
 - Tone: bright, clean, trustworthy, modern, energetic, student-centered
 - Avoid: dark-first UI, childish visuals, overuse of gradients, random icon styles, heavy shadows
 
+## Web Style & Design Philosophy
+
+- **Overall Feel**: Professional educational site
+- **Effects**: Not too much animation, avoid clunky and mass effects
+- **Backgrounds**: No gradient backgrounds
+
 ## Color Tokens
 
 - Primary orange: `#f68d2e`

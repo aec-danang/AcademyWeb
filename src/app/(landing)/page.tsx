@@ -10,15 +10,10 @@ export const metadata: Metadata = {
 export const revalidate = 60; // Revalidate cache every 60 seconds
 
 export default async function LandingPage() {
-  const dbPrograms = await prisma.program.findMany();
-  const programs = dbPrograms.map(p => ({
-    id: p.id,
-    title: p.name,
-    slug: p.code,
-    description: p.description,
-    iconType: "lucide",
-    iconValue: "BookOpen"
-  }));
+  const programs = await prisma.siteProgram.findMany({
+    where: { published: true },
+    orderBy: { order: 'asc' }
+  });
   
   const features: any[] = []; 
 

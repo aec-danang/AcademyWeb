@@ -65,7 +65,7 @@ export default async function AdminDashboard() {
         
         <Card className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden relative group transition-all hover:shadow-md hover:border-orange/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 pt-6 px-6">
-            <CardTitle className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">New Leads</CardTitle>
+            <CardTitle className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">New Submissions</CardTitle>
             <div className="p-3 bg-orange/10 dark:bg-orange/20 rounded-2xl text-orange dark:text-orange-400 group-hover:scale-110 transition-transform duration-300">
               <Target className="h-5 w-5" />
             </div>
@@ -248,7 +248,7 @@ export default async function AdminDashboard() {
             <CardHeader className="border-b border-slate-200 dark:border-slate-800 pb-4 pt-5 px-6 bg-slate-50/30 dark:bg-slate-900/20">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  Pending Leads
+                  Pending Submissions
                   <Badge className="bg-orange hover:bg-orange text-white rounded-full px-2 py-0">
                     {newLeadsCount}
                   </Badge>
@@ -289,7 +289,7 @@ export default async function AdminDashboard() {
                       <ShieldCheck className="h-6 w-6 text-emerald-500" />
                     </div>
                     <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Inbox zero!</p>
-                    <p className="text-xs text-slate-500 mt-1">No pending leads at the moment.</p>
+                    <p className="text-xs text-slate-500 mt-1">No pending submissions at the moment.</p>
                   </div>
                 )}
               </div>
@@ -297,7 +297,7 @@ export default async function AdminDashboard() {
             {recentLeads.length > 0 && (
               <CardFooter className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-center">
                 <Button variant="ghost" size="sm" className="text-slate-600 dark:text-slate-400 text-xs font-semibold w-full" asChild>
-                  <Link href="/management/leads">View All Leads <ChevronRight className="w-4 h-4 ml-1" /></Link>
+                  <Link href="/management/submissions">View All Submissions <ChevronRight className="w-4 h-4 ml-1" /></Link>
                 </Button>
               </CardFooter>
             )}

@@ -16,7 +16,7 @@ type Lead = {
   createdAt: Date;
 };
 
-export default function LeadsClient({ initialLeads }: { initialLeads: Lead[] }) {
+export default function SubmissionsClient({ initialLeads }: { initialLeads: Lead[] }) {
   const [leads, setLeads] = useState(initialLeads);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
@@ -44,8 +44,8 @@ export default function LeadsClient({ initialLeads }: { initialLeads: Lead[] }) 
     <div className="space-y-6 max-w-6xl mx-auto py-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-navy dark:text-white">Leads Management</h1>
-          <p className="text-slate-500 dark:text-slate-400">View and manage placement test registrations</p>
+          <h1 className="text-2xl font-bold text-navy dark:text-white">Contact Submissions</h1>
+          <p className="text-slate-500 dark:text-slate-400">View and manage contact form submissions</p>
         </div>
       </div>
 
@@ -66,7 +66,7 @@ export default function LeadsClient({ initialLeads }: { initialLeads: Lead[] }) 
               {leads.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-slate-500">
-                    No leads found.
+                    No submissions found.
                   </td>
                 </tr>
               ) : (

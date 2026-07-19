@@ -1,19 +1,19 @@
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import LeadsClient from "./LeadsClient";
+import SubmissionsClient from "./SubmissionsClient";
 
 export const metadata: Metadata = {
-  title: "Manage Leads | Admin Dashboard",
+  title: "Manage Submissions | Admin Dashboard",
 };
 
-export default async function LeadsPage() {
+export default async function SubmissionsPage() {
   const leads = await prisma.lead.findMany({
     orderBy: { createdAt: 'desc' }
   });
 
   return (
     <div className="p-6">
-      <LeadsClient initialLeads={leads} />
+      <SubmissionsClient initialLeads={leads} />
     </div>
   );
 }

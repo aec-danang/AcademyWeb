@@ -8,12 +8,12 @@ export async function updateLeadStatus(id: string, status: string) {
     where: { id },
     data: { status },
   });
-  revalidatePath("/management/leads");
+  revalidatePath("/management/submissions");
 }
 
 export async function deleteLead(id: string) {
   await prisma.lead.delete({
     where: { id },
   });
-  revalidatePath("/management/leads");
+  revalidatePath("/management/submissions");
 }
