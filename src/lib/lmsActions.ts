@@ -541,38 +541,42 @@ export async function addQuizQuestionAction(formData: FormData) {
 
   const optionRows = parseOptionRows(textValue(formData, "options"));
   const correctLabel = textValue(formData, "correctLabel").toUpperCase();
-  const question = await prisma.question.create({
-    data: {
-      text,
-      section: sectionTitle || null,
-      sourceOrder: order,
-      sourceType: type.toLowerCase(),
-      type,
-      answerKey: optionalText(formData, "answerKey"),
-      explanation: optionalText(formData, "explanation"),
-      points: numberValue(formData, "points", 1),
-      createdById: actor.id,
-      options: optionRows.length > 0
-        ? {
-            create: optionRows.map((option) => ({
-              label: option.label,
-              text: option.text,
-              order: option.order,
-              isCorrect: Boolean(correctLabel && option.label === correctLabel),
-            })),
-          }
-        : undefined,
-    },
-  });
+  const question = await prisma.$transaction(async (tx) => {
+    const q = await tx.question.create({
+      data: {
+        text,
+        section: sectionTitle || null,
+        sourceOrder: order,
+        sourceType: type.toLowerCase(),
+        type,
+        answerKey: optionalText(formData, "answerKey"),
+        explanation: optionalText(formData, "explanation"),
+        points: numberValue(formData, "points", 1),
+        createdById: actor.id,
+        options: optionRows.length > 0
+          ? {
+              create: optionRows.map((option) => ({
+                label: option.label,
+                text: option.text,
+                order: option.order,
+                isCorrect: Boolean(correctLabel && option.label === correctLabel),
+              })),
+            }
+          : undefined,
+      },
+    });
 
-  await prisma.quizQuestion.create({
-    data: {
-      quizId,
-      sectionId,
-      questionId: question.id,
-      points: numberValue(formData, "points", 1),
-      order: order || (maxOrder._max.order || 0) + 1,
-    },
+    await tx.quizQuestion.create({
+      data: {
+        quizId,
+        sectionId,
+        questionId: q.id,
+        points: numberValue(formData, "points", 1),
+        order: order || (maxOrder._max.order || 0) + 1,
+      },
+    });
+
+    return q;
   });
 
   await logActivity(actor.id, "ADD_QUIZ_QUESTION", "Question", question.id);
@@ -757,34 +761,38 @@ export async function createPracticeQuestionAction(formData: FormData) {
 
   const optionLines = parseOptionLines(textValue(formData, "options"));
   const correctIndex = numberValue(formData, "correctIndex", 1) - 1;
-  const question = await prisma.question.create({
-    data: {
-      text,
-      type: practiceQuestionTypeValue(textValue(formData, "type")),
-      audioUrl: optionalText(formData, "audioUrl"),
-      passage: optionalText(formData, "passage"),
-      answerKey: optionalText(formData, "answerKey"),
-      explanation: optionalText(formData, "explanation"),
-      points: numberValue(formData, "points", 1),
-      createdById: actor.id,
-      options: {
-        create: optionLines.map((option, index) => ({
-          text: option,
-          order: index + 1,
-          isCorrect: index === correctIndex,
-        })),
+  const question = await prisma.$transaction(async (tx) => {
+    const q = await tx.question.create({
+      data: {
+        text,
+        type: practiceQuestionTypeValue(textValue(formData, "type")),
+        audioUrl: optionalText(formData, "audioUrl"),
+        passage: optionalText(formData, "passage"),
+        answerKey: optionalText(formData, "answerKey"),
+        explanation: optionalText(formData, "explanation"),
+        points: numberValue(formData, "points", 1),
+        createdById: actor.id,
+        options: {
+          create: optionLines.map((option, index) => ({
+            text: option,
+            order: index + 1,
+            isCorrect: index === correctIndex,
+          })),
+        },
       },
-    },
-  });
+    });
 
-  await prisma.quizQuestion.create({
-    data: {
-      quizId,
-      sectionId,
-      questionId: question.id,
-      points: numberValue(formData, "points", 1),
-      order: numberValue(formData, "order", 0),
-    },
+    await tx.quizQuestion.create({
+      data: {
+        quizId,
+        sectionId,
+        questionId: q.id,
+        points: numberValue(formData, "points", 1),
+        order: numberValue(formData, "order", 0),
+      },
+    });
+
+    return q;
   });
 
   await logActivity(actor.id, "CREATE_TEST_QUESTION", "Question", question.id);
@@ -866,6 +874,7 @@ function importedOptions(question: ImportedQuestion) {
 }
 
 async function createImportedPracticeQuestion(
+  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
   actorId: string,
   quizId: string,
   sectionId: string | null,
@@ -876,7 +885,7 @@ async function createImportedPracticeQuestion(
   if (!text) return;
 
   const points = Number.isFinite(question.points) ? Number(question.points) : 1;
-  const createdQuestion = await prisma.question.create({
+  const createdQuestion = await tx.question.create({
     data: {
       text,
       type: practiceQuestionTypeValue(question.type || ""),
@@ -890,7 +899,7 @@ async function createImportedPracticeQuestion(
     },
   });
 
-  await prisma.quizQuestion.create({
+  await tx.quizQuestion.create({
     data: {
       quizId,
       sectionId,
@@ -920,53 +929,57 @@ export async function importPracticeTestJsonAction(formData: FormData) {
   const classSection = await canManageClassSection(classSectionId, actor);
   if (!classSection) return;
 
-  const test = await prisma.quiz.create({
-    data: {
-      title,
-      description: payload.description?.trim() || null,
-      classSectionId,
-      isPracticeTest: true,
-      examType: examTypeValue(payload.examType || ""),
-      skill: examSkillValue(payload.skill || "", "MIXED"),
-      timeLimit: Number.isFinite(payload.timeLimitMinutes) ? Number(payload.timeLimitMinutes) : null,
-      attemptLimit: Number.isFinite(payload.attemptLimit) ? Number(payload.attemptLimit) : 1,
-      openAt: payload.openAt ? new Date(payload.openAt) : null,
-      closeAt: payload.closeAt ? new Date(payload.closeAt) : null,
-      instructions: payload.instructions?.trim() || null,
-      audioUrl: payload.audioUrl?.trim() || null,
-      passage: payload.passage?.trim() || null,
-      published: true,
-      createdById: actor.id,
-    },
-  });
-
-  let order = 1;
-  for (const sectionPayload of payload.sections || []) {
-    const section = await prisma.testSection.create({
+  const test = await prisma.$transaction(async (tx) => {
+    const newTest = await tx.quiz.create({
       data: {
-        quizId: test.id,
-        title: sectionPayload.title?.trim() || `Section ${order}`,
-        skill: examSkillValue(sectionPayload.skill || "", "READING"),
-        instructions: sectionPayload.instructions?.trim() || null,
-        audioUrl: sectionPayload.audioUrl?.trim() || null,
-        passage: sectionPayload.passage?.trim() || null,
-        order: Number.isFinite(sectionPayload.order) ? Number(sectionPayload.order) : order,
+        title,
+        description: payload.description?.trim() || null,
+        classSectionId,
+        isPracticeTest: true,
+        examType: examTypeValue(payload.examType || ""),
+        skill: examSkillValue(payload.skill || "", "MIXED"),
+        timeLimit: Number.isFinite(payload.timeLimitMinutes) ? Number(payload.timeLimitMinutes) : null,
+        attemptLimit: Number.isFinite(payload.attemptLimit) ? Number(payload.attemptLimit) : 1,
+        openAt: payload.openAt ? new Date(payload.openAt) : null,
+        closeAt: payload.closeAt ? new Date(payload.closeAt) : null,
+        instructions: payload.instructions?.trim() || null,
+        audioUrl: payload.audioUrl?.trim() || null,
+        passage: payload.passage?.trim() || null,
+        published: true,
+        createdById: actor.id,
       },
     });
 
-    let questionOrder = 1;
-    for (const question of sectionPayload.questions || []) {
-      await createImportedPracticeQuestion(actor.id, test.id, section.id, question, questionOrder);
-      questionOrder += 1;
-    }
-    order += 1;
-  }
+    let order = 1;
+    for (const sectionPayload of payload.sections || []) {
+      const section = await tx.testSection.create({
+        data: {
+          quizId: newTest.id,
+          title: sectionPayload.title?.trim() || `Section ${order}`,
+          skill: examSkillValue(sectionPayload.skill || "", "READING"),
+          instructions: sectionPayload.instructions?.trim() || null,
+          audioUrl: sectionPayload.audioUrl?.trim() || null,
+          passage: sectionPayload.passage?.trim() || null,
+          order: Number.isFinite(sectionPayload.order) ? Number(sectionPayload.order) : order,
+        },
+      });
 
-  let looseQuestionOrder = order * 100;
-  for (const question of payload.questions || []) {
-    await createImportedPracticeQuestion(actor.id, test.id, null, question, looseQuestionOrder);
-    looseQuestionOrder += 1;
-  }
+      let questionOrder = 1;
+      for (const question of sectionPayload.questions || []) {
+        await createImportedPracticeQuestion(tx, actor.id, newTest.id, section.id, question, questionOrder);
+        questionOrder += 1;
+      }
+      order += 1;
+    }
+
+    let looseQuestionOrder = order * 100;
+    for (const question of payload.questions || []) {
+      await createImportedPracticeQuestion(tx, actor.id, newTest.id, null, question, looseQuestionOrder);
+      looseQuestionOrder += 1;
+    }
+
+    return newTest;
+  });
 
   await logActivity(actor.id, "IMPORT_PRACTICE_TEST_JSON", "Quiz", test.id);
   revalidatePath("/admin/tests");
@@ -1118,6 +1131,7 @@ export async function submitPracticeTestAttemptAction(formData: FormData) {
   let score = 0;
   let requiresManualGrade = false;
   const autoSubmitted = textValue(formData, "autoSubmit") === "true";
+  const answersData = [];
 
   for (const link of attempt.quiz.questions) {
     const question = link.question;
@@ -1154,24 +1168,20 @@ export async function submitPracticeTestAttemptAction(formData: FormData) {
 
     score += pointsAwarded || 0;
 
-    await prisma.attemptAnswer.upsert({
-      where: { attemptId_questionId: { attemptId: attempt.id, questionId: question.id } },
-      update: {
-        optionId,
-        answerText,
-        isCorrect,
-        pointsAwarded,
-      },
-      create: {
-        attemptId: attempt.id,
-        questionId: question.id,
-        optionId,
-        answerText,
-        isCorrect,
-        pointsAwarded,
-      },
+    answersData.push({
+      attemptId: attempt.id,
+      questionId: question.id,
+      optionId,
+      answerText,
+      isCorrect,
+      pointsAwarded,
     });
   }
+
+  await prisma.$transaction([
+    prisma.attemptAnswer.deleteMany({ where: { attemptId: attempt.id } }),
+    prisma.attemptAnswer.createMany({ data: answersData }),
+  ]);
 
   await prisma.attempt.update({
     where: { id: attempt.id },
@@ -1275,6 +1285,7 @@ export async function submitQuizAttemptAction(formData: FormData) {
   let score = 0;
   let requiresManualGrade = false;
   let autoGradableQuestions = 0;
+  const answersData = [];
 
   const attempt = await prisma.attempt.create({
     data: {
@@ -1329,17 +1340,17 @@ export async function submitQuizAttemptAction(formData: FormData) {
 
     score += pointsAwarded || 0;
 
-    await prisma.attemptAnswer.create({
-      data: {
-        attemptId: attempt.id,
-        questionId: question.id,
-        optionId,
-        answerText,
-        isCorrect,
-        pointsAwarded,
-      },
+    answersData.push({
+      attemptId: attempt.id,
+      questionId: question.id,
+      optionId,
+      answerText,
+      isCorrect,
+      pointsAwarded,
     });
   }
+
+  await prisma.attemptAnswer.createMany({ data: answersData });
 
   await prisma.attempt.update({
     where: { id: attempt.id },
@@ -1444,27 +1455,28 @@ export async function gradeSubmissionAction(formData: FormData) {
   const submission = await prisma.submission.findUnique({ where: { id: submissionId } });
   if (!submission) return;
 
-  await prisma.grade.upsert({
-    where: { submissionId },
-    update: {
-      score,
-      feedback: optionalText(formData, "feedback"),
-      gradedById: actor.id,
-    },
-    create: {
-      submissionId,
-      studentId: submission.studentId,
-      assignmentId: submission.assignmentId,
-      score,
-      feedback: optionalText(formData, "feedback"),
-      gradedById: actor.id,
-    },
-  });
-
-  await prisma.submission.update({
-    where: { id: submissionId },
-    data: { status: "GRADED" },
-  });
+  await prisma.$transaction([
+    prisma.grade.upsert({
+      where: { submissionId },
+      update: {
+        score,
+        feedback: optionalText(formData, "feedback"),
+        gradedById: actor.id,
+      },
+      create: {
+        submissionId,
+        studentId: submission.studentId,
+        assignmentId: submission.assignmentId,
+        score,
+        feedback: optionalText(formData, "feedback"),
+        gradedById: actor.id,
+      },
+    }),
+    prisma.submission.update({
+      where: { id: submissionId },
+      data: { status: "GRADED" },
+    })
+  ]);
 
   await logActivity(actor.id, "GRADE_SUBMISSION", "Submission", submissionId);
   revalidatePath("/admin/grades");

@@ -11,7 +11,7 @@ model Course {
   id          String             @id @default(cuid())
   title       String
   description String?
-  price       Float              @default(0)
+  price       Decimal            @default(0) @db.Decimal(10, 2)
   imageUrl    String?
   published   Boolean            @default(false)
   createdAt   DateTime           @default(now())
@@ -38,6 +38,7 @@ model Lesson {
   updatedAt DateTime @updatedAt
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
+  @@index([courseId])
   @@schema("elearning")
 }
 
@@ -54,9 +55,10 @@ model CourseEnrollment {
 }
 
 model Post {
+  id              String   @id @default(cuid())
   title           String
   content         String
-  slug            String   @id
+  slug            String   @unique
   type            String   @default("post")
   published       Boolean  @default(true)
   createdAt       DateTime @default(now())
@@ -74,23 +76,23 @@ model Post {
 
 
 model Lead {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   name      String
   email     String?
   phone     String?
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
   message   String?
-  status    String   @default("new")
+  status    LeadStatus @default(NEW)
 
   @@schema("public")
 }
 
 model Order {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   userId      String?
-  totalAmount Float
-  status      String   @default("completed")
-  createdAt   DateTime @default(now())
+  totalAmount Decimal     @db.Decimal(10, 2)
+  status      OrderStatus @default(COMPLETED)
+  createdAt   DateTime    @default(now())
   courseId    String?
   course      Course?  @relation(fields: [courseId], references: [id])
   user        User?    @relation(fields: [userId], references: [id])
@@ -102,19 +104,22 @@ model SiteSetting {
   id        String   @id @default(cuid())
   key       String   @unique
   value     String
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@schema("public")
 }
 
 model MenuItem {
-  id        String  @id @default(cuid())
+  id        String       @id @default(cuid())
   label     String
   url       String
-  order     Int     @default(0)
-  position  String  @default("header")
+  order     Int          @default(0)
+  position  MenuPosition @default(HEADER)
   parentId  String?
-  published Boolean @default(true)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@schema("public")
 }
@@ -243,6 +248,32 @@ enum Role {
 
   @@schema("elearning")
 }
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CLOSED
+
+  @@schema("public")
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+
+  @@schema("elearning")
+}
+
+enum MenuPosition {
+  HEADER
+  FOOTER
+
+  @@schema("public")
+}
+
 enum ClassStatus {
   ACTIVE
   ARCHIVED
@@ -367,6 +398,8 @@ model ClassSection {
   quizzes     Quiz[]
   teacher     User?        @relation("ClassTeacher", fields: [teacherId], references: [id], onDelete: SetNull)
 
+  @@index([courseId])
+  @@index([teacherId])
   @@schema("elearning")
 }
 
@@ -384,6 +417,7 @@ model Enrollment {
   student        User             @relation("StudentEnrollments", fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, classSectionId])
+  @@index([classSectionId])
   @@schema("elearning")
 }
 
@@ -408,6 +442,8 @@ model Assignment {
   grades         Grade[]
   submissions    Submission[]
 
+  @@index([classSectionId])
+  @@index([createdById])
   @@schema("elearning")
 }
 
@@ -550,6 +586,8 @@ model Attempt {
   quiz        Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
   student     User            @relation("StudentAttempts", fields: [studentId], references: [id], onDelete: Cascade)
 
+  @@index([quizId])
+  @@index([studentId])
   @@schema("elearning")
 }
 
@@ -594,7 +632,7 @@ model Grade {
   studentId    String
   assignmentId String?
   quizId       String?
-  attemptId    String?
+  attemptId    String?     @unique
   submissionId String?     @unique
   score        Float
   feedback     String?
@@ -608,6 +646,11 @@ model Grade {
   student      User        @relation("StudentGrades", fields: [studentId], references: [id], onDelete: Cascade)
   submission   Submission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
+  @@index([studentId])
+  @@index([assignmentId])
+  @@index([quizId])
+  @@index([attemptId])
+  @@index([submissionId])
   @@schema("elearning")
 }
 
@@ -623,6 +666,7 @@ model ActivityLog {
   createdAt  DateTime @default(now())
   actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
 
+  @@index([actorId])
   @@schema("elearning")
 }
 

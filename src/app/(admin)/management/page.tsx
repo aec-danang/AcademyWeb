@@ -10,9 +10,9 @@ export default async function AdminDashboard() {
   const [totalRevenue, newLeadsCount, totalEnrollments, activeStudents, recentOrders, recentLeads, publishedPostsCount, recentAccounts] = await Promise.all([
     prisma.order.aggregate({
       _sum: { totalAmount: true },
-      where: { status: "completed" }
+      where: { status: "COMPLETED" }
     }),
-    prisma.lead.count({ where: { status: "new" } }),
+    prisma.lead.count({ where: { status: "NEW" } }),
     prisma.courseEnrollment.count(),
     prisma.user.count({ where: { role: "USER" } }),
     prisma.order.findMany({
@@ -21,7 +21,7 @@ export default async function AdminDashboard() {
       include: { user: true, course: true },
     }),
     prisma.lead.findMany({
-      where: { status: "new" },
+      where: { status: "NEW" },
       take: 4,
       orderBy: { createdAt: "desc" },
     }),
@@ -32,7 +32,7 @@ export default async function AdminDashboard() {
     }),
   ]);
 
-  const revenue = totalRevenue._sum.totalAmount || 0;
+  const revenue = totalRevenue._sum.totalAmount?.toNumber() || 0;
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
@@ -142,7 +142,7 @@ export default async function AdminDashboard() {
                         {order.course?.title || "Unknown Course"}
                       </TableCell>
                       <TableCell className="font-semibold text-slate-900 dark:text-slate-100">
-                        ${order.totalAmount.toLocaleString()}
+                        ${order.totalAmount.toNumber().toLocaleString()}
                       </TableCell>
                       <TableCell className="text-slate-500 dark:text-slate-400 text-sm font-medium py-5">
                         {new Intl.DateTimeFormat("en-US", {
@@ -154,7 +154,7 @@ export default async function AdminDashboard() {
                       </TableCell>
                       <TableCell className="text-right pr-8 py-5">
                         <Badge variant="outline" className={`font-semibold rounded-full px-3 py-0.5 ${
-                          order.status === "completed" 
+                          order.status === "COMPLETED" 
                             ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
                             : "bg-orange/10 text-orange border-orange/20 dark:bg-orange/20 dark:text-orange-400"
                         }`}>

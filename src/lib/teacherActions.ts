@@ -139,25 +139,29 @@ export async function createClassSectionAction(formData: FormData) {
   const courseDescription = formData.get("courseDescription") as string;
   const coursePublished = formData.get("coursePublished") === "on";
 
-  // Create a new Course and ClassSection
-  const newCourse = await prisma.course.create({
-    data: {
-      title: courseTitle,
-      description: courseDescription,
-      published: coursePublished,
-    }
-  });
+  // Create a new Course and ClassSection in a transaction
+  const newCourse = await prisma.$transaction(async (tx) => {
+    const course = await tx.course.create({
+      data: {
+        title: courseTitle,
+        description: courseDescription,
+        published: coursePublished,
+      }
+    });
 
-  await prisma.classSection.create({
-    data: {
-      name,
-      code,
-      status,
-      startAt,
-      endAt,
-      teacherId: user.id,
-      courseId: newCourse.id,
-    }
+    await tx.classSection.create({
+      data: {
+        name,
+        code,
+        status,
+        startAt,
+        endAt,
+        teacherId: user.id,
+        courseId: course.id,
+      }
+    });
+
+    return course;
   });
 
   revalidatePath("/elearning/courses");

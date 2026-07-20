@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 export async function updateLeadStatus(id: string, status: string) {
   await prisma.lead.update({
     where: { id },
-    data: { status },
+    data: { status: status as any },
   });
   revalidatePath("/management/submissions");
 }
