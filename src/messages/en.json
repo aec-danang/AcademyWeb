@@ -1,5 +1,12 @@
 {
   "Index": {
     "title": "Home"
+  },
+  "Navbar": {
+    "programs": "Programs",
+    "about": "About",
+    "teachers": "Teachers",
+    "contact": "Contact",
+    "login": "Login"
   }
 }

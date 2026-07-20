@@ -1,0 +1,203 @@
+/* Animations */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero Section */
+.heroSection {
+  position: relative;
+  background-color: var(--color-navy);
+  padding: 8rem 2rem 5rem;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.heroBackground {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 80% 20%, rgba(246, 141, 46, 0.15) 0%, transparent 40%),
+    linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-deep) 100%);
+  z-index: 1;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  text-align: center;
+}
+
+.heroBadge {
+  display: inline-block;
+  background-color: rgba(246, 141, 46, 0.1);
+  color: var(--color-orange);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(246, 141, 46, 0.2);
+}
+
+.heroTitle {
+  font-size: var(--text-5xl);
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: var(--color-white);
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: var(--text-xl);
+  color: #aeb0cc;
+  line-height: 1.6;
+}
+
+/* Programs Grid Layout */
+.programsWrapper {
+  padding: 5rem 0;
+  background-color: #f8fafc;
+  min-height: 50vh;
+}
+
+.programsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 1rem 0 2rem 0;
+}
+
+@media (max-width: 1024px) {
+  .programsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .programsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Program Card */
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Load-in staggered animation class applied via JS */
+.cardVisible {
+  animation: slideUpFade 0.6s ease-out both;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-orange-light);
+}
+
+.iconWrapper {
+  width: 80px;
+  height: 80px;
+  background-color: var(--color-navy-light);
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem auto;
+  color: var(--color-navy);
+  transition: all 0.3s ease;
+}
+
+.card:hover .iconWrapper {
+  background-color: var(--color-orange);
+  color: var(--color-white);
+  transform: scale(1.1);
+}
+
+.programTitle {
+  font-size: 1.5rem;
+  color: var(--color-navy);
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+}
+
+.programDesc {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  flex-grow: 1;
+}
+
+.readMoreBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--color-navy);
+  font-weight: 700;
+  transition: color 0.3s;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.readMoreBtn:hover {
+  color: var(--color-orange);
+}
+
+.readMoreIcon {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card:hover .readMoreIcon {
+  transform: translateX(4px);
+}
+
+/* Empty State */
+.emptyState {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  border: 1px dashed #cbd5e1;
+}
+
+.emptyStateIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background-color: #f1f5f9;
+  border-radius: var(--radius-pill);
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+}
+
+.emptyState h3 {
+  font-size: 1.5rem;
+  color: var(--color-navy);
+  margin-bottom: 0.5rem;
+}
+
+.emptyState p {
+  color: var(--text-muted);
+}

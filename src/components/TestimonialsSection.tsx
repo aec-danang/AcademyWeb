@@ -28,7 +28,10 @@ export default async function TestimonialsSection() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "32px" }}>
           {testimonials.map((testimonial) => (
-            <Card key={testimonial.id} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <Card 
+              key={testimonial.id} 
+              style={{ display: "flex", flexDirection: "column", gap: "24px" }}
+            >
               <div style={{ color: "var(--color-orange)" }}>
                 <Quote size={40} opacity={0.2} fill="currentColor" />
               </div>

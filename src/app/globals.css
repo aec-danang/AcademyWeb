@@ -5,11 +5,11 @@
   /* AEC Bright Learning System Colors */
   --color-orange: #f68d2e;
   --color-orange-hover: #ea740a;
-  --color-navy: #2c2d65;
-  --color-navy-dark: #1d1e44;
-  --color-navy-deep: #0e0f22;
+  --color-navy: #1d1e44;
+  --color-navy-dark: #0e0f22;
+  --color-navy-deep: #070815;
   --color-orange-light: #fef4eb;
-  --color-navy-light: #f0f0f8;
+  --color-navy-light: #e2e4f0;
   --color-white: #ffffff;
 
   --text-main: #2c2d65;
@@ -104,8 +104,9 @@ a {
 
 /* Layout Utilities */
 .container {
+  width: 100%;
   max-width: var(--container);
-  margin: 0 auto;
+  margin: 0 auto !important;
   padding: 0 24px;
 }
 
@@ -245,10 +246,10 @@ section[aria-label="Notifications alt+T"] {
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --color-navy: #2c2d65;
-  --color-navy-dark: #1d1e44;
-  --color-navy-deep: #0e0f22;
-  --color-navy-light: #f0f0f8;
+  --color-navy: #1d1e44;
+  --color-navy-dark: #0e0f22;
+  --color-navy-deep: #070815;
+  --color-navy-light: #e2e4f0;
   --color-orange: #f68d2e;
   --color-orange-hover: #ea740a;
   --color-orange-light: #fef4eb;

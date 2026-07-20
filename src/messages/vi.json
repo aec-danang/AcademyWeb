@@ -1,5 +1,12 @@
 {
   "Index": {
     "title": "Trang chủ"
+  },
+  "Navbar": {
+    "programs": "Chương trình",
+    "about": "Về chúng tôi",
+    "teachers": "Giáo viên",
+    "contact": "Liên hệ",
+    "login": "Đăng nhập"
   }
 }
