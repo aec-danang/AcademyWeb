@@ -20,17 +20,6 @@ export default function Navbar() {
         </Link>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <LanguageSwitcher />
-
-          <button 
-            className={styles.mobileToggle}
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label={isOpen ? "Close menu" : "Open menu"}
-            aria-expanded={isOpen}
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-
           <nav className={`${styles.nav} ${isOpen ? styles.navOpen : ''}`}>
             <ul className={styles.navLinks}>
               <li><Link href="/programs" className={styles.navLink} onClick={() => setIsOpen(false)}>{t('programs')}</Link></li>
@@ -44,6 +33,17 @@ export default function Navbar() {
               </li>
             </ul>
           </nav>
+
+          <LanguageSwitcher />
+
+          <button 
+            className={styles.mobileToggle}
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
+          >
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
     </header>
