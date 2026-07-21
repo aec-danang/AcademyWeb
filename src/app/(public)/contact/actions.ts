@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 
-export async function submitLead(formData: FormData) {
+export async function submitContactForm(formData: FormData) {
   try {
     const name = formData.get("name") as string;
     const phone = formData.get("phone") as string;
@@ -12,7 +12,7 @@ export async function submitLead(formData: FormData) {
       return { success: false, error: "Name and phone are required." };
     }
 
-    await prisma.lead.create({
+    await prisma.contactSubmission.create({
       data: {
         name,
         phone,
@@ -22,7 +22,7 @@ export async function submitLead(formData: FormData) {
 
     return { success: true };
   } catch (error) {
-    console.error("Failed to submit lead:", error);
+    console.error("Failed to submit contact form:", error);
     return { success: false, error: "An error occurred while submitting." };
   }
 }

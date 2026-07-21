@@ -7,13 +7,13 @@ export const metadata: Metadata = {
 };
 
 export default async function SubmissionsPage() {
-  const leads = await prisma.lead.findMany({
+  const submissions = await prisma.contactSubmission.findMany({
     orderBy: { createdAt: 'desc' }
   });
 
   return (
     <div className="p-6">
-      <SubmissionsClient initialLeads={leads} />
+      <SubmissionsClient initialSubmissions={submissions} />
     </div>
   );
 }

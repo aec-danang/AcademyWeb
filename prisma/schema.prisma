@@ -75,14 +75,14 @@ model Post {
 
 
 
-model Lead {
-  id        String     @id @default(cuid())
+model ContactSubmission {
+  id        String                  @id @default(cuid())
   name      String
   email     String?
   phone     String?
-  createdAt DateTime   @default(now())
+  createdAt DateTime                @default(now())
   message   String?
-  status    LeadStatus @default(NEW)
+  status    ContactSubmissionStatus @default(NEW)
 
   @@schema("public")
 }
@@ -249,7 +249,7 @@ enum Role {
   @@schema("elearning")
 }
 
-enum LeadStatus {
+enum ContactSubmissionStatus {
   NEW
   CONTACTED
   QUALIFIED

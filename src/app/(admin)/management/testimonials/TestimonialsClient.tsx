@@ -238,101 +238,104 @@ export default function TestimonialsClient({ initialTestimonials }: { initialTes
       </div>
 
       <Dialog open={isCreating || isEditing !== null} onOpenChange={(open) => !open && cancelEdit()}>
-        <DialogContent className="sm:max-w-[600px] bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 shadow-2xl p-0 overflow-hidden">
-          <DialogHeader className="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-            <DialogTitle className="text-slate-900 dark:text-slate-100">{isCreating ? "Add Testimonial" : "Edit Testimonial"}</DialogTitle>
-          </DialogHeader>
-          <div className="max-h-[60vh] overflow-y-auto px-6 py-4">
-            <div className="grid gap-4 py-2">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium">Author Name</label>
-                  <Input 
-                    value={formData.authorName} 
-                    onChange={e => setFormData({...formData, authorName: e.target.value})} 
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium">Author Role <span className="text-slate-400 font-normal">(Optional)</span></label>
-                  <Input 
-                    value={formData.authorRole} 
-                    onChange={e => setFormData({...formData, authorRole: e.target.value})} 
-                    placeholder="e.g. IELTS Student"
-                  />
-                </div>
-              </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium">Content</label>
-                <Textarea 
-                  value={formData.content} 
-                  onChange={e => setFormData({...formData, content: e.target.value})}
-                  rows={4}
+        <DialogContent className="sm:max-w-[600px] rounded-2xl p-0 overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-[#0b101e]">
+          <div className="bg-slate-50/80 dark:bg-slate-900/50 px-6 py-5 border-b border-slate-100 dark:border-slate-800/80">
+            <DialogTitle className="text-xl text-slate-900 dark:text-slate-100">{isCreating ? "Add Testimonial" : "Edit Testimonial"}</DialogTitle>
+          </div>
+          <div className="max-h-[60vh] overflow-y-auto px-6 py-6 space-y-5">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Author Name</label>
+                <Input 
+                  className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm"
+                  value={formData.authorName} 
+                  onChange={e => setFormData({...formData, authorName: e.target.value})} 
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium">Avatar URL <span className="text-slate-400 font-normal">(Optional)</span></label>
-                  <Input 
-                    value={formData.avatarUrl} 
-                    onChange={e => setFormData({...formData, avatarUrl: e.target.value})} 
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium">High Score <span className="text-slate-400 font-normal">(Optional)</span></label>
-                  <Input 
-                    value={formData.score} 
-                    onChange={e => setFormData({...formData, score: e.target.value})} 
-                    placeholder="e.g. IELTS 8.0"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800 mt-2">
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="checkbox" 
-                    id="isHallOfFame" 
-                    checked={formData.isHallOfFame} 
-                    onChange={e => setFormData({...formData, isHallOfFame: e.target.checked})}
-                    className="rounded border-slate-300 w-4 h-4"
-                  />
-                  <div className="flex flex-col">
-                    <label htmlFor="isHallOfFame" className="text-sm font-medium">Hall of Fame</label>
-                    <span className="text-xs text-slate-500">Add to Hall of Fame section</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="checkbox" 
-                    id="isFeatured" 
-                    checked={formData.isFeatured} 
-                    onChange={e => setFormData({...formData, isFeatured: e.target.checked})}
-                    className="rounded border-slate-300 w-4 h-4"
-                  />
-                  <div className="flex flex-col">
-                    <label htmlFor="isFeatured" className="text-sm font-medium">Featured</label>
-                    <span className="text-xs text-slate-500">Pin to the front page</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 pt-2">
-                  <input 
-                    type="checkbox" 
-                    id="published" 
-                    checked={formData.published} 
-                    onChange={e => setFormData({...formData, published: e.target.checked})}
-                    className="rounded border-slate-300 w-4 h-4"
-                  />
-                  <label htmlFor="published" className="text-sm font-medium">Published</label>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Author Role <span className="text-slate-400 font-normal">(Optional)</span></label>
+                <Input 
+                  className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm"
+                  value={formData.authorRole} 
+                  onChange={e => setFormData({...formData, authorRole: e.target.value})} 
+                  placeholder="e.g. IELTS Student"
+                />
               </div>
             </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Content</label>
+              <Textarea 
+                className="rounded-xl resize-none bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm"
+                value={formData.content} 
+                onChange={e => setFormData({...formData, content: e.target.value})}
+                rows={4}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Avatar URL <span className="text-slate-400 font-normal">(Optional)</span></label>
+                <Input 
+                  className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm"
+                  value={formData.avatarUrl} 
+                  onChange={e => setFormData({...formData, avatarUrl: e.target.value})} 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">High Score <span className="text-slate-400 font-normal">(Optional)</span></label>
+                <Input 
+                  className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm"
+                  value={formData.score} 
+                  onChange={e => setFormData({...formData, score: e.target.value})} 
+                  placeholder="e.g. IELTS 8.0"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <input 
+                  type="checkbox" 
+                  id="isHallOfFame" 
+                  checked={formData.isHallOfFame} 
+                  onChange={e => setFormData({...formData, isHallOfFame: e.target.checked})}
+                  className="rounded border-slate-300 dark:border-slate-700 dark:bg-slate-900 w-4 h-4 text-orange focus:ring-orange"
+                />
+                <div className="flex flex-col">
+                  <label htmlFor="isHallOfFame" className="text-sm font-medium dark:text-slate-200">Hall of Fame</label>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Add to Hall of Fame section</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <input 
+                  type="checkbox" 
+                  id="isFeatured" 
+                  checked={formData.isFeatured} 
+                  onChange={e => setFormData({...formData, isFeatured: e.target.checked})}
+                  className="rounded border-slate-300 dark:border-slate-700 dark:bg-slate-900 w-4 h-4 text-orange focus:ring-orange"
+                />
+                <div className="flex flex-col">
+                  <label htmlFor="isFeatured" className="text-sm font-medium dark:text-slate-200">Featured</label>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Pin to the front page</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 pt-2">
+                <input 
+                  type="checkbox" 
+                  id="published" 
+                  checked={formData.published} 
+                  onChange={e => setFormData({...formData, published: e.target.checked})}
+                  className="rounded border-slate-300 dark:border-slate-700 dark:bg-slate-900 w-4 h-4 text-orange focus:ring-orange"
+                />
+                <label htmlFor="published" className="text-sm font-medium dark:text-slate-200">Published</label>
+            </div>
           </div>
-          <DialogFooter className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-            <Button variant="ghost" onClick={cancelEdit}>Cancel</Button>
-            <Button className="bg-orange hover:bg-orange-hover text-white" onClick={isCreating ? handleCreate : handleUpdate}>
+          <div className="px-6 py-5 bg-slate-50/80 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/80 flex justify-end gap-3">
+            <Button variant="outline" className="rounded-xl font-semibold h-11 px-5 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-300" onClick={cancelEdit}>Cancel</Button>
+            <Button className="rounded-xl font-semibold h-11 px-6 bg-orange hover:bg-orange-hover text-white shadow-md shadow-orange/20" onClick={isCreating ? handleCreate : handleUpdate}>
               {isCreating ? "Add Testimonial" : "Save Changes"}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

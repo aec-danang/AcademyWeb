@@ -183,32 +183,32 @@ export default function ProgramsClient({ initialPrograms }: { initialPrograms: P
       </div>
 
       <Dialog open={isCreating || isEditing !== null} onOpenChange={(open) => !open && cancelEdit()}>
-        <DialogContent className="sm:max-w-[700px] bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 shadow-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-slate-100">{isCreating ? "Add New Program" : "Edit Program"}</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
+        <DialogContent className="sm:max-w-[700px] rounded-2xl p-0 overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-[#0b101e] max-h-[90vh] flex flex-col">
+          <div className="bg-slate-50/80 dark:bg-slate-900/50 px-6 py-5 border-b border-slate-100 dark:border-slate-800/80 shrink-0">
+            <DialogTitle className="text-xl text-slate-900 dark:text-slate-100">{isCreating ? "Add New Program" : "Edit Program"}</DialogTitle>
+          </div>
+          <div className="px-6 py-6 space-y-5 overflow-y-auto flex-1">
             <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Title</label>
-                <Input placeholder="English for Kids" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Title</label>
+                <Input className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm" placeholder="English for Kids" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
               </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Slug</label>
-                <Input placeholder="kids" value={formData.slug} onChange={e => setFormData({...formData, slug: e.target.value})} />
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Slug</label>
+                <Input className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm" placeholder="kids" value={formData.slug} onChange={e => setFormData({...formData, slug: e.target.value})} />
               </div>
             </div>
             
-            <div className="grid gap-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Description (Short excerpt)</label>
-              <Input placeholder="Interactive learning for young minds..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Description (Short excerpt)</label>
+              <Input className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm" placeholder="Interactive learning for young minds..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Icon Type</label>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Icon Type</label>
                 <select 
-                  className="flex h-10 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300"
+                  className="flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/80 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-orange focus:border-orange disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-100 shadow-sm"
                   value={formData.iconType}
                   onChange={(e) => setFormData({...formData, iconType: e.target.value})}
                 >
@@ -216,33 +216,35 @@ export default function ProgramsClient({ initialPrograms }: { initialPrograms: P
                   <option value="image">Image URL</option>
                 </select>
               </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{formData.iconType === 'lucide' ? 'Icon' : 'Image URL'}</label>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">{formData.iconType === 'lucide' ? 'Icon' : 'Image URL'}</label>
                 {formData.iconType === 'lucide' ? (
                   <IconSelector 
                     value={formData.iconValue} 
                     onValueChange={value => setFormData({...formData, iconValue: value})} 
                   />
                 ) : (
-                  <Input placeholder="/logos/addc.png" value={formData.iconValue} onChange={e => setFormData({...formData, iconValue: e.target.value})} />
+                  <Input className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm" placeholder="/logos/addc.png" value={formData.iconValue} onChange={e => setFormData({...formData, iconValue: e.target.value})} />
                 )}
               </div>
             </div>
 
-            <div className="grid gap-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Page Content (HTML)</label>
-              <RichTextEditor
-                content={formData.content}
-                onChange={content => setFormData({...formData, content})}
-              />
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Page Content (HTML)</label>
+              <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
+                <RichTextEditor
+                  content={formData.content}
+                  onChange={content => setFormData({...formData, content})}
+                />
+              </div>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={cancelEdit}>Cancel</Button>
-            <Button className="bg-orange hover:bg-orange-hover text-white" onClick={isCreating ? handleCreate : handleUpdate}>
+          <div className="px-6 py-5 bg-slate-50/80 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/80 flex justify-end gap-3 shrink-0">
+            <Button variant="outline" onClick={cancelEdit} className="rounded-xl font-semibold h-11 px-5 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-300">Cancel</Button>
+            <Button className="rounded-xl font-semibold h-11 px-6 bg-orange hover:bg-orange-hover text-white shadow-md shadow-orange/20" onClick={isCreating ? handleCreate : handleUpdate}>
               {isCreating ? "Add Program" : "Save Changes"}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

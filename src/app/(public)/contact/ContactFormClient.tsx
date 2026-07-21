@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { submitLead } from "./actions";
+import { submitContactForm } from "./actions";
 import styles from "./contact.module.css";
 import { Loader2 } from "lucide-react";
 
@@ -17,7 +17,7 @@ export default function ContactFormClient({ programs = [] }: { programs?: any[] 
     setSuccess(false);
 
     const formData = new FormData(e.currentTarget);
-    const result = await submitLead(formData);
+    const result = await submitContactForm(formData);
 
     if (result.success) {
       setSuccess(true);

@@ -259,14 +259,14 @@ export default function SponsorsClient({ initialSponsors }: { initialSponsors: S
       </div>
 
       <Dialog open={isCreating || isEditing !== null} onOpenChange={(open) => !open && cancelEdit()}>
-        <DialogContent className="sm:max-w-[550px] bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-slate-100">{isCreating ? "Add New Sponsor" : "Edit Sponsor"}</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-6 py-4 md:grid-cols-[120px_1fr]">
+        <DialogContent className="sm:max-w-[550px] rounded-2xl p-0 overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-[#0b101e]">
+          <div className="bg-slate-50/80 dark:bg-slate-900/50 px-6 py-5 border-b border-slate-100 dark:border-slate-800/80">
+            <DialogTitle className="text-xl text-slate-900 dark:text-slate-100">{isCreating ? "Add New Sponsor" : "Edit Sponsor"}</DialogTitle>
+          </div>
+          <div className="grid gap-6 px-6 py-6 md:grid-cols-[120px_1fr]">
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Logo Preview</label>
-              <div className="w-full h-[80px] rounded-lg border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center bg-slate-50 dark:bg-slate-900/50 overflow-hidden shadow-inner">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Logo Preview</label>
+              <div className="w-full h-[80px] rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center bg-slate-50/50 dark:bg-slate-900/80 overflow-hidden shadow-inner">
                 {formData.imageUrl ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img 
@@ -276,32 +276,32 @@ export default function SponsorsClient({ initialSponsors }: { initialSponsors: S
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} 
                   />
                 ) : (
-                  <span className="text-xs text-slate-400">No Image</span>
+                  <span className="text-xs text-slate-400 font-medium">No Image</span>
                 )}
               </div>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Sponsor Name</label>
+            <div className="flex flex-col gap-5">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Sponsor Name</label>
                 <Input 
                   placeholder="e.g. FPT Software" 
                   value={formData.name} 
                   onChange={e => setFormData({...formData, name: e.target.value})} 
-                  className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                  className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm"
                 />
               </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Logo URL</label>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Logo URL</label>
                 <Input 
                   placeholder="https://example.com/logo.png" 
                   value={formData.imageUrl} 
                   onChange={e => setFormData({...formData, imageUrl: e.target.value})} 
-                  className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                  className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm"
                 />
               </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium flex items-center justify-between text-slate-700 dark:text-slate-300">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold flex items-center justify-between text-slate-900 dark:text-slate-200">
                   Website URL
                   <span className="text-xs text-slate-400 font-normal">(Optional)</span>
                 </label>
@@ -309,17 +309,17 @@ export default function SponsorsClient({ initialSponsors }: { initialSponsors: S
                   placeholder="https://example.com" 
                   value={formData.website} 
                   onChange={e => setFormData({...formData, website: e.target.value})} 
-                  className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                  className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm"
                 />
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={cancelEdit} className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100">Cancel</Button>
-            <Button className="bg-orange hover:bg-orange-hover text-white shadow-sm" onClick={isCreating ? handleCreate : handleUpdate}>
+          <div className="px-6 py-5 bg-slate-50/80 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/80 flex justify-end gap-3">
+            <Button variant="outline" onClick={cancelEdit} className="rounded-xl font-semibold h-11 px-5 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-300">Cancel</Button>
+            <Button className="rounded-xl font-semibold h-11 px-6 bg-orange hover:bg-orange-hover text-white shadow-md shadow-orange/20" onClick={isCreating ? handleCreate : handleUpdate}>
               {isCreating ? "Add Sponsor" : "Save Changes"}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

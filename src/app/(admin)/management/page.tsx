@@ -7,12 +7,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default async function AdminDashboard() {
-  const [totalRevenue, newLeadsCount, totalEnrollments, activeStudents, recentOrders, recentLeads, publishedPostsCount, recentAccounts] = await Promise.all([
+  const [totalRevenue, newSubmissionsCount, totalEnrollments, activeStudents, recentOrders, recentSubmissions, publishedPostsCount, recentAccounts] = await Promise.all([
     prisma.order.aggregate({
       _sum: { totalAmount: true },
       where: { status: "COMPLETED" }
     }),
-    prisma.lead.count({ where: { status: "NEW" } }),
+    prisma.contactSubmission.count({ where: { status: "NEW" } }),
     prisma.courseEnrollment.count(),
     prisma.user.count({ where: { role: "USER" } }),
     prisma.order.findMany({
@@ -20,7 +20,7 @@ export default async function AdminDashboard() {
       orderBy: { createdAt: "desc" },
       include: { user: true, course: true },
     }),
-    prisma.lead.findMany({
+    prisma.contactSubmission.findMany({
       where: { status: "NEW" },
       take: 4,
       orderBy: { createdAt: "desc" },
@@ -71,7 +71,7 @@ export default async function AdminDashboard() {
             </div>
           </CardHeader>
           <CardContent className="px-6 pb-6">
-            <div className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{newLeadsCount}</div>
+            <div className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{newSubmissionsCount}</div>
             <p className="text-sm text-slate-500 mt-3 font-medium opacity-80">Requires follow-up</p>
           </CardContent>
         </Card>
@@ -250,40 +250,40 @@ export default async function AdminDashboard() {
                 <CardTitle className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   Pending Submissions
                   <Badge className="bg-orange hover:bg-orange text-white rounded-full px-2 py-0">
-                    {newLeadsCount}
+                    {newSubmissionsCount}
                   </Badge>
                 </CardTitle>
               </div>
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-slate-200 dark:divide-slate-800">
-                {recentLeads.map((lead: any) => (
-                  <div key={lead.id} className="p-5 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group">
+                {recentSubmissions.map((submission: any) => (
+                  <div key={submission.id} className="p-5 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group">
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-semibold text-slate-900 dark:text-slate-100">{lead.name}</h4>
+                      <h4 className="font-semibold text-slate-900 dark:text-slate-100">{submission.name}</h4>
                       <span className="text-xs font-medium text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md flex items-center">
                         <Clock className="w-3 h-3 mr-1" />
-                        {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(lead.createdAt))}
+                        {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(submission.createdAt))}
                       </span>
                     </div>
-                    {lead.message && (
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-2">"{lead.message}"</p>
+                    {submission.message && (
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-2">"{submission.message}"</p>
                     )}
                     <div className="flex items-center gap-3">
-                      {lead.email && (
-                        <a href={`mailto:${lead.email}`} className="text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 flex items-center transition-colors">
+                      {submission.email && (
+                        <a href={`mailto:${submission.email}`} className="text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 flex items-center transition-colors">
                           <Mail className="w-3.5 h-3.5 mr-1" /> Email
                         </a>
                       )}
-                      {lead.phone && (
-                        <a href={`tel:${lead.phone}`} className="text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 flex items-center transition-colors">
+                      {submission.phone && (
+                        <a href={`tel:${submission.phone}`} className="text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 flex items-center transition-colors">
                           <Phone className="w-3.5 h-3.5 mr-1" /> Call
                         </a>
                       )}
                     </div>
                   </div>
                 ))}
-                {recentLeads.length === 0 && (
+                {recentSubmissions.length === 0 && (
                   <div className="p-8 text-center flex flex-col items-center">
                     <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-full flex items-center justify-center mb-3">
                       <ShieldCheck className="h-6 w-6 text-emerald-500" />
@@ -294,7 +294,7 @@ export default async function AdminDashboard() {
                 )}
               </div>
             </CardContent>
-            {recentLeads.length > 0 && (
+            {recentSubmissions.length > 0 && (
               <CardFooter className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-center">
                 <Button variant="ghost" size="sm" className="text-slate-600 dark:text-slate-400 text-xs font-semibold w-full" asChild>
                   <Link href="/management/submissions">View All Submissions <ChevronRight className="w-4 h-4 ml-1" /></Link>

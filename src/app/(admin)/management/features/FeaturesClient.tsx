@@ -185,49 +185,52 @@ export default function FeaturesClient({ initialFeatures }: { initialFeatures: S
       </div>
 
       <Dialog open={isCreating || isEditing !== null} onOpenChange={(open) => !open && cancelEdit()}>
-        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-slate-100">{isCreating ? "Add New Feature" : "Edit Feature"}</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <label className="text-sm font-medium">Title</label>
+        <DialogContent className="sm:max-w-[500px] rounded-2xl p-0 overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-[#0b101e]">
+          <div className="bg-slate-50/80 dark:bg-slate-900/50 px-6 py-5 border-b border-slate-100 dark:border-slate-800/80">
+            <DialogTitle className="text-xl text-slate-900 dark:text-slate-100">{isCreating ? "Add New Feature" : "Edit Feature"}</DialogTitle>
+          </div>
+          <div className="px-6 py-6 space-y-5 max-h-[70vh] overflow-y-auto">
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Title</label>
               <Input 
+                className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm"
                 value={formData.title} 
                 onChange={e => setFormData({...formData, title: e.target.value})} 
               />
             </div>
-            <div className="grid gap-2">
-              <label className="text-sm font-medium">Description</label>
-              <RichTextEditor
-                content={formData.description}
-                onChange={content => setFormData({...formData, description: content})}
-              />
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Description</label>
+              <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
+                <RichTextEditor
+                  content={formData.description}
+                  onChange={content => setFormData({...formData, description: content})}
+                />
+              </div>
             </div>
-            <div className="grid gap-2">
-              <label className="text-sm font-medium">Icon</label>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Icon</label>
               <IconSelector 
                 value={formData.iconValue} 
                 onValueChange={value => setFormData({...formData, iconValue: value})} 
               />
             </div>
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex items-center gap-2 pt-2">
               <input 
                 type="checkbox" 
                 id="published" 
                 checked={formData.published} 
                 onChange={e => setFormData({...formData, published: e.target.checked})}
-                className="rounded border-slate-300"
+                className="rounded border-slate-300 dark:border-slate-700 dark:bg-slate-900 w-4 h-4 text-orange focus:ring-orange"
               />
-              <label htmlFor="published" className="text-sm font-medium">Published</label>
+              <label htmlFor="published" className="text-sm font-medium dark:text-slate-200">Published</label>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={cancelEdit}>Cancel</Button>
-            <Button className="bg-orange hover:bg-orange-hover text-white" onClick={isCreating ? handleCreate : handleUpdate}>
+          <div className="px-6 py-5 bg-slate-50/80 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/80 flex justify-end gap-3">
+            <Button variant="outline" onClick={cancelEdit} className="rounded-xl font-semibold h-11 px-5 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-300">Cancel</Button>
+            <Button className="rounded-xl font-semibold h-11 px-6 bg-orange hover:bg-orange-hover text-white shadow-md shadow-orange/20" onClick={isCreating ? handleCreate : handleUpdate}>
               {isCreating ? "Add Feature" : "Save Changes"}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
