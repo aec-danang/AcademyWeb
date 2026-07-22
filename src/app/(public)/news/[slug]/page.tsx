@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CalendarDays, User, Tag } from 'lucide-react';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -40,46 +40,156 @@ export default async function NewsPostPage({ params }: Props) {
     notFound();
   }
 
+  const dateStr = post.createdAt.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  const typeLabel = post.type === 'event' ? 'Sự kiện' : 'Tin tức';
+  const typeBg = post.type === 'event'
+    ? 'bg-orange text-white'
+    : 'bg-navy text-white';
+
   return (
-    <div className="min-h-screen p-8 max-w-4xl mx-auto">
-      <div className="mb-8">
-        <Link href="/news" className="inline-flex items-center text-orange-600 hover:text-orange-700 transition-colors">
-          <ArrowLeft size={20} className="mr-2" />
-          Back to News
-        </Link>
-      </div>
+    <div className="min-h-screen bg-navy-light">
+      {/* Hero */}
+      {post.featuredImage ? (
+        <div className="relative w-full h-[420px] md:h-[520px] overflow-hidden">
+          <Image
+            src={post.featuredImage}
+            alt={post.title}
+            fill
+            priority
+            style={{ objectFit: 'cover' }}
+            className="brightness-75"
+          />
+          {/* Overlay gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/30 to-transparent" />
 
-      <article>
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
-          <div className="flex items-center text-gray-500 text-sm">
-            <span>{post.createdAt.toLocaleDateString()}</span>
-            {post.author && (
-              <>
-                <span className="mx-2">•</span>
-                <span>By {post.author.name || 'Academy Staff'}</span>
-              </>
-            )}
+          {/* Back link */}
+          <div className="absolute top-8 left-0 right-0 container mx-auto px-6">
+            <Link
+              href="/news"
+              className="inline-flex items-center gap-2 text-white/90 hover:text-white font-semibold text-sm transition-colors group"
+            >
+              <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+              Trở về Tin tức
+            </Link>
           </div>
-        </header>
 
+          {/* Title overlay */}
+          <div className="absolute bottom-0 left-0 right-0 container mx-auto px-6 pb-10">
+            <div className="max-w-3xl">
+              {/* Type badge */}
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 ${typeBg}`}>
+                <Tag size={12} />
+                {typeLabel}
+              </span>
+              <div className="flex items-center gap-4 text-white/70 text-sm mb-4 font-semibold">
+                <span className="flex items-center gap-1.5">
+                  <CalendarDays size={15} />
+                  {dateStr}
+                </span>
+                {post.author && (
+                  <>
+                    <span className="w-1 h-1 rounded-full bg-white/40" />
+                    <span className="flex items-center gap-1.5">
+                      <User size={15} />
+                      {post.author.name || 'Academy Staff'}
+                    </span>
+                  </>
+                )}
+              </div>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white font-montserrat leading-tight">
+                {post.title}
+              </h1>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* No featured image – plain header */
+        <div className="bg-white border-b border-gray-100 pt-32 pb-12">
+          <div className="container mx-auto px-6 max-w-3xl">
+            <Link
+              href="/news"
+              className="inline-flex items-center gap-2 text-orange hover:text-orange-hover font-semibold text-sm transition-colors group mb-8"
+            >
+              <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+              Trở về Tin tức
+            </Link>
+            {/* Type badge */}
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 ${typeBg}`}>
+              <Tag size={12} />
+              {typeLabel}
+            </span>
+            <div className="flex items-center gap-4 text-navy/50 text-sm mb-4 font-semibold">
+              <span className="flex items-center gap-1.5">
+                <CalendarDays size={15} />
+                {dateStr}
+              </span>
+              {post.author && (
+                <>
+                  <span className="w-1 h-1 rounded-full bg-navy/20" />
+                  <span className="flex items-center gap-1.5">
+                    <User size={15} />
+                    {post.author.name || 'Academy Staff'}
+                  </span>
+                </>
+              )}
+            </div>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-navy font-montserrat leading-tight">
+              {post.title}
+            </h1>
+          </div>
+        </div>
+      )}
+
+      {/* Article Body */}
+      <div className="container mx-auto px-6 max-w-3xl py-14">
+        {/* Back link when image hero is shown */}
         {post.featuredImage && (
-          <div className="mb-8">
-            <Image
-              src={post.featuredImage}
-              alt={post.title}
-              width={1200}
-              height={500}
-              className="w-full max-h-[500px] object-cover rounded-xl shadow-sm"
-            />
-          </div>
+          <Link
+            href="/news"
+            className="inline-flex items-center gap-2 text-orange hover:text-orange-hover font-semibold text-sm transition-colors group mb-10"
+          >
+            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+            Trở về Tin tức
+          </Link>
         )}
 
-        <div 
-          className="prose prose-lg max-w-none text-gray-800"
+        {/* Excerpt callout */}
+        {post.excerpt && (
+          <p className="text-lg text-navy/70 font-medium leading-relaxed border-l-4 border-orange pl-5 mb-10 italic">
+            {post.excerpt}
+          </p>
+        )}
+
+        <article
+          className="prose prose-lg max-w-none
+            prose-headings:font-montserrat prose-headings:text-navy prose-headings:font-bold
+            prose-p:text-navy/80 prose-p:leading-relaxed
+            prose-a:text-orange prose-a:no-underline hover:prose-a:text-orange-hover
+            prose-strong:text-navy
+            prose-img:rounded-xl prose-img:shadow-sm
+            prose-blockquote:border-l-orange prose-blockquote:text-navy/70
+            prose-code:text-orange prose-code:bg-orange-light prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
+          "
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
-      </article>
+
+        {/* Footer divider */}
+        <div className="mt-14 pt-8 border-t border-gray-200 flex items-center justify-between">
+          <Link
+            href="/news"
+            className="inline-flex items-center gap-2 text-orange hover:text-orange-hover font-bold text-sm uppercase tracking-wider transition-colors group"
+          >
+            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+            Tất cả tin tức
+          </Link>
+          <span className="text-navy/40 text-sm">{dateStr}</span>
+        </div>
+      </div>
     </div>
   );
 }

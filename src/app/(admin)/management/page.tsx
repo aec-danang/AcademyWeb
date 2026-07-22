@@ -1,4 +1,4 @@
-import { Users, Activity, Plus, DollarSign, Target, BookOpen, Clock, ChevronRight, Mail, Phone, FileText, ShieldCheck, Star, MessageSquare } from "lucide-react";
+import { Users, Activity, DollarSign, Target, BookOpen, Clock, ChevronRight, Mail, Phone, FileText, ShieldCheck, Star, MessageSquare } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -36,17 +36,9 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Business Operations</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2">Monitor revenue, enrollments, and active leads requiring attention.</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button className="bg-orange hover:bg-orange-hover text-white shadow-lg shadow-orange/20 rounded-xl px-6 h-11 font-medium transition-all">
-            <Plus className="mr-2 h-4 w-4" />
-            Quick Action
-          </Button>
-        </div>
+      <div className="mb-10">
+        <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Dashboard</h2>
+        <p className="text-slate-500 dark:text-slate-400 mt-2">Monitor revenue, enrollments, and active leads requiring attention.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-10">

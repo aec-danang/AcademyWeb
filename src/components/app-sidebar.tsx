@@ -11,7 +11,6 @@ import {
   Settings,
   Bell,
   Users,
-  Search,
   Sun,
   Moon,
   LogOut,
@@ -113,49 +112,35 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="bg-slate-50 dark:bg-slate-950 p-4 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-4">
-        {/* 3. Buttons */}
-        <div className="flex items-center justify-around pb-4 border-b border-slate-200 dark:border-slate-800">
-          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy dark:text-slate-400 dark:hover:text-white rounded-full cursor-pointer">
-            <Search className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy dark:text-slate-400 dark:hover:text-white rounded-full cursor-pointer">
-            <Bell className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-slate-500 hover:text-navy dark:text-slate-400 dark:hover:text-white rounded-full cursor-pointer">
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </Button>
-        </div>
-
-        {/* 4. Profile */}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-3 px-2">
+      <SidebarFooter className="bg-slate-50 dark:bg-slate-950 p-4 border-t border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-between gap-2 px-1">
+          {/* Profile */}
+          <div className="flex items-center gap-3 overflow-hidden">
             <Avatar className="h-9 w-9 rounded-lg bg-orange flex items-center justify-center text-white font-semibold text-xs shadow-sm shrink-0">
               <AvatarFallback className="bg-transparent text-white">
                 {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "A"}
               </AvatarFallback>
             </Avatar>
-            <div className="flex flex-col overflow-hidden">
-              <span className="truncate font-semibold text-navy dark:text-slate-200 text-sm">
-                {session?.user?.name || "Admin"}
-              </span>
-              <span className="truncate text-xs text-slate-500 dark:text-slate-400">
-                {session?.user?.email || "admin@aec.edu.vn"}
-              </span>
-            </div>
+            <span className="truncate font-semibold text-navy dark:text-slate-200 text-sm">
+              {session?.user?.name || "Admin"}
+            </span>
           </div>
           
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                onClick={() => signOut({ callbackUrl: "/login" })}
-                className="h-10 mt-1 rounded-lg text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/50 transition-all duration-200 font-medium w-full justify-start px-3 cursor-pointer"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                <span className="text-sm">Log out</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+          {/* Actions */}
+          <div className="flex items-center shrink-0 gap-1">
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-8 w-8 text-slate-500 hover:text-navy dark:text-slate-400 dark:hover:text-white rounded-full cursor-pointer">
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => signOut({ callbackUrl: "/login" })} 
+              className="h-8 w-8 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-full cursor-pointer"
+              title="Log out"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </SidebarFooter>
     </Sidebar>

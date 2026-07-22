@@ -139,3 +139,14 @@ export async function deleteAccount(id: string) {
   revalidatePath("/management/accounts");
   revalidatePath("/management");
 }
+
+export async function batchDeleteAccounts(ids: string[]) {
+  await requireAdmin();
+
+  await prisma.user.deleteMany({
+    where: { id: { in: ids } },
+  });
+
+  revalidatePath("/management/accounts");
+  revalidatePath("/management");
+}

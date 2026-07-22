@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { saveSettings, updateAdminAccount } from "./actions";
-import { Plus, Trash2, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -38,10 +38,6 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
     initialSettings.reduce((acc, curr) => ({ ...acc, [curr.key]: curr.value }), {})
   );
 
-  const [customSettings, setCustomSettings] = useState<Setting[]>(
-    initialSettings.filter(s => !DEFAULT_KEYS.some(dk => dk.key === s.key) && !STATS_KEYS.some(sk => sk.key === s.key))
-  );
-
   const [accountData, setAccountData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -52,22 +48,6 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
 
   const handleStandardChange = (key: string, value: string) => {
     setSettingsMap(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleCustomChange = (index: number, field: "key" | "value", val: string) => {
-    const updated = [...customSettings];
-    updated[index][field] = val;
-    setCustomSettings(updated);
-  };
-
-  const addCustomSetting = () => {
-    setCustomSettings([...customSettings, { key: "", value: "" }]);
-  };
-
-  const removeCustomSetting = (index: number) => {
-    const updated = [...customSettings];
-    updated.splice(index, 1);
-    setCustomSettings(updated);
   };
 
   const handleSave = async () => {
@@ -102,12 +82,6 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
     STATS_KEYS.forEach(sk => {
       if (settingsMap[sk.key] !== undefined) {
         finalSettings.push({ key: sk.key, value: settingsMap[sk.key] });
-      }
-    });
-
-    customSettings.forEach(cs => {
-      if (cs.key && cs.key.trim() !== "") {
-        finalSettings.push({ key: cs.key.trim(), value: cs.value });
       }
     });
 
@@ -267,63 +241,6 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
                 <label className="text-sm font-medium">About Description</label>
                 <Textarea rows={5} defaultValue="At AEC, we believe that learning English is more than just passing exams; it's about connecting with the world..." />
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Custom Variables */}
-        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
-          <CardHeader className="flex flex-row items-start justify-between space-y-0">
-            <div>
-              <CardTitle>Custom Settings</CardTitle>
-              <CardDescription>Add custom variables not covered by standard settings.</CardDescription>
-            </div>
-            <Button variant="outline" size="sm" onClick={addCustomSetting}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Variable
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {customSettings.length === 0 ? (
-                <div className="text-center py-8 border border-dashed rounded-lg text-muted-foreground bg-slate-50 dark:bg-slate-900/50">
-                  No custom settings defined. Click "Add Variable" to create one.
-                </div>
-              ) : (
-                customSettings.map((item, index) => (
-                  <div key={index} className="flex gap-4 items-start bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
-                    <div className="grid gap-2 flex-1">
-                      <label className="text-xs font-medium">Key</label>
-                      <Input 
-                        type="text" 
-                        placeholder="custom_key"
-                        value={item.key}
-                        onChange={e => handleCustomChange(index, "key", e.target.value)}
-                        className="font-mono bg-white dark:bg-slate-950"
-                      />
-                    </div>
-                    <div className="grid gap-2 flex-[2]">
-                      <label className="text-xs font-medium">Value</label>
-                      <Input 
-                        type="text" 
-                        placeholder="Value..."
-                        value={item.value}
-                        onChange={e => handleCustomChange(index, "value", e.target.value)}
-                        className="bg-white dark:bg-slate-950"
-                      />
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="mt-6 text-destructive hover:bg-destructive/10 hover:text-destructive shrink-0"
-                      onClick={() => removeCustomSetting(index)}
-                      title="Remove"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))
-              )}
             </div>
           </CardContent>
         </Card>
