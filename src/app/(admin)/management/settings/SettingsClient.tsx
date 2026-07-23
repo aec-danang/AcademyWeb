@@ -33,6 +33,13 @@ const STATS_KEYS = [
   { key: "stats_years_experience", label: "Years Experience", placeholder: "e.g. 15" },
 ];
 
+const FEATURES_KEYS = [
+  { prefix: "feature_1", titleKey: "feature_1_title", descKey: "feature_1_desc", defaultTitle: "High-Quality Training", defaultDesc: "Provide high-quality, diverse, international-standard English training. We ensure every student reaches their full potential with modern methodologies." },
+  { prefix: "feature_2", titleKey: "feature_2_title", descKey: "feature_2_desc", defaultTitle: "Soft Skills", defaultDesc: "Develop soft skills and life values so learners become confident global citizens." },
+  { prefix: "feature_3", titleKey: "feature_3_title", descKey: "feature_3_desc", defaultTitle: "Humanistic Education", defaultDesc: "Maintain professionalism and humanistic values, putting student character first." },
+  { prefix: "feature_4", titleKey: "feature_4_title", descKey: "feature_4_desc", defaultTitle: "Our Vision & Mission", defaultDesc: "Build AEC into a dedicated learning community that serves carefully, wholeheartedly, and professionally. We aim to educate people through English so they become successful global citizens responsible toward themselves and the community." },
+];
+
 export default function SettingsClient({ initialSettings, user }: { initialSettings: Setting[], user?: UserInfo }) {
   const [settingsMap, setSettingsMap] = useState<Record<string, string>>(
     initialSettings.reduce((acc, curr) => ({ ...acc, [curr.key]: curr.value }), {})
@@ -82,6 +89,15 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
     STATS_KEYS.forEach(sk => {
       if (settingsMap[sk.key] !== undefined) {
         finalSettings.push({ key: sk.key, value: settingsMap[sk.key] });
+      }
+    });
+
+    FEATURES_KEYS.forEach(fk => {
+      if (settingsMap[fk.titleKey] !== undefined) {
+        finalSettings.push({ key: fk.titleKey, value: settingsMap[fk.titleKey] });
+      }
+      if (settingsMap[fk.descKey] !== undefined) {
+        finalSettings.push({ key: fk.descKey, value: settingsMap[fk.descKey] });
       }
     });
 
@@ -240,6 +256,44 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
               <div className="grid gap-2">
                 <label className="text-sm font-medium">About Description</label>
                 <Textarea rows={5} defaultValue="At AEC, we believe that learning English is more than just passing exams; it's about connecting with the world..." />
+              </div>
+            </div>
+
+            <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <div className="mb-4">
+                <h4 className="font-semibold text-slate-800 dark:text-slate-200">Features (Why Choose AEC?)</h4>
+                <p className="text-sm text-slate-500">Edit the four main bento box features displayed on the landing page.</p>
+              </div>
+              
+              <div className="grid sm:grid-cols-2 gap-4">
+                {FEATURES_KEYS.map((fk, idx) => (
+                  <div key={fk.prefix} className="grid gap-4 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40">
+                    <h5 className="text-sm font-bold text-navy dark:text-white flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-orange/10 text-orange flex items-center justify-center text-xs">{idx + 1}</span>
+                      Feature {idx + 1}
+                    </h5>
+                    <div className="grid gap-2">
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Title</label>
+                      <Input 
+                        type="text" 
+                        placeholder={fk.defaultTitle}
+                        value={settingsMap[fk.titleKey] || ""}
+                        onChange={e => handleStandardChange(fk.titleKey, e.target.value)}
+                        className="bg-white dark:bg-slate-900"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</label>
+                      <Textarea 
+                        rows={3} 
+                        placeholder={fk.defaultDesc}
+                        value={settingsMap[fk.descKey] || ""}
+                        onChange={e => handleStandardChange(fk.descKey, e.target.value)}
+                        className="bg-white dark:bg-slate-900 resize-none"
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </CardContent>

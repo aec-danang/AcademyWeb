@@ -14,7 +14,7 @@ export default async function ProgramsPage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-navy text-white pt-24 pb-32">
+      <section className="relative overflow-hidden bg-navy text-white pt-32 pb-32">
         <div className="absolute inset-0 z-0 opacity-20">
           <div className="absolute top-0 -left-1/4 w-1/2 h-full bg-orange blur-[120px] rounded-full mix-blend-screen" />
           <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-blue-500 blur-[100px] rounded-full mix-blend-screen" />

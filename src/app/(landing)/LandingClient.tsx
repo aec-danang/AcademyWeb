@@ -253,7 +253,7 @@ export default function LandingClient({
       <section style={{ padding: "80px 0", backgroundColor: "var(--color-white)" }}>
         <div className="container" style={{ textAlign: "center", maxWidth: "800px" }}>
           <h2 style={{ fontSize: "var(--text-3xl)", marginBottom: "24px", color: "var(--color-navy)" }}>About Academy English Center</h2>
-          <p style={{ fontSize: "var(--text-lg)", lineHeight: 1.8, color: "var(--color-navy-light)" }}>
+          <p style={{ fontSize: "var(--text-lg)", lineHeight: 1.8, color: "var(--text-muted)" }}>
             Founded in 2006, Academy English Center (AEC) has been a leading English education center in Da Nang. We provide high-quality, international-standard English training to help learners become confident global citizens.
           </p>
         </div>
@@ -273,8 +273,8 @@ export default function LandingClient({
                 <LucideIcons.GraduationCap size={32} />
               </div>
               <div className={styles.bentoContent}>
-                <h3>High-Quality Training</h3>
-                <p>Provide high-quality, diverse, international-standard English training. We ensure every student reaches their full potential with modern methodologies.</p>
+                <h3>{settings.feature_1_title || "High-Quality Training"}</h3>
+                <p>{settings.feature_1_desc || "Provide high-quality, diverse, international-standard English training. We ensure every student reaches their full potential with modern methodologies."}</p>
               </div>
             </div>
             
@@ -284,8 +284,8 @@ export default function LandingClient({
                 <LucideIcons.HeartHandshake size={32} />
               </div>
               <div className={styles.bentoContent}>
-                <h3>Soft Skills</h3>
-                <p>Develop soft skills and life values so learners become confident global citizens.</p>
+                <h3>{settings.feature_2_title || "Soft Skills"}</h3>
+                <p>{settings.feature_2_desc || "Develop soft skills and life values so learners become confident global citizens."}</p>
               </div>
             </div>
 
@@ -295,8 +295,8 @@ export default function LandingClient({
                 <LucideIcons.BookOpen size={32} />
               </div>
               <div className={styles.bentoContent}>
-                <h3>Humanistic Education</h3>
-                <p>Maintain professionalism and humanistic values, putting student character first.</p>
+                <h3>{settings.feature_3_title || "Humanistic Education"}</h3>
+                <p>{settings.feature_3_desc || "Maintain professionalism and humanistic values, putting student character first."}</p>
               </div>
             </div>
 
@@ -306,8 +306,8 @@ export default function LandingClient({
                 <LucideIcons.Globe2 size={32} />
               </div>
               <div className={styles.bentoContent}>
-                <h3>Our Vision & Mission</h3>
-                <p>Build AEC into a dedicated learning community that serves carefully, wholeheartedly, and professionally. We aim to educate people through English so they become successful global citizens responsible toward themselves and the community.</p>
+                <h3>{settings.feature_4_title || "Our Vision & Mission"}</h3>
+                <p>{settings.feature_4_desc || "Build AEC into a dedicated learning community that serves carefully, wholeheartedly, and professionally. We aim to educate people through English so they become successful global citizens responsible toward themselves and the community."}</p>
               </div>
             </div>
           </div>

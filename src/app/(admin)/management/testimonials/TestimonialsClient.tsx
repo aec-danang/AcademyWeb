@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Switch } from "@/components/ui/switch";
 
 type Testimonial = {
   id: string;
@@ -242,7 +243,7 @@ export default function TestimonialsClient({ initialTestimonials }: { initialTes
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="max-w-[200px] md:max-w-[400px] lg:max-w-[600px] whitespace-normal">
                     <div className="flex flex-col gap-1.5 py-1">
                       {item.score && (
                         <span className="inline-flex items-center text-xs font-bold text-orange dark:text-orange-400 uppercase">
@@ -260,8 +261,8 @@ export default function TestimonialsClient({ initialTestimonials }: { initialTes
                     </div>
                   </TableCell>
                   <TableCell className="text-right px-6">
-                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900" onClick={() => openEdit(item)}>
+                    <div className="flex items-center justify-end gap-1">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-orange hover:bg-orange/10" onClick={() => openEdit(item)}>
                         <Edit2 className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(item.id)}>
@@ -337,42 +338,43 @@ export default function TestimonialsClient({ initialTestimonials }: { initialTes
             </div>
 
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
+              <div className="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40">
+                <Switch
                   id="isHallOfFame"
                   checked={formData.isHallOfFame}
-                  onChange={(e) => setFormData({ ...formData, isHallOfFame: e.target.checked })}
-                  className="rounded border-slate-300 dark:border-slate-700 dark:bg-slate-900 w-4 h-4 text-orange focus:ring-orange"
+                  onCheckedChange={(checked) => setFormData({ ...formData, isHallOfFame: checked })}
+                  className="data-[state=checked]:bg-orange"
                 />
                 <div className="flex flex-col">
-                  <label htmlFor="isHallOfFame" className="text-sm font-medium dark:text-slate-200 cursor-pointer">Hall of Fame</label>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Add to Hall of Fame section</span>
+                  <label htmlFor="isHallOfFame" className="text-sm font-semibold dark:text-slate-200 cursor-pointer">Hall of Fame</label>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">Add to Hall of Fame</span>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
+              <div className="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40">
+                <Switch
                   id="isFeatured"
                   checked={formData.isFeatured}
-                  onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
-                  className="rounded border-slate-300 dark:border-slate-700 dark:bg-slate-900 w-4 h-4 text-orange focus:ring-orange"
+                  onCheckedChange={(checked) => setFormData({ ...formData, isFeatured: checked })}
+                  className="data-[state=checked]:bg-orange"
                 />
                 <div className="flex flex-col">
-                  <label htmlFor="isFeatured" className="text-sm font-medium dark:text-slate-200 cursor-pointer">Featured</label>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Pin to the front page</span>
+                  <label htmlFor="isFeatured" className="text-sm font-semibold dark:text-slate-200 cursor-pointer">Featured</label>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">Pin to the front page</span>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 pt-2">
-              <input
-                type="checkbox"
+            
+            <div className="flex items-center justify-between p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 mt-2">
+              <div className="flex flex-col">
+                <label htmlFor="published" className="text-sm font-semibold dark:text-slate-200 cursor-pointer">Published</label>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Make this testimonial visible publicly</span>
+              </div>
+              <Switch
                 id="published"
                 checked={formData.published}
-                onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
-                className="rounded border-slate-300 dark:border-slate-700 dark:bg-slate-900 w-4 h-4 text-orange focus:ring-orange"
+                onCheckedChange={(checked) => setFormData({ ...formData, published: checked })}
+                className="data-[state=checked]:bg-orange"
               />
-              <label htmlFor="published" className="text-sm font-medium dark:text-slate-200 cursor-pointer">Published</label>
             </div>
           </div>
           <div className="px-6 py-5 bg-slate-50/80 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/80 flex justify-end gap-3">

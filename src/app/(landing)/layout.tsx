@@ -13,11 +13,16 @@ export default async function LandingLayout({
     orderBy: { order: "asc" },
   });
 
+  const programs = await prisma.siteProgram.findMany({
+    where: { published: true },
+    orderBy: { order: "asc" },
+  });
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-1">{children}</main>
-      <Footer sponsors={sponsors} />
+      <Footer sponsors={sponsors} programs={programs} />
     </div>
   );
 }

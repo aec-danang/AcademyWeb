@@ -274,10 +274,10 @@
   border: none;
 }
 
-.bentoCard1 h3, .bentoCard4 h3 {
+.bentoCard1 .bentoContent h3, .bentoCard4 .bentoContent h3 {
   color: var(--color-white);
 }
-.bentoCard1 p, .bentoCard4 p {
+.bentoCard1 .bentoContent p, .bentoCard4 .bentoContent p {
   color: #aeb0cc;
 }
 

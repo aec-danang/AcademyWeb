@@ -42,7 +42,6 @@ const navItems = [
   { name: "Posts", path: "/management/posts", icon: Newspaper },
   { name: "Programs", path: "/management/programs", icon: BookOpen },
   { name: "Sponsors", path: "/management/sponsors", icon: FileText },
-  { name: "Features", path: "/management/features", icon: Star },
   { name: "Testimonials", path: "/management/testimonials", icon: MessageSquare },
   { name: "Submissions", path: "/management/submissions", icon: Target },
   { name: "Notifications", path: "/management/notifications", icon: Bell },
