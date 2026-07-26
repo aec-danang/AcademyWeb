@@ -33,12 +33,12 @@ export default function BlogListClient({ posts }: { posts: Post[] }) {
 
   if (posts.length === 0) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm p-12 text-center max-w-2xl mx-auto">
-        <div className="w-20 h-20 bg-orange-light rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-12 text-center max-w-2xl mx-auto border border-slate-200/60 dark:border-slate-800">
+        <div className="w-20 h-20 bg-orange/10 rounded-full flex items-center justify-center mx-auto mb-6">
           <BookOpen className="text-orange w-10 h-10" />
         </div>
-        <h3 className="text-2xl font-bold text-navy mb-2 font-montserrat">Chưa có bài viết nào</h3>
-        <p className="text-navy/60">Chúng tôi đang chuẩn bị những bài viết thú vị. Vui lòng quay lại sau nhé!</p>
+        <h3 className="text-2xl font-bold text-navy dark:text-white mb-2">Chưa có bài viết nào</h3>
+        <p className="text-slate-500 dark:text-slate-400">Chúng tôi đang chuẩn bị những bài viết thú vị. Vui lòng quay lại sau nhé!</p>
       </div>
     );
   }
@@ -50,7 +50,7 @@ export default function BlogListClient({ posts }: { posts: Post[] }) {
           <Link
             key={post.slug}
             href={`/posts/${post.slug}`}
-            className="group flex flex-col lg:flex-row bg-white rounded-2xl shadow-sm hover:shadow-card transition-all duration-300 overflow-hidden border border-gray-100"
+            className="group flex flex-col lg:flex-row bg-white dark:bg-slate-900 rounded-2xl shadow-[0_8px_30px_rgba(44,45,101,0.06)] dark:shadow-none hover:shadow-[0_12px_40px_rgba(44,45,101,0.12)] dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] hover:-translate-y-2 border border-slate-200/60 dark:border-slate-800 transition-all duration-300 overflow-hidden"
           >
             {post.featuredImage && (
               <div className="relative w-full lg:w-2/5 h-56 lg:h-auto overflow-hidden shrink-0">
@@ -63,22 +63,24 @@ export default function BlogListClient({ posts }: { posts: Post[] }) {
                 />
               </div>
             )}
-            <div className="p-6 lg:p-8 flex flex-col justify-center flex-grow">
-              <div className="flex items-center gap-2 text-sm text-navy/50 mb-3 font-semibold">
+            <div className="p-8 lg:p-10 flex flex-col justify-center flex-grow">
+              <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-4 font-semibold">
                 <CalendarDays size={16} />
                 <span>{new Date(post.createdAt).toLocaleDateString("vi-VN")}</span>
               </div>
-              <h3 className="text-xl font-bold mb-3 text-navy group-hover:text-orange transition-colors line-clamp-2 font-montserrat">
+              <h3 className="text-xl font-bold mb-4 text-navy dark:text-slate-100 group-hover:text-orange transition-colors line-clamp-2">
                 {post.title}
               </h3>
               {post.excerpt && (
-                <p className="text-navy/70 mb-4 line-clamp-3 lg:line-clamp-2 text-sm leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-400 mb-8 line-clamp-3 lg:line-clamp-2 text-sm leading-relaxed">
                   {post.excerpt}
                 </p>
               )}
-              <div className="mt-auto flex items-center font-bold text-orange text-sm tracking-wider uppercase transition-all">
-                Xem chi tiết{" "}
-                <ArrowRight size={16} className="ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+              <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center font-bold text-navy dark:text-slate-200 group-hover:text-orange text-sm uppercase tracking-wider transition-colors">
+                Xem chi tiết
+                <span className="ml-auto w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-orange group-hover:text-white transition-colors">
+                  <ArrowRight size={18} />
+                </span>
               </div>
             </div>
           </Link>
@@ -87,14 +89,14 @@ export default function BlogListClient({ posts }: { posts: Post[] }) {
 
       {/* Load More */}
       {hasMore && (
-        <div className="mt-12 flex flex-col items-center gap-3">
-          <p className="text-sm text-navy/50 font-medium">
+        <div className="mt-16 flex flex-col items-center gap-4">
+          <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
             Hiển thị {shown.length} / {posts.length} bài viết
           </p>
           <button
             onClick={handleLoadMore}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-full border-2 border-orange text-orange font-bold hover:bg-orange hover:text-white transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 shadow-sm transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
               <Loader2 size={18} className="animate-spin" />

@@ -151,6 +151,7 @@ export default async function BlogPostPage({ params }: Props) {
         )}
 
         <article
+          suppressHydrationWarning
           className="prose prose-lg max-w-none
             prose-headings:font-montserrat prose-headings:text-navy prose-headings:font-bold
             prose-p:text-navy/80 prose-p:leading-relaxed

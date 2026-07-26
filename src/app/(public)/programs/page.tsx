@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Clock, Target } from "lucide-react";
 import Image from "next/image";
+import GsapReveal from "@/components/animations/GsapReveal";
 
 export default async function ProgramsPage() {
   const programs = await prisma.siteProgram.findMany({
@@ -20,18 +21,16 @@ export default async function ProgramsPage() {
           <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-blue-500 blur-[100px] rounded-full mix-blend-screen" />
         </div>
         
-        <div className="container relative z-10 max-w-4xl mx-auto text-center px-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-6">
-            <span className="w-2 h-2 rounded-full bg-orange animate-pulse" />
-            <span className="text-sm font-medium tracking-wide">AEC Bright Learning System</span>
+        <GsapReveal className="container relative z-10 max-w-4xl mx-auto text-center px-4" target=".gsap-target > *">
+          <div className="gsap-target">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+              Our <span className="text-orange">Programs</span>
+            </h1>
+            <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+              Explore our wide range of English courses designed for all ages and goals. Unlock your full potential with our proven methodology.
+            </p>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Our <span className="text-orange">Programs</span>
-          </h1>
-          <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Explore our wide range of English courses designed for all ages and goals. Unlock your full potential with our proven methodology.
-          </p>
-        </div>
+        </GsapReveal>
         
         {/* Decorative wave at the bottom */}
         <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
@@ -43,13 +42,13 @@ export default async function ProgramsPage() {
       
       {/* Programs Grid */}
       <section className="py-20 bg-slate-50 dark:bg-slate-950 relative -mt-10">
-        <div className="container mx-auto px-4 max-w-7xl">
+        <GsapReveal className="container mx-auto px-4 max-w-7xl" target=".gsap-item" delay={0.2}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {programs.map((program, idx) => (
               <div 
                 key={program.id} 
                 id={program.slug}
-                className="group flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-2 border border-slate-200/60 dark:border-slate-800 transition-all duration-300 overflow-hidden"
+                className="gsap-item group flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-2 border border-slate-200/60 dark:border-slate-800 transition-all duration-300 overflow-hidden"
               >
                 <div className="h-48 bg-slate-100 dark:bg-slate-800 relative overflow-hidden flex items-center justify-center border-b border-slate-100 dark:border-slate-800">
                   {/* Abstract placeholder background pattern */}
@@ -90,7 +89,7 @@ export default async function ProgramsPage() {
               </div>
             ))}
           </div>
-        </div>
+        </GsapReveal>
       </section>
       
       <TestimonialsSection />
