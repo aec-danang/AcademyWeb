@@ -7,6 +7,18 @@
       "skillPath": "skills/claimable-postgres/SKILL.md",
       "computedHash": "c41d3ca7dd8f55958912b7d316b1e77f2d4d1f5891f3ce51f80ad3df104b982b"
     },
+    "frontend-ui-engineering": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-ui-engineering/SKILL.md",
+      "computedHash": "3a5d4a84e52710f2d724ff68813fba0d61db4f2a232a9d0b0050a8fec08b3e82"
+    },
+    "hallmark": {
+      "source": "nutlope/hallmark",
+      "sourceType": "github",
+      "skillPath": "skills/hallmark/SKILL.md",
+      "computedHash": "d3a20aae61e43793d74932c92b63bcad5882e73ec1c8545b858910fd95b25136"
+    },
     "neon": {
       "source": "neondatabase/agent-skills",
       "sourceType": "github",
