@@ -23,29 +23,29 @@ export default function SubmissionsClient({ initialSubmissions }: { initialSubmi
     try {
       await updateSubmissionStatus(id, newStatus);
       setSubmissions(submissions.map(s => s.id === id ? { ...s, status: newStatus } : s));
-      toast.success(`Submission status updated to ${newStatus}`);
+      toast.success(`Đã cập nhật trạng thái liên hệ`);
     } catch (error) {
-      toast.error("Failed to update lead status");
+      toast.error("Không thể cập nhật trạng thái");
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this lead?")) return;
+    if (!confirm("Bạn có chắc chắn muốn xóa đăng ký tư vấn này?")) return;
     try {
       await deleteSubmission(id);
       setSubmissions(submissions.filter(s => s.id !== id));
-      toast.success("Submission deleted successfully");
+      toast.success("Đã xóa đăng ký tư vấn");
     } catch (error) {
-      toast.error("Failed to delete lead");
+      toast.error("Không thể xóa thông tin này");
     }
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto py-8">
+    <div className="space-y-6 max-w-6xl mx-auto py-4">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-navy dark:text-white">Contact Submissions</h1>
-          <p className="text-slate-500 dark:text-slate-400">View and manage contact form submissions</p>
+          <h1 className="text-2xl font-bold text-navy dark:text-white">Đăng ký tư vấn & Liên hệ</h1>
+          <p className="text-slate-500 dark:text-slate-400">Xem và quản lý danh sách phụ huynh, học viên đăng ký tư vấn từ website</p>
         </div>
       </div>
 
@@ -54,19 +54,19 @@ export default function SubmissionsClient({ initialSubmissions }: { initialSubmi
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
-                <th className="p-4 font-medium text-slate-500 dark:text-slate-400">Name</th>
-                <th className="p-4 font-medium text-slate-500 dark:text-slate-400">Contact</th>
-                <th className="p-4 font-medium text-slate-500 dark:text-slate-400">Program Interest</th>
-                <th className="p-4 font-medium text-slate-500 dark:text-slate-400">Date</th>
-                <th className="p-4 font-medium text-slate-500 dark:text-slate-400">Status</th>
-                <th className="p-4 font-medium text-slate-500 dark:text-slate-400 text-right">Actions</th>
+                <th className="p-4 font-medium text-slate-500 dark:text-slate-400">Họ tên</th>
+                <th className="p-4 font-medium text-slate-500 dark:text-slate-400">Thông tin liên hệ</th>
+                <th className="p-4 font-medium text-slate-500 dark:text-slate-400">Khóa học quan tâm / Lời nhắn</th>
+                <th className="p-4 font-medium text-slate-500 dark:text-slate-400">Ngày gửi</th>
+                <th className="p-4 font-medium text-slate-500 dark:text-slate-400">Trạng thái</th>
+                <th className="p-4 font-medium text-slate-500 dark:text-slate-400 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {submissions.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-slate-500">
-                    No submissions found.
+                    Chưa có đăng ký tư vấn nào.
                   </td>
                 </tr>
               ) : (
@@ -78,17 +78,17 @@ export default function SubmissionsClient({ initialSubmissions }: { initialSubmi
                       {submission.email && <div className="text-sm">{submission.email}</div>}
                     </td>
                     <td className="p-4 text-slate-600 dark:text-slate-400">
-                      {submission.message?.replace("Interested in: ", "")}
+                      {submission.message?.replace("Interested in: ", "Quan tâm: ")}
                     </td>
                     <td className="p-4 text-slate-500 dark:text-slate-400 text-sm" suppressHydrationWarning>
-                      {new Date(submission.createdAt).toLocaleDateString()}
+                      {new Date(submission.createdAt).toLocaleDateString("vi-VN")}
                     </td>
                     <td className="p-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         submission.status === 'contacted' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 
                         'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                       }`}>
-                        {submission.status === 'contacted' ? 'Contacted' : 'New'}
+                        {submission.status === 'contacted' ? 'Đã liên hệ' : 'Mới'}
                       </span>
                     </td>
                     <td className="p-4 text-right">
@@ -98,10 +98,11 @@ export default function SubmissionsClient({ initialSubmissions }: { initialSubmi
                             variant="outline" 
                             size="sm"
                             onClick={() => handleStatusChange(submission.id, 'contacted')}
-                            className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20 h-8 px-2"
-                            title="Mark as Contacted"
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20 h-8 px-2.5 text-xs font-semibold"
+                            title="Đánh dấu đã liên hệ"
                           >
-                            <CheckCircle className="h-4 w-4" />
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Đã tư vấn
                           </Button>
                         )}
                         {submission.status === 'contacted' && (
@@ -109,10 +110,11 @@ export default function SubmissionsClient({ initialSubmissions }: { initialSubmi
                             variant="outline" 
                             size="sm"
                             onClick={() => handleStatusChange(submission.id, 'new')}
-                            className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 h-8 px-2"
-                            title="Mark as New"
+                            className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 h-8 px-2.5 text-xs font-semibold"
+                            title="Đánh dấu chờ xử lý"
                           >
-                            <Clock className="h-4 w-4" />
+                            <Clock className="h-4 w-4 mr-1" />
+                            Chưa tư vấn
                           </Button>
                         )}
                         <Button 

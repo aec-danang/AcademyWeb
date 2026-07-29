@@ -66,9 +66,32 @@ model Post {
   authorId        String?
   excerpt         String?
   featuredImage   String?
+  featuredImageId String?
   metaDescription String?
   metaTitle       String?
   author          User?    @relation(fields: [authorId], references: [id])
+  featuredMedia   Media?   @relation("FeaturedImageMedia", fields: [featuredImageId], references: [id], onDelete: SetNull)
+  categories      String[] @default([])
+  tags            String[] @default([])
+  canonicalUrl    String?
+
+  @@schema("public")
+}
+
+model Media {
+  id          String   @id @default(cuid())
+  provider    String   @default("cloudinary")
+  publicId    String   @unique
+  secureUrl   String
+  width       Int?
+  height      Int?
+  bytes       Int?
+  format      String?
+  folder      String?  @default("academy_media")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  postsAsFeatured Post[] @relation("FeaturedImageMedia")
 
   @@schema("public")
 }
@@ -287,6 +310,8 @@ enum EnrollmentStatus {
   REJECTED
   ACTIVE
   REMOVED
+  CANCELLED
+  LEFT
 
   @@schema("elearning")
 }
@@ -321,6 +346,8 @@ enum SubmissionStatus {
   SUBMITTED
   GRADED
   MISSING
+  RETURNED
+  REVISION_REQUESTED
 
   @@schema("elearning")
 }
@@ -361,6 +388,8 @@ enum ExamSkill {
   SPEAKING
   GRAMMAR
   MIXED
+  VOCABULARY
+  PRONUNCIATION
 
   @@schema("elearning")
 }
@@ -386,14 +415,14 @@ model ClassSection {
   name        String
   code        String       @unique
   status      ClassStatus  @default(ACTIVE)
-  courseId    String
+  courseId    String?
   teacherId   String?
   startAt     DateTime?
   endAt       DateTime?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   assignments Assignment[]
-  course      Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course      Course?       @relation(fields: [courseId], references: [id], onDelete: Cascade)
   enrollments Enrollment[]
   quizzes     Quiz[]
   teacher     User?        @relation("ClassTeacher", fields: [teacherId], references: [id], onDelete: SetNull)
@@ -634,7 +663,7 @@ model Grade {
   quizId       String?
   attemptId    String?     @unique
   submissionId String?     @unique
-  score        Float
+  score        Float?
   feedback     String?
   gradedById   String?
   createdAt    DateTime    @default(now())
@@ -697,4 +726,18 @@ model SiteFeature {
   updatedAt   DateTime @updatedAt
 
   @@schema("public")
+}
+enum DeliveryStatus {
+  PENDING
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  @@schema("elearning")
+}
+
+enum LessonProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  @@schema("elearning")
 }

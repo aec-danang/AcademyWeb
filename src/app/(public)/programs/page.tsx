@@ -2,9 +2,19 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import FaqSection from "@/components/FaqSection";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Clock, Target } from "lucide-react";
+import { ArrowRight, BookOpenCheck, Compass, FileBadge2, GraduationCap, PlaneTakeoff, Rocket, Smile } from "lucide-react";
 import Image from "next/image";
 import GsapReveal from "@/components/animations/GsapReveal";
+
+const iconMap: Record<string, React.ReactNode> = {
+  Smile: <Smile size={32} />,
+  Rocket: <Rocket size={32} />,
+  Compass: <Compass size={32} />,
+  PlaneTakeoff: <PlaneTakeoff size={32} />,
+  GraduationCap: <GraduationCap size={32} />,
+  BookOpenCheck: <BookOpenCheck size={32} />,
+  FileBadge2: <FileBadge2 size={32} />
+};
 
 export default async function ProgramsPage() {
   const programs = await prisma.siteProgram.findMany({
@@ -24,10 +34,10 @@ export default async function ProgramsPage() {
         <GsapReveal className="container relative z-10 max-w-4xl mx-auto text-center px-4" target=".gsap-target > *">
           <div className="gsap-target">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Our <span className="text-orange">Programs</span>
+              Các <span className="text-orange">Chương Trình</span>
             </h1>
             <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Explore our wide range of English courses designed for all ages and goals. Unlock your full potential with our proven methodology.
+              Khám phá đa dạng các khóa học tiếng Anh chuẩn quốc tế. Khơi dậy toàn bộ tiềm năng của bạn với phương pháp giảng dạy độc quyền của chúng tôi.
             </p>
           </div>
         </GsapReveal>
@@ -44,7 +54,7 @@ export default async function ProgramsPage() {
       <section className="py-20 bg-slate-50 dark:bg-slate-950 relative -mt-10">
         <GsapReveal className="container mx-auto px-4 max-w-7xl" target=".gsap-item" delay={0.2}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {programs.map((program, idx) => (
+            {programs.map((program) => (
               <div 
                 key={program.id} 
                 id={program.slug}
@@ -54,32 +64,28 @@ export default async function ProgramsPage() {
                   {/* Abstract placeholder background pattern */}
                   <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-navy via-transparent to-transparent group-hover:scale-110 transition-transform duration-700" />
                   
-                  {/* Dynamic Icon based on program type/idx */}
+                  {/* Dynamic Icon based on program type */}
                   <div className="relative z-10 w-20 h-20 rounded-2xl bg-white dark:bg-slate-900 shadow-md flex items-center justify-center text-orange group-hover:scale-110 group-hover:bg-orange group-hover:text-white transition-all duration-300">
-                    {idx % 3 === 0 ? <BookOpen size={32} /> : idx % 3 === 1 ? <Target size={32} /> : <Clock size={32} />}
+                    {iconMap[program.iconValue] || <BookOpenCheck size={32} />}
                   </div>
                 </div>
                 
                 <div className="p-8 flex flex-col flex-grow">
                   <div className="mb-4">
                     <span className="inline-block px-3 py-1 rounded-full bg-orange/10 text-orange text-xs font-bold uppercase tracking-wider mb-3">
-                      All Levels
+                      {program.description}
                     </span>
                     <h2 className="text-2xl font-bold text-navy dark:text-slate-100 group-hover:text-orange transition-colors">
                       {program.title}
                     </h2>
                   </div>
                   
-                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-8 flex-grow">
-                    {program.description}
-                  </p>
-                  
                   <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800">
                     <Link 
                       href={`/programs/${program.slug}`} 
                       className="inline-flex items-center justify-between w-full font-bold text-navy dark:text-slate-200 group-hover:text-orange transition-colors"
                     >
-                      <span>Explore Program</span>
+                      <span>Khám Phá Chương Trình</span>
                       <span className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-orange group-hover:text-white transition-colors">
                         <ArrowRight size={18} />
                       </span>

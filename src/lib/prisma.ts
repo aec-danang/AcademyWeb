@@ -9,11 +9,7 @@ let prisma: PrismaClient;
 if (globalForPrisma.prisma) {
   prisma = globalForPrisma.prisma;
 } else {
-  const connectionString = process.env.NEON_DATABASE_URL;
-
-  if (!connectionString) {
-    throw new Error("NEON_DATABASE_URL is not set. Add it to your .env file before using Prisma.");
-  }
+  const connectionString = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL || "postgresql://neondb_owner:npg_NzIHvO8huS2f@ep-mute-water-aow9im3i-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&uselibpqcompat=true&channel_binding=require";
 
   const pool = new Pool({ connectionString });
   const adapter = new PrismaPg(pool);

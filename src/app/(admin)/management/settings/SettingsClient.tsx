@@ -20,24 +20,24 @@ type UserInfo = {
 } | null;
 
 const DEFAULT_KEYS = [
-  { key: "contact_email", label: "Contact Email", placeholder: "contact@example.com" },
-  { key: "contact_phone", label: "Contact Phone", placeholder: "+1 234 567 890" },
-  { key: "facebook_url", label: "Facebook URL", placeholder: "https://facebook.com/..." },
-  { key: "address", label: "Physical Address", placeholder: "123 Street Name..." },
-  { key: "footer_text", label: "Footer Text", placeholder: "© 2026 Academy English Center..." },
+  { key: "contact_email", label: "Email liên hệ", placeholder: "contact@aec.edu.vn" },
+  { key: "contact_phone", label: "Số điện thoại Hotline", placeholder: "090 123 4567" },
+  { key: "facebook_url", label: "Địa chỉ Facebook Fanpage", placeholder: "https://facebook.com/..." },
+  { key: "address", label: "Địa chỉ trụ sở chính", placeholder: "Số 123 Đường Nguyễn Văn Cừ..." },
+  { key: "footer_text", label: "Văn bản bản quyền Footer", placeholder: "© 2026 Anh ngữ AEC. Tất cả quyền được bảo lưu." },
 ];
 
 const STATS_KEYS = [
-  { key: "stats_native_teachers", label: "Native Teachers", placeholder: "e.g. 44" },
-  { key: "stats_happy_students", label: "Happy Students", placeholder: "e.g. 15,000+" },
-  { key: "stats_years_experience", label: "Years Experience", placeholder: "e.g. 15" },
+  { key: "stats_native_teachers", label: "Giáo viên bản xứ", placeholder: "Ví dụ: 44" },
+  { key: "stats_happy_students", label: "Học viên hài lòng", placeholder: "Ví dụ: 15,000+" },
+  { key: "stats_years_experience", label: "Năm kinh nghiệm", placeholder: "Ví dụ: 15" },
 ];
 
 const FEATURES_KEYS = [
-  { prefix: "feature_1", titleKey: "feature_1_title", descKey: "feature_1_desc", defaultTitle: "High-Quality Training", defaultDesc: "Provide high-quality, diverse, international-standard English training. We ensure every student reaches their full potential with modern methodologies." },
-  { prefix: "feature_2", titleKey: "feature_2_title", descKey: "feature_2_desc", defaultTitle: "Soft Skills", defaultDesc: "Develop soft skills and life values so learners become confident global citizens." },
-  { prefix: "feature_3", titleKey: "feature_3_title", descKey: "feature_3_desc", defaultTitle: "Humanistic Education", defaultDesc: "Maintain professionalism and humanistic values, putting student character first." },
-  { prefix: "feature_4", titleKey: "feature_4_title", descKey: "feature_4_desc", defaultTitle: "Our Vision & Mission", defaultDesc: "Build AEC into a dedicated learning community that serves carefully, wholeheartedly, and professionally. We aim to educate people through English so they become successful global citizens responsible toward themselves and the community." },
+  { prefix: "feature_1", titleKey: "feature_1_title", descKey: "feature_1_desc", defaultTitle: "Đào tạo chất lượng cao", defaultDesc: "Cung cấp chương trình Tiếng Anh đa dạng, đạt chuẩn quốc tế giúp học viên phát triển toàn diện." },
+  { prefix: "feature_2", titleKey: "feature_2_title", descKey: "feature_2_desc", defaultTitle: "Kỹ năng mềm toàn diện", defaultDesc: "Rèn luyện kỹ năng sống và giá trị bản thân giúp người học tự tin trở thành công dân toàn cầu." },
+  { prefix: "feature_3", titleKey: "feature_3_title", descKey: "feature_3_desc", defaultTitle: "Giáo dục nhân văn", defaultDesc: "Duy trì sự chuyên nghiệp, chuẩn mực và đặt sự phát triển tính cách của học viên lên hàng đầu." },
+  { prefix: "feature_4", titleKey: "feature_4_title", descKey: "feature_4_desc", defaultTitle: "Tầm nhìn & Sứ mệnh", defaultDesc: "Xây dựng AEC thành cộng đồng học tập tận tâm, phục vụ chuyên nghiệp và hết lòng vì sự thành công của học viên." },
 ];
 
 export default function SettingsClient({ initialSettings, user }: { initialSettings: Setting[], user?: UserInfo }) {
@@ -71,8 +71,8 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
         try {
           await updateAdminAccount(user.id, updates);
         } catch (e) {
-          console.error("Failed to update account", e);
-          alert("Failed to update account information.");
+          console.error("Lỗi cập nhật tài khoản", e);
+          alert("Không thể cập nhật thông tin tài khoản.");
         }
       }
     }
@@ -103,29 +103,32 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
 
     try {
       await saveSettings(finalSettings);
-      alert("Settings saved successfully!");
+      alert("Đã lưu cài đặt hệ thống thành công!");
       if (accountData.password) {
         setAccountData(prev => ({ ...prev, password: "" })); // Clear password field after save
       }
     } catch (e) {
       console.error(e);
-      alert("Failed to save site settings.");
+      alert("Không thể lưu cài đặt trang web.");
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h2 className="text-3xl font-bold tracking-tight text-navy dark:text-white">Settings</h2>
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight text-navy dark:text-white">Cấu hình Hệ thống</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Quản lý thông tin liên hệ, chỉ số trang chủ và tài khoản cá nhân.</p>
+        </div>
         <Button 
-          className="bg-orange hover:bg-orange-hover text-white" 
+          className="bg-orange hover:bg-orange-hover text-white shadow-lg shadow-orange/20 font-semibold" 
           onClick={handleSave}
           disabled={isSaving}
         >
           <Save className="mr-2 h-4 w-4" />
-          {isSaving ? "Saving..." : "Save All Settings"}
+          {isSaving ? "Đang lưu..." : "Lưu tất cả thay đổi"}
         </Button>
       </div>
 
@@ -133,37 +136,40 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
         
         {/* Account Settings */}
         {user && (
-          <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
+          <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-[#0f172a]">
             <CardHeader>
-              <CardTitle>Account Information</CardTitle>
-              <CardDescription>Manage your admin profile. Leave password blank to keep it unchanged.</CardDescription>
+              <CardTitle>Thông tin Tài khoản Quản trị</CardTitle>
+              <CardDescription>Cập nhật thông tin cá nhân của bạn. Để trống mật khẩu nếu không muốn thay đổi.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-2">
-                <label className="text-sm font-medium">Name</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Họ và tên</label>
                 <Input 
                   type="text" 
-                  placeholder="Admin Name"
+                  placeholder="Tên quản trị viên"
                   value={accountData.name}
                   onChange={e => setAccountData(prev => ({ ...prev, name: e.target.value }))}
+                  className="rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/80"
                 />
               </div>
               <div className="grid gap-2">
-                <label className="text-sm font-medium">Email</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Địa chỉ Email</label>
                 <Input 
                   type="email" 
-                  placeholder="admin@example.com"
+                  placeholder="admin@aec.edu.vn"
                   value={accountData.email}
                   onChange={e => setAccountData(prev => ({ ...prev, email: e.target.value }))}
+                  className="rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/80"
                 />
               </div>
               <div className="grid gap-2">
-                <label className="text-sm font-medium">New Password</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Mật khẩu mới</label>
                 <Input 
                   type="password" 
-                  placeholder="Enter new password..."
+                  placeholder="Nhập mật khẩu mới..."
                   value={accountData.password}
                   onChange={e => setAccountData(prev => ({ ...prev, password: e.target.value }))}
+                  className="rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/80"
                 />
               </div>
             </CardContent>
@@ -171,17 +177,17 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
         )}
 
         {/* Standard Settings */}
-        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
+        <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-[#0f172a]">
           <CardHeader>
-            <CardTitle>Standard Settings</CardTitle>
-            <CardDescription>Core contact info and basic site details.</CardDescription>
+            <CardTitle>Thông tin Liên hệ & Footer</CardTitle>
+            <CardDescription>Các thông tin liên lạc hiển thị công khai trên giao diện người dùng.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {DEFAULT_KEYS.map((item) => (
               <div key={item.key} className="grid gap-2">
-                <label className="text-sm font-medium flex items-center">
+                <label className="text-sm font-semibold flex items-center text-slate-700 dark:text-slate-300">
                   {item.label} 
-                  <span className="text-xs text-muted-foreground ml-2 font-normal">({item.key})</span>
+                  <span className="text-xs text-slate-400 ml-2 font-normal">({item.key})</span>
                 </label>
                 {item.key === "footer_text" || item.key === "address" ? (
                   <Textarea 
@@ -189,6 +195,7 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
                     value={settingsMap[item.key] || ""}
                     onChange={e => handleStandardChange(item.key, e.target.value)}
                     rows={2}
+                    className="rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/80 resize-none"
                   />
                 ) : (
                   <Input 
@@ -196,6 +203,7 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
                     placeholder={item.placeholder}
                     value={settingsMap[item.key] || ""}
                     onChange={e => handleStandardChange(item.key, e.target.value)}
+                    className="rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/80"
                   />
                 )}
               </div>
@@ -203,100 +211,76 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
           </CardContent>
         </Card>
 
-        {/* Stats Counters */}
-        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
+        {/* Home Page Stats */}
+        <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-[#0f172a]">
           <CardHeader>
-            <CardTitle>Stats Counters</CardTitle>
-            <CardDescription>Manage the numeric statistics displayed on the landing page.</CardDescription>
+            <CardTitle>Chỉ số ấn tượng Trang chủ</CardTitle>
+            <CardDescription>Các con số thống kê nổi bật hiển thị ở giao diện chính.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 grid sm:grid-cols-3 gap-6 sm:space-y-0">
+          <CardContent className="grid sm:grid-cols-3 gap-4">
             {STATS_KEYS.map((item) => (
               <div key={item.key} className="grid gap-2">
-                <label className="text-sm font-medium">{item.label}</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">{item.label}</label>
                 <Input 
                   type="text" 
                   placeholder={item.placeholder}
                   value={settingsMap[item.key] || ""}
                   onChange={e => handleStandardChange(item.key, e.target.value)}
+                  className="rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/80"
                 />
               </div>
             ))}
           </CardContent>
         </Card>
 
-        {/* Landing Page Content */}
-        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
+        {/* Feature Cards (Why Choose Us & Vision/Mission) */}
+        <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-[#0f172a]">
           <CardHeader>
-            <CardTitle>Landing Page Content</CardTitle>
-            <CardDescription>Configure text and imagery for the public site's homepage.</CardDescription>
+            <CardTitle>Đặc điểm nổi bật & Tầm nhìn</CardTitle>
+            <CardDescription>Tùy chỉnh nội dung 4 thẻ giới thiệu giá trị cốt lõi của học viện trên trang chủ.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <h4 className="font-semibold text-slate-800 dark:text-slate-200">Hero Section</h4>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium">Hero Headline</label>
-                <Input type="text" defaultValue="Learn English. Build Confidence. Become a Global Citizen." />
-              </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium">Hero Subheadline</label>
-                <Textarea rows={3} defaultValue="Join AEC Da Nang to unlock your potential with our expert teachers and proven methodology." />
-              </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium">Hero Background Image URL</label>
-                <Input type="text" defaultValue="/images/hero-bg.jpg" />
-              </div>
-            </div>
-
-            <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-              <h4 className="font-semibold text-slate-800 dark:text-slate-200">About Us Section</h4>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium">About Heading</label>
-                <Input type="text" defaultValue="Why Choose Academy English Center?" />
-              </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium">About Description</label>
-                <Textarea rows={5} defaultValue="At AEC, we believe that learning English is more than just passing exams; it's about connecting with the world..." />
-              </div>
-            </div>
-
-            <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-              <div className="mb-4">
-                <h4 className="font-semibold text-slate-800 dark:text-slate-200">Features (Why Choose AEC?)</h4>
-                <p className="text-sm text-slate-500">Edit the four main bento box features displayed on the landing page.</p>
-              </div>
-              
-              <div className="grid sm:grid-cols-2 gap-4">
-                {FEATURES_KEYS.map((fk, idx) => (
-                  <div key={fk.prefix} className="grid gap-4 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40">
-                    <h5 className="text-sm font-bold text-navy dark:text-white flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-orange/10 text-orange flex items-center justify-center text-xs">{idx + 1}</span>
-                      Feature {idx + 1}
-                    </h5>
-                    <div className="grid gap-2">
-                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Title</label>
-                      <Input 
-                        type="text" 
-                        placeholder={fk.defaultTitle}
-                        value={settingsMap[fk.titleKey] || ""}
-                        onChange={e => handleStandardChange(fk.titleKey, e.target.value)}
-                        className="bg-white dark:bg-slate-900"
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</label>
-                      <Textarea 
-                        rows={3} 
-                        placeholder={fk.defaultDesc}
-                        value={settingsMap[fk.descKey] || ""}
-                        onChange={e => handleStandardChange(fk.descKey, e.target.value)}
-                        className="bg-white dark:bg-slate-900 resize-none"
-                      />
-                    </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {FEATURES_KEYS.map((fk, idx) => (
+                <div key={fk.prefix} className="grid gap-4 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40">
+                  <h5 className="text-sm font-bold text-navy dark:text-white flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-orange/10 text-orange flex items-center justify-center text-xs">{idx + 1}</span>
+                    Mục {idx + 1}
+                  </h5>
+                  <div className="grid gap-2">
+                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tiêu đề thẻ</label>
+                    <Input 
+                      type="text" 
+                      placeholder={fk.defaultTitle}
+                      value={settingsMap[fk.titleKey] || ""}
+                      onChange={e => handleStandardChange(fk.titleKey, e.target.value)}
+                      className="bg-white dark:bg-slate-900 rounded-xl"
+                    />
                   </div>
-                ))}
-              </div>
+                  <div className="grid gap-2">
+                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Nội dung chi tiết</label>
+                    <Textarea 
+                      rows={3} 
+                      placeholder={fk.defaultDesc}
+                      value={settingsMap[fk.descKey] || ""}
+                      onChange={e => handleStandardChange(fk.descKey, e.target.value)}
+                      className="bg-white dark:bg-slate-900 resize-none rounded-xl"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
+          <CardFooter className="pt-2 pb-6 border-t border-slate-100 dark:border-slate-800/80 flex justify-end">
+            <Button 
+              className="bg-orange hover:bg-orange-hover text-white shadow-lg shadow-orange/20 font-semibold" 
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              {isSaving ? "Đang lưu..." : "Lưu tất cả thay đổi"}
+            </Button>
+          </CardFooter>
         </Card>
 
       </div>
