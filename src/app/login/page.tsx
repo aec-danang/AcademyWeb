@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, Suspense, useState } from "react";
+import React, { useRef, Suspense, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
@@ -25,7 +25,20 @@ function AuthContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const saved = localStorage.getItem("rememberedAccount");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.identifier) setIdentifier(parsed.identifier);
+        if (parsed.password) setPassword(parsed.password);
+        setRememberMe(true);
+      } catch (e) {}
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +59,11 @@ function AuthContent() {
       }
 
       if (res?.ok) {
+        if (rememberMe) {
+          localStorage.setItem("rememberedAccount", JSON.stringify({ identifier, password }));
+        } else {
+          localStorage.removeItem("rememberedAccount");
+        }
         const sessionRes = await fetch("/api/auth/session");
         const session = await sessionRes.json();
         
@@ -176,8 +194,20 @@ function AuthContent() {
             )}
 
             {isLogin && (
-              <div className={styles.forgotPassword}>
-                Quên mật khẩu?
+              <div className={styles.rememberForgot}>
+                <label className={styles.rememberMe}>
+                  <input 
+                    type="checkbox" 
+                    className={styles.checkbox}
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    disabled={isLoading}
+                  />
+                  Ghi nhớ tài khoản
+                </label>
+                <div className={styles.forgotPassword}>
+                  Quên mật khẩu?
+                </div>
               </div>
             )}
 

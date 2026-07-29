@@ -5,7 +5,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma db push && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate"
@@ -45,6 +45,7 @@
     "lucide-react": "^1.17.0",
     "next": "16.2.7",
     "next-auth": "^4.24.14",
+    "next-cloudinary": "^6.17.5",
     "next-intl": "^4.13.2",
     "next-themes": "^0.4.6",
     "pg": "^8.21.0",

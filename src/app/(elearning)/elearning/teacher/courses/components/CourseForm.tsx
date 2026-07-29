@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ImagePlus, Save, ArrowLeft, BookOpen, Layers, Target, Languages } from "lucide-react";
 import Link from "next/link";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { Course } from "../mock-data";
 import styles from "../../../elearning.module.css";
 
@@ -167,58 +168,18 @@ export default function CourseForm({ initialData, isEditing = false }: CourseFor
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">Course Thumbnail</label>
-                <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 flex flex-col items-center justify-center text-center bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer group relative overflow-hidden">
-                  {formData.thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={formData.thumbnail} alt="Thumbnail" className="absolute inset-0 w-full h-full object-cover" />
-                  ) : (
-                    <>
-                      <div className="h-12 w-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-3">
-                        <ImagePlus className="h-6 w-6" />
-                      </div>
-                      <p className="text-sm font-medium text-slate-900">Upload thumbnail</p>
-                      <p className="text-xs text-slate-500 mt-1">Recommended: 1280x720</p>
-                    </>
-                  )}
-                  {formData.thumbnail && (
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                       <span className="text-white text-sm font-medium">Change image</span>
-                    </div>
-                  )}
-                </div>
-                <Input 
-                   name="thumbnail" 
-                   placeholder="Or enter image URL" 
-                   value={formData.thumbnail}
-                   onChange={handleChange}
-                   className="mt-2 text-sm"
+                <ImageUpload 
+                  value={formData.thumbnail}
+                  onChange={(url) => setFormData(prev => ({ ...prev, thumbnail: url }))}
                 />
+                <p className="text-xs text-slate-500 mt-1">Recommended: 1280x720</p>
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">Cover Image</label>
-                <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 flex flex-col items-center justify-center text-center bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer group relative overflow-hidden h-32">
-                  {formData.coverImage ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={formData.coverImage} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
-                  ) : (
-                    <>
-                      <ImagePlus className="h-6 w-6 text-slate-400 mb-2" />
-                      <p className="text-sm font-medium text-slate-900">Upload cover</p>
-                    </>
-                  )}
-                  {formData.coverImage && (
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                       <span className="text-white text-sm font-medium">Change image</span>
-                    </div>
-                  )}
-                </div>
-                 <Input 
-                   name="coverImage" 
-                   placeholder="Or enter image URL" 
-                   value={formData.coverImage}
-                   onChange={handleChange}
-                   className="mt-2 text-sm"
+                <ImageUpload 
+                  value={formData.coverImage}
+                  onChange={(url) => setFormData(prev => ({ ...prev, coverImage: url }))}
                 />
               </div>
             </CardContent>

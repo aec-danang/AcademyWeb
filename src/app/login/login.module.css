@@ -129,6 +129,30 @@
   color: var(--color-orange);
 }
 
+.rememberForgot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.rememberMe {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-sm);
+  color: var(--color-navy);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-orange);
+}
+
 .submitBtn {
   margin-top: 8px;
   width: 100%;
