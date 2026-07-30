@@ -4,7 +4,6 @@ import {
   BookOpen,
   ChevronDown,
   ClipboardList,
-  Filter,
   RotateCcw,
   Search,
   Target,
@@ -13,12 +12,15 @@ import {
 import styles from "../elearning.module.css";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
+import { startQuizReviewAttemptAction } from "@/lib/lmsActions";
+import type { Prisma } from "@prisma/client";
 
 type Props = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export const dynamic = "force-dynamic";
+type WrongAnswerRecord = Prisma.AttemptAnswerGetPayload<{ include: { option: true; question: { include: { options: true } }; attempt: { include: { student: true; quizDelivery: { include: { classSection: true } }; quiz: { include: { program: true; classSection: true } } } } } }>;
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -65,44 +67,59 @@ function correctAnswerText(question: {
 }
 
 export async function WrongQuestionsTab({ searchParams }: Props) {
-  const user = await requireUser(["STUDENT"]);
+  const user = await requireUser();
+  const isStudent = user.role === "STUDENT";
   const resolvedSearchParams = await searchParams;
-  const selectedCourse = searchValue(resolvedSearchParams?.course);
-  const selectedProgram = searchValue(resolvedSearchParams?.program);
-  const selectedSkill = searchValue(resolvedSearchParams?.skill);
-  const selectedQuiz = searchValue(resolvedSearchParams?.quiz);
   const searchTerm = searchValue(resolvedSearchParams?.q);
   const normalizedSearch = searchTerm.trim().toLowerCase();
 
-  const wrongAnswers = await prisma.attemptAnswer.findMany({
-    where: {
-      isCorrect: false,
-      attempt: {
-        studentId: user.id,
-        status: { not: "IN_PROGRESS" },
+  let wrongAnswers: WrongAnswerRecord[] = [];
+
+  try {
+    wrongAnswers = await prisma.attemptAnswer.findMany({
+      where: {
+        isCorrect: false,
+        attempt: {
+          isReviewPractice: false,
+          ...(isStudent
+            ? { studentId: user.id }
+            : user.role === "TEACHER"
+              ? {
+                  OR: [
+                    { quizDelivery: { classSection: { teacherId: user.id } } },
+                    { quiz: { classSection: { teacherId: user.id } } },
+                  ],
+                }
+              : {}),
+          status: { not: "IN_PROGRESS" },
+        },
       },
-    },
-    orderBy: { updatedAt: "desc" },
-    include: {
-      option: true,
-      question: { include: { options: { orderBy: { order: "asc" } } } },
-      attempt: {
-        include: {
-          quiz: {
-            include: {
-              program: true,
-              classSection: { include: { course: true } },
+      orderBy: { updatedAt: "desc" },
+      include: {
+        option: true,
+        question: { include: { options: { orderBy: { order: "asc" } } } },
+        attempt: {
+          include: {
+            student: true,
+            quizDelivery: { include: { classSection: true } },
+            quiz: {
+              include: {
+                program: true,
+                classSection: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error("Failed to load wrong questions:", error);
+  }
 
   type WrongAnswer = (typeof wrongAnswers)[number];
   const groups = new Map<string, { answers: WrongAnswer[] }>();
   for (const answer of wrongAnswers) {
-    const key = `${answer.attempt.quizId}:${answer.questionId}`;
+    const key = `${answer.attempt.studentId}:${answer.attempt.quizId}:${answer.questionId}`;
     const group = groups.get(key);
     if (group) {
       group.answers.push(answer);
@@ -114,6 +131,7 @@ export async function WrongQuestionsTab({ searchParams }: Props) {
   const cards = Array.from(groups.values()).map((group) => {
     const latest = group.answers[0];
     const quiz = latest.attempt.quiz;
+    const classroom = latest.attempt.quizDelivery?.classSection || quiz.classSection;
     const question = latest.question;
     const latestWrongAt = latest.attempt.submittedAt || latest.updatedAt;
 
@@ -121,11 +139,15 @@ export async function WrongQuestionsTab({ searchParams }: Props) {
       key: `${quiz.id}:${question.id}`,
       questionId: question.id,
       quizId: quiz.id,
+      quizDeliveryId: latest.attempt.quizDeliveryId,
       quizTitle: quiz.title,
       isPracticeTest: quiz.isPracticeTest,
-      courseId: quiz.classSection?.course?.id || "practice_test",
-      courseTitle: quiz.classSection?.course?.title || "Practice Tests",
-      classCode: quiz.classSection?.code || "Practice",
+      classroomId: classroom?.id || "open_quiz",
+      classroomName: classroom?.name || "Open quiz",
+      classCode: classroom?.code || "Practice",
+      studentId: latest.attempt.studentId,
+      studentName: latest.attempt.student.name || latest.attempt.student.email || "Student",
+      studentEmail: latest.attempt.student.email,
       programCode: quiz.program?.code || "General",
       programName: quiz.program?.name || "General",
       skill: quiz.skill,
@@ -141,7 +163,6 @@ export async function WrongQuestionsTab({ searchParams }: Props) {
       wrongCount: group.answers.length,
       latestAnswer: answerText(latest),
       reviewHref: `/elearning/exercises/${quiz.id}?attempt=${latest.attemptId}`,
-      practiceHref: `/elearning/exercises/${quiz.id}`,
       searchText: [
         question.text,
         question.explanation,
@@ -150,220 +171,254 @@ export async function WrongQuestionsTab({ searchParams }: Props) {
         quiz.program?.name,
         quiz.unit,
         quiz.skill,
-        quiz.classSection?.course?.title,
+        classroom?.name,
+        latest.attempt.student.name,
+        latest.attempt.student.email,
       ].filter(Boolean).join(" ").toLowerCase(),
     };
   });
 
-  const courseOptions = uniqueBy(
-    cards.map((card) => ({ id: card.courseId, title: card.courseTitle })),
-    (course) => course.id,
+  const studentOptions = uniqueBy(
+    cards.map((card) => ({ id: card.studentId, title: card.studentName })),
+    (student) => student.id,
   ).sort((a, b) => a.title.localeCompare(b.title, "en", { numeric: true }));
-  const programOptions = uniqueBy(
-    cards.map((card) => ({ code: card.programCode, name: card.programName })).filter((program) => program.code !== "General"),
-    (program) => program.code,
-  ).sort((a, b) => a.code.localeCompare(b.code, "en", { numeric: true }));
-  const skillOptions = Array.from(new Set(cards.map((card) => card.skill))).sort();
-  const quizOptions = uniqueBy(
-    cards.map((card) => ({ id: card.quizId, title: card.quizTitle })),
-    (quiz) => quiz.id,
-  ).sort((a, b) => a.title.localeCompare(b.title, "en", { numeric: true }));
-
   const filteredCards = cards.filter((card) => {
-    if (selectedCourse && card.courseId !== selectedCourse) return false;
-    if (selectedProgram && card.programCode !== selectedProgram) return false;
-    if (selectedSkill && card.skill !== selectedSkill) return false;
-    if (selectedQuiz && card.quizId !== selectedQuiz) return false;
-    if (normalizedSearch && !card.searchText.includes(normalizedSearch)) return false;
+    if (isStudent) return true;
+    if (normalizedSearch && ![
+      card.classroomName,
+      card.classCode,
+      card.studentName,
+      card.studentEmail,
+    ].filter(Boolean).join(" ").toLowerCase().includes(normalizedSearch)) return false;
     return true;
   });
+  type WrongQuestionCard = (typeof filteredCards)[number];
+  type QuizGroup = {
+    quizId: string;
+    quizTitle: string;
+    classroomName: string;
+    studentName: string;
+    programCode: string;
+    classCode: string;
+    quizDeliveryId: string | null;
+    cards: WrongQuestionCard[];
+  };
+  const groupedCards = Array.from(filteredCards.reduce<Map<string, QuizGroup>>((acc, card) => {
+    const groupKey = isStudent ? card.quizId : `${card.classroomId}:${card.studentId}:${card.quizId}`;
+    if (!acc.has(groupKey)) {
+      acc.set(groupKey, { quizId: card.quizId, quizDeliveryId: card.quizDeliveryId, quizTitle: card.quizTitle, classroomName: card.classroomName, studentName: card.studentName, programCode: card.programCode, classCode: card.classCode, cards: [] });
+    }
+    acc.get(groupKey)?.cards.push(card);
+    return acc;
+  }, new Map()).values());
+  type TeacherStudentGroup = {
+    studentId: string;
+    studentName: string;
+    studentEmail: string | null;
+    quizzes: QuizGroup[];
+    cards: WrongQuestionCard[];
+  };
+  type TeacherClassGroup = {
+    classroomId: string;
+    classroomName: string;
+    classCode: string;
+    students: TeacherStudentGroup[];
+    cards: WrongQuestionCard[];
+  };
+  const teacherClassGroups = Array.from(filteredCards.reduce<Map<string, TeacherClassGroup>>((classMap, card) => {
+    const classroom = classMap.get(card.classroomId) || {
+      classroomId: card.classroomId,
+      classroomName: card.classroomName,
+      classCode: card.classCode,
+      students: [],
+      cards: [],
+    };
+    classroom.cards.push(card);
+    let student = classroom.students.find((item) => item.studentId === card.studentId);
+    if (!student) {
+      student = {
+        studentId: card.studentId,
+        studentName: card.studentName,
+        studentEmail: card.studentEmail,
+        quizzes: [],
+        cards: [],
+      };
+      classroom.students.push(student);
+    }
+    student.cards.push(card);
+    let studentQuiz = student.quizzes.find((item) => item.quizId === card.quizId);
+    if (!studentQuiz) {
+      studentQuiz = {
+        quizId: card.quizId,
+        quizTitle: card.quizTitle,
+        classroomName: card.classroomName,
+        studentName: card.studentName,
+        programCode: card.programCode,
+        classCode: card.classCode,
+        quizDeliveryId: card.quizDeliveryId,
+        cards: [],
+      };
+      student.quizzes.push(studentQuiz);
+    }
+    studentQuiz.cards.push(card);
+    classMap.set(card.classroomId, classroom);
+    return classMap;
+  }, new Map()).values()).sort((a, b) => a.classroomName.localeCompare(b.classroomName, "en", { numeric: true }));
 
   return (
     <div className={styles.quizPageShell}>
-      <section className={styles.quizHero}>
-        <div>
-          <span className={styles.cockpitEyebrow}><Target size={16} /> Wrong Question Bank</span>
-          <h1>Review the questions that need another look.</h1>
-          <p>
-            This page is generated from your real submitted attempts. No mock data, no extra table: just the questions marked incorrect in AttemptAnswer.
-          </p>
+      <section className={styles.wrongCompactHeader}>
+        <div className={styles.wrongCompactTitle}>
+          <span className={styles.wrongCompactIcon}><Target size={20} /></span>
+          <div>
+            <span>{isStudent ? "Review practice" : "Classroom mistakes"}</span>
+            <h1>{isStudent ? "Quizzes to practise again" : "Wrong questions by classroom"}</h1>
+            <p>
+              {isStudent
+                ? "Choose a completed quiz. Practice attempts never change your submitted score."
+                : "Open a class, choose a student, then inspect a quiz only when needed."}
+            </p>
+          </div>
         </div>
-        <div className={styles.quizHeroStats}>
-          <div><strong>{cards.length}</strong><span>Wrong questions</span></div>
-          <div><strong>{wrongAnswers.length}</strong><span>Total misses</span></div>
-          <div><strong>{quizOptions.length}</strong><span>Source quizzes</span></div>
+        <div className={styles.wrongCompactStats}>
+          {isStudent ? (
+            <>
+              <span><strong>{groupedCards.length}</strong> quizzes</span>
+              <span><strong>{cards.length}</strong> wrong</span>
+            </>
+          ) : (
+            <>
+              <span><strong>{teacherClassGroups.length}</strong> classes</span>
+              <span><strong>{studentOptions.length}</strong> students</span>
+              <span><strong>{filteredCards.length}</strong> wrong</span>
+            </>
+          )}
         </div>
       </section>
 
-      <form className={styles.quizFilterPanel} action="/elearning/practice">
-        <input type="hidden" name="tab" value="wrong" />
-        <div className={styles.quizFilterHeader}>
-          <div>
-            <span className={styles.cockpitEyebrow}><Filter size={16} /> Focus filters</span>
-            <h2>Choose what to review</h2>
-          </div>
-        </div>
-        <div className={styles.quizFilterGrid}>
-          <label className={styles.quizSearchControl}>
-            <span>Search</span>
-            <div>
-              <Search size={16} />
-              <input name="q" defaultValue={searchTerm} placeholder="Search question, quiz, explanation..." />
-            </div>
-          </label>
-          <label>
-            <span>Course</span>
-            <select name="course" defaultValue={selectedCourse}>
-              <option value="">All courses</option>
-              {courseOptions.map((course) => <option key={course.id} value={course.id}>{course.title}</option>)}
-            </select>
-          </label>
-          <label>
-            <span>Program</span>
-            <select name="program" defaultValue={selectedProgram}>
-              <option value="">All programs</option>
-              {programOptions.map((program) => <option key={program.code} value={program.code}>{program.code} - {program.name}</option>)}
-            </select>
-          </label>
-          <label>
-            <span>Skill</span>
-            <select name="skill" defaultValue={selectedSkill}>
-              <option value="">All skills</option>
-              {skillOptions.map((skill) => <option key={skill} value={skill}>{formatSkill(skill)}</option>)}
-            </select>
-          </label>
-          <label>
-            <span>Quiz</span>
-            <select name="quiz" defaultValue={selectedQuiz}>
-              <option value="">All quizzes</option>
-              {quizOptions.map((quiz) => <option key={quiz.id} value={quiz.id}>{quiz.title}</option>)}
-            </select>
-          </label>
-        </div>
-        <div className={styles.quizFilterActions}>
-          <button className="btn-primary" type="submit">Apply filters</button>
-          <Link href="/elearning/practice?tab=wrong" className="btn-secondary">Clear filters</Link>
-        </div>
-      </form>
+      {!isStudent ? (
+        <form className={styles.wrongCompactSearch} action="/elearning/practice">
+          <input type="hidden" name="tab" value="wrong" />
+          <Search size={18} />
+          <input
+            type="search"
+            name="q"
+            defaultValue={searchTerm}
+            aria-label="Search classroom or student"
+            placeholder="Search classroom or student..."
+          />
+          <button className="btn-primary" type="submit">Search</button>
+          {searchTerm ? <Link href="/elearning/practice?tab=wrong">Clear</Link> : null}
+        </form>
+      ) : null}
 
       {cards.length === 0 ? (
         <section className={styles.quizEmptyState}>
           <Trophy size={42} />
           <h2>No wrong questions yet</h2>
           <p>Once you submit quizzes and miss questions, your focused review bank will appear here.</p>
-          <Link href="/elearning/exercises" className="btn-primary">Go to quizzes</Link>
+          <Link href="/elearning/practice?tab=quizzes" className="btn-primary">Go to quizzes</Link>
         </section>
       ) : filteredCards.length === 0 ? (
         <section className={styles.quizEmptyState}>
           <Search size={42} />
           <h2>No questions match these filters</h2>
-          <p>Clear the filters to review all incorrect questions.</p>
-          <Link href="/elearning/practice?tab=wrong" className="btn-primary">Clear filters</Link>
+          <p>Try another classroom or student name.</p>
+          <Link href="/elearning/practice?tab=wrong" className="btn-primary">Clear search</Link>
         </section>
       ) : (
-        <div className={styles.wrongQuestionGroups}>
-          {Array.from(
-            filteredCards.reduce((acc, card) => {
-              if (!acc.has(card.quizId)) {
-                acc.set(card.quizId, {
-                  quizId: card.quizId,
-                  quizTitle: card.quizTitle,
-                  courseTitle: card.courseTitle,
-                  programCode: card.programCode,
-                  classCode: card.classCode,
-                  practiceHref: card.practiceHref,
-                  cards: [],
-                });
-              }
-              acc.get(card.quizId)!.cards.push(card);
-              return acc;
-            }, new Map<string, any>()).values()
-          ).map((group: any) => (
-            <details key={group.quizId} className={styles.quizGroupDetails}>
-              <summary className={styles.quizGroupSummary}>
-                <div className={styles.quizGroupSummaryHeader}>
-                  <h3>
-                    <Target size={18} /> {group.quizTitle}
-                  </h3>
-                  <span>
-                    <ClipboardList size={14} /> {group.courseTitle} | {group.programCode} | {group.classCode}
-                  </span>
+        isStudent ? (
+          <section className={styles.studentReviewGrid}>
+            {groupedCards.map((group) => (
+              <article key={group.quizId} className={styles.studentReviewCard}>
+                <div className={styles.studentReviewIcon}><Target size={24} /></div>
+                <div className={styles.studentReviewCopy}>
+                  <span>{group.programCode} · {group.classCode}</span>
+                  <h2>{group.quizTitle}</h2>
+                  <p>{group.classroomName}</p>
                 </div>
-                <div className={styles.quizGroupSummaryMeta}>
-                  <span className={styles.quizGroupCountBadge}>
-                    {group.cards.length} {group.cards.length === 1 ? "mistake" : "mistakes"}
-                  </span>
-                  <ChevronDown className={styles.quizGroupChevron} size={20} />
+                <div className={styles.studentReviewCount}>
+                  <strong>{group.cards.length}</strong>
+                  <span>wrong</span>
                 </div>
-              </summary>
-              <div className={styles.quizGroupContent}>
-                <section className={styles.wrongQuestionGrid}>
-                  {group.cards.map((card: any) => (
-                    <article key={card.key} className={styles.wrongQuestionCard}>
-                      <div className={styles.wrongQuestionHeader}>
-                        <div className={styles.quizTypeIcon}><AlertCircle size={22} /></div>
-                        <div>
-                          <span>{card.quizTitle}</span>
-                          <h2>{card.questionType}</h2>
-                        </div>
+                <div className={styles.studentReviewActions}>
+                  <form action={startQuizReviewAttemptAction}>
+                    <input type="hidden" name="quizId" value={group.quizId} />
+                    <input type="hidden" name="scope" value="wrong" />
+                    {group.quizDeliveryId ? <input type="hidden" name="quizDeliveryId" value={group.quizDeliveryId} /> : null}
+                    <button type="submit" className="btn-primary"><RotateCcw size={16} /> Retry wrong</button>
+                  </form>
+                  <form action={startQuizReviewAttemptAction}>
+                    <input type="hidden" name="quizId" value={group.quizId} />
+                    <input type="hidden" name="scope" value="full" />
+                    {group.quizDeliveryId ? <input type="hidden" name="quizDeliveryId" value={group.quizDeliveryId} /> : null}
+                    <button type="submit" className="btn-secondary"><BookOpen size={16} /> Full quiz</button>
+                  </form>
+                </div>
+              </article>
+            ))}
+          </section>
+        ) : (
+          <section className={styles.teacherWrongExplorer}>
+            {teacherClassGroups.map((classroom) => (
+              <details key={classroom.classroomId} className={styles.teacherClassGroup}>
+                <summary>
+                  <span className={styles.teacherClassIcon}><ClipboardList size={20} /></span>
+                  <div><small>{classroom.classCode}</small><strong>{classroom.classroomName}</strong></div>
+                  <div className={styles.teacherGroupMetrics}>
+                    <span><b>{classroom.students.length}</b> {classroom.students.length === 1 ? "student" : "students"}</span>
+                    <span><b>{classroom.cards.length}</b> mistakes</span>
+                  </div>
+                  <ChevronDown size={20} />
+                </summary>
+                <div className={styles.teacherStudentList}>
+                  {classroom.students.map((student) => (
+                    <details key={student.studentId} className={styles.teacherStudentGroup}>
+                      <summary>
+                        <span className={styles.teacherStudentAvatar}>{student.studentName.charAt(0).toUpperCase()}</span>
+                        <div><strong>{student.studentName}</strong><small>{student.studentEmail || "Student"}</small></div>
+                        <span className={styles.quizGroupCountBadge}>{student.cards.length} wrong</span>
+                        <ChevronDown size={18} />
+                      </summary>
+                      <div className={styles.teacherQuizList}>
+                        {student.quizzes.map((quiz) => (
+                          <details key={quiz.quizId} className={styles.teacherQuizGroup}>
+                            <summary>
+                              <span className={styles.teacherQuizIcon}><Target size={17} /></span>
+                              <div>
+                                <strong>{quiz.quizTitle}</strong>
+                                <small>{quiz.programCode} · {formatSkill(quiz.cards[0]?.skill || "MIXED")}</small>
+                              </div>
+                              <span className={styles.quizGroupCountBadge}>{quiz.cards.length} wrong</span>
+                              <ChevronDown size={17} />
+                            </summary>
+                            <div className={styles.teacherWrongList}>
+                              {quiz.cards.map((card, index) => (
+                                <article key={card.key} className={styles.teacherWrongRow}>
+                                  <span className={styles.teacherWrongNumber}>{index + 1}</span>
+                                  <div className={styles.teacherWrongMain}>
+                                    <header><div><strong>{card.questionText}</strong></div><span>{dateFormatter.format(card.latestWrongAt)}</span></header>
+                                    <div className={styles.teacherAnswerCompare}>
+                                      <div><span>Student answered</span><strong>{card.latestAnswer}</strong></div>
+                                      <div><span>Correct answer</span><strong>{card.correctAnswer}</strong></div>
+                                      <div><span>Missed</span><strong>{card.wrongCount}×</strong></div>
+                                    </div>
+                                    {card.explanation ? <p className={styles.teacherExplanation}><AlertCircle size={15} /> {card.explanation}</p> : null}
+                                  </div>
+                                  <Link href={card.reviewHref} className="btn-secondary"><BookOpen size={15} /> Open attempt</Link>
+                                </article>
+                              ))}
+                            </div>
+                          </details>
+                        ))}
                       </div>
-                      <div className={styles.quizBadgeRow}>
-                        <span>{card.programCode}</span>
-                        <span>{formatSkill(card.skill)}</span>
-                        <span>{card.classCode}</span>
-                        {card.unit ? <span>Unit {card.unit}</span> : null}
-                      </div>
-                      {card.passage ? <div className={styles.reviewPassage}>{card.passage}</div> : null}
-                      {card.audioUrl ? (
-                        <audio controls src={card.audioUrl} className={styles.reviewAudio}>
-                          Your browser does not support audio.
-                        </audio>
-                      ) : null}
-                      <p className={styles.wrongQuestionText}>{card.questionText}</p>
-                      <div className={styles.reviewAnswerGrid}>
-                        <div>
-                          <span>Your last answer</span>
-                          <strong>{card.latestAnswer}</strong>
-                        </div>
-                        <div>
-                          <span>Correct answer</span>
-                          <strong>{card.correctAnswer}</strong>
-                        </div>
-                        <div>
-                          <span>Last missed</span>
-                          <strong>{dateFormatter.format(card.latestWrongAt)}</strong>
-                        </div>
-                        <div>
-                          <span>Miss count</span>
-                          <strong>{card.wrongCount}</strong>
-                        </div>
-                      </div>
-                      {card.explanation ? (
-                        <div className={styles.reviewExplanation}>
-                          <strong>Explanation</strong>
-                          <p>{card.explanation}</p>
-                        </div>
-                      ) : null}
-                      <div className={styles.wrongQuestionActions}>
-                        <Link href={card.practiceHref} className="btn-primary">
-                          <RotateCcw size={16} /> Practice again
-                        </Link>
-                        <Link href={card.reviewHref} className="btn-secondary">
-                          <BookOpen size={16} /> Review source
-                        </Link>
-                      </div>
-                    </article>
+                    </details>
                   ))}
-                </section>
-                <div className={styles.quizGroupActions}>
-                  <Link href={group.practiceHref} className="btn-primary">
-                    <RotateCcw size={16} /> Practice all wrong questions from this quiz
-                  </Link>
                 </div>
-              </div>
-            </details>
-          ))}
-        </div>
+              </details>
+            ))}
+          </section>
+        )
       )}
     </div>
   );

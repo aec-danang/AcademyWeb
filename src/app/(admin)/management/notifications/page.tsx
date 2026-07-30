@@ -1,24 +1,16 @@
-import { Bell, CheckCircle2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function NotificationsPage() {
   return (
-    <div className="space-y-6 relative pb-20">
-      <div className="flex flex-col gap-2">
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Thông báo Hệ thống</h2>
-        <p className="text-slate-500 dark:text-slate-400">Xem danh sách cảnh báo, cập nhật và tin nhắn hệ thống gần đây.</p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold tracking-tight text-navy dark:text-white">Notifications</h2>
       </div>
-      
-      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden min-h-[400px] flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center animate-in fade-in zoom-in duration-500">
-          <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center mb-2 shadow-sm border border-slate-100 dark:border-slate-800">
-            <CheckCircle2 className="h-8 w-8 text-emerald-500" />
-          </div>
-          <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Bạn đã cập nhật tất cả thông báo!</h3>
-          <p className="text-slate-500 dark:text-slate-400 max-w-sm">
-            Hiện tại chưa có thông báo mới nào. Mọi tin nhắn hoặc cảnh báo hệ thống mới sẽ xuất hiện tại đây.
-          </p>
-        </div>
-      </div>
+      <Card>
+        <CardContent className="pt-6">
+          <p className="text-muted-foreground text-center py-8">You have no new notifications.</p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
