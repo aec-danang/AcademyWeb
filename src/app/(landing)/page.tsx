@@ -57,6 +57,10 @@ export default async function LandingPage() {
     take: 3
   });
 
+  const studentLifeEvents = await prisma.studentLifeEvent.findMany({
+    orderBy: { order: 'asc' }
+  });
+
   return (
     <LandingClient 
       programs={programs} 
@@ -66,6 +70,7 @@ export default async function LandingPage() {
       news={news}
       posts={posts}
       testimonials={testimonials}
+      studentLifeEvents={studentLifeEvents}
     />
   );
 }

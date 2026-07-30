@@ -13,12 +13,11 @@ export default async function ElearningLayout({ children }: { children: React.Re
 
   return (
     <AnimatedLayoutWrapper>
-      <div className={styles.elearningContainer}>
+      <div className={`${styles.elearningContainer} `}>
         <ElearningSidebar user={{ name: user.name, email: user.email, role: user.role }} />
 
           <div className={styles.elearningBody}>
             <main className={styles.mainContent}>
-              {user.role === "TEACHER" ? <TeacherSetupProgress /> : null}
               {children}
             </main>
         </div>

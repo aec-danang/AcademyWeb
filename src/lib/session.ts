@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
@@ -11,8 +12,10 @@ export async function getCurrentUser() {
 
   if (!email) {
     // --- MOCK FOR E-LEARNING DEV ---
-    // MẸO: Đổi giá trị TEST_ROLE thành "TEACHER" hoặc "STUDENT" để test các chức năng tương ứng
-    const TEST_ROLE: AppRole = "TEACHER"; 
+    // Reads demo_role cookie set by the DemoRoleSwitcher
+    const cookieStore = await cookies();
+    const demoRoleCookie = cookieStore.get("demo_role")?.value;
+    const TEST_ROLE: AppRole = (demoRoleCookie as AppRole) || "TEACHER"; 
     
     return {
       id: TEST_ROLE === "TEACHER" ? "mock-teacher-id" : "mock-student-id",

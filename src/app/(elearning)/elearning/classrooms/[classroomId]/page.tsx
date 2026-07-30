@@ -15,6 +15,7 @@ import {
   UserMinus,
   Users,
   Trash2,
+  CheckSquare,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
@@ -24,6 +25,7 @@ import { ElearningBreadcrumbs } from "../../ElearningBreadcrumbs";
 import { AssignmentComposer } from "../../assignments/AssignmentComposer";
 import { StudentImportForm } from "./StudentImportForm";
 import { ConfirmSubmitButton } from "./ConfirmSubmitButton";
+import { AttendanceBoard } from "./AttendanceBoard";
 import styles from "../../elearning.module.css";
 
 type Props = {
@@ -77,8 +79,8 @@ export default async function ClassroomHubPage({ params, searchParams }: Props) 
     include: { _count: { select: { questions: true } } },
   }) : [];
   const tabs = isManager
-    ? ["overview", "students", "assignments", "quizzes", "scores", "activity", "settings"]
-    : ["overview", "assignments", "quizzes", "scores"];
+    ? ["overview", "students", "attendance", "assignments", "quizzes", "scores", "activity", "settings"]
+    : ["overview", "attendance", "assignments", "quizzes", "scores"];
   const activeTab = tabs.includes(requestedTab) ? requestedTab : "overview";
   const activeEnrollments = classroom.enrollments.filter((item) => item.status === "ACTIVE");
   const pendingEnrollments = classroom.enrollments.filter((item) => item.status === "REQUESTED");
@@ -91,6 +93,7 @@ export default async function ClassroomHubPage({ params, searchParams }: Props) 
   const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const tabIcon: Record<string, React.ReactNode> = {
     overview: <Activity size={16} />, students: <Users size={16} />,
+    attendance: <CheckSquare size={16} />,
     assignments: <FileText size={16} />, quizzes: <ClipboardList size={16} />, scores: <Award size={16} />,
     activity: <Activity size={16} />, settings: <Settings size={16} />,
   };
@@ -164,6 +167,15 @@ export default async function ClassroomHubPage({ params, searchParams }: Props) 
           {pendingEnrollments.length ? <section className={styles.dashboardPanel}><div className={styles.dashboardPanelHeader}><div><span className={styles.cockpitEyebrow}><UserPlus size={16} /> Needs attention</span><h2>Pending enrollments</h2></div></div><div className={styles.classroomRoster}>{pendingEnrollments.map((item) => <div key={item.id}><div><strong>{item.student.name || "Unnamed student"}</strong><p>{item.student.email || "No email"} · Requested {formatDate(item.requestedAt)}</p></div><form action={decideEnrollmentAction}><input type="hidden" name="id" value={item.id} /><button name="decision" value="approve" className="btn-primary">Approve</button><button name="decision" value="reject" className="btn-secondary">Reject</button></form></div>)}</div></section> : null}
           <section className={styles.dashboardPanel}><div className={styles.dashboardPanelHeader}><div><span className={styles.cockpitEyebrow}><Users size={16} /> Roster</span><h2>Active students</h2></div></div>{activeEnrollments.length ? <div className={styles.classroomRoster}>{activeEnrollments.map((item) => <div key={item.id}><div><strong>{item.student.name || "Unnamed student"}</strong><p>{item.student.email || "No email"}</p></div><div className={styles.rosterActions}><span className={styles.scorePill}>Active</span><form action={removeStudentFromClassAction}><input type="hidden" name="enrollmentId" value={item.id} /><input type="hidden" name="classroomId" value={classroom.id} /><ConfirmSubmitButton className={styles.rosterRemoveButton} message={`Remove ${item.student.name || item.student.email || "this student"} from ${classroom.name}? Their account, submissions and score history will be kept.`}><UserMinus size={15} /> Remove</ConfirmSubmitButton></form></div></div>)}</div> : <div className={styles.classroomContextEmpty}><UserPlus size={28} /><strong>No students in this class yet</strong><p>Add an existing account above or share the class code.</p></div>}</section>
           {previousEnrollments.length ? <details className={styles.rosterHistory}><summary>Previous access ({previousEnrollments.length})</summary><div>{previousEnrollments.map((item) => <div key={item.id}><span><strong>{item.student.name || "Unnamed student"}</strong><small>{item.student.email || "No email"}</small></span><em>{item.status}</em></div>)}</div><p>Records remain here for audit. Add the same email again to restore classroom access.</p></details> : null}
+        </div>
+      ) : null}
+
+      {activeTab === "attendance" ? (
+        <div className={styles.classroomHubContent}>
+          <AttendanceBoard 
+            classroomId={classroom.id} 
+            students={activeEnrollments.map(e => e.student)} 
+          />
         </div>
       ) : null}
 

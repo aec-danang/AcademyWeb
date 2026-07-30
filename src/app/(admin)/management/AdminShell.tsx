@@ -2,7 +2,7 @@
 
 import React from "react";
 import { signOut } from "next-auth/react";
-import { LogOut, Moon, Sun } from "lucide-react";
+import { LogOut, Moon, Sun, Search, Bell } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
@@ -42,10 +42,24 @@ export function AdminShell({ children, user }: { children: React.ReactNode; user
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
+              <div className="relative hidden md:block">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm..."
+                  className="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pl-9 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64 transition-all dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200"
+                />
+              </div>
+
               <Button variant="ghost" size="icon" onClick={toggleTheme} title="Toggle theme" className="text-slate-500">
                 {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
+
+              <button className="relative w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-slate-500 dark:border-slate-800 dark:hover:bg-slate-800">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900" />
+              </button>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

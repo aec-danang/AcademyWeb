@@ -131,6 +131,17 @@ model Testimonial {
   @@schema("public")
 }
 
+model StudentLifeEvent {
+  id        String   @id @default(cuid())
+  title     String
+  imageUrl  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@schema("public")
+}
+
 model Faq {
   id        String   @id @default(cuid())
   question  String
@@ -184,11 +195,13 @@ model User {
   questions              Question[]              @relation("QuestionCreator")
   quizzes                Quiz[]                  @relation("QuizCreator")
   submissions            Submission[]            @relation("StudentSubmissions")
+  attendances            Attendance[]            @relation("StudentAttendances")
   quizDeliveriesCreated  QuizDelivery[]          @relation("QuizDeliveryCreator")
   testVersionsCreated    TestVersion[]           @relation("TestVersionCreator")
   teacherAgentSession    TeacherAgentSession?
   teacherAgentExecutions TeacherAgentExecution[]
   teacherWorkflowRuns    TeacherWorkflowRun[]
+  scheduleAdjustments    ClassScheduleAdjustment[] @relation("UserScheduleAdjustments")
 
   @@schema("elearning")
 }
@@ -363,6 +376,33 @@ enum ExamSkill {
   @@schema("elearning")
 }
 
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
+  EXCUSED
+
+  @@schema("elearning")
+}
+
+model Attendance {
+  id             String           @id @default(cuid())
+  classSectionId String
+  studentId      String
+  date           DateTime
+  status         AttendanceStatus @default(PRESENT)
+  note           String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  classSection ClassSection @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+  student      User         @relation("StudentAttendances", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([classSectionId, studentId, date])
+  @@index([classSectionId, date])
+  @@schema("elearning")
+}
+
 model Program {
   id          String   @id @default(cuid())
   code        String   @unique
@@ -392,6 +432,8 @@ model ClassSection {
   quizzes        Quiz[]
   quizDeliveries QuizDelivery[]
   meetings       ClassMeeting[]
+  attendances    Attendance[]
+  scheduleAdjustments ClassScheduleAdjustment[]
   teacher        User?          @relation("ClassTeacher", fields: [teacherId], references: [id], onDelete: SetNull)
   course         Course?        @relation(fields: [courseId], references: [id])
   courseId       String?
@@ -915,6 +957,7 @@ enum MenuPosition {
 
   @@schema("public")
 }
+
 enum ContactSubmissionStatus {
   NEW
   CONTACTED
@@ -922,4 +965,40 @@ enum ContactSubmissionStatus {
   CLOSED
 
   @@schema("public")
+}
+
+model ClassScheduleAdjustment {
+  id             String           @id @default(cuid())
+  classSectionId String
+  userId         String           // The teacher making the request
+  type           AdjustmentType
+  date           DateTime         // Original missed date
+  targetDate     DateTime?        // Proposed makeup date (only if type is MAKEUP)
+  reason         String
+  evidenceUrl    String?
+  status         AdjustmentStatus @default(PENDING)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  classSection   ClassSection     @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+  user           User             @relation("UserScheduleAdjustments", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([classSectionId])
+  @@index([userId])
+  @@schema("elearning")
+}
+
+enum AdjustmentType {
+  ABSENCE
+  MAKEUP
+
+  @@schema("elearning")
+}
+
+enum AdjustmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+
+  @@schema("elearning")
 }

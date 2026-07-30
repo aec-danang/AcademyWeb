@@ -640,3 +640,271 @@
   margin-top: 40px;
 }
 
+
+/* NEW SECTION STYLES FOR HOMEPAGE REFACTOR */
+
+.imagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background-color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: inherit;
+}
+
+/* Our Journey Section */
+.journeySection {
+  padding: 80px 0;
+  background-color: var(--color-white);
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 40px;
+  position: relative;
+  padding-left: 20px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--color-orange);
+}
+
+.timelineItem {
+  position: relative;
+  padding-left: 24px;
+}
+
+.timelineItem::before {
+  content: '';
+  position: absolute;
+  left: -25px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--color-orange);
+  border: 2px solid var(--color-white);
+}
+
+.timelineYear {
+  font-weight: bold;
+  color: var(--color-navy);
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+.timelineDesc {
+  color: var(--text-muted);
+}
+
+@media (min-width: 768px) {
+  .timeline {
+    flex-direction: row;
+    padding-left: 0;
+    margin-top: 60px;
+  }
+  .timeline::before {
+    left: 0;
+    top: 20px;
+    bottom: auto;
+    width: 100%;
+    height: 2px;
+  }
+  .timelineItem {
+    flex: 1;
+    padding-left: 0;
+    padding-top: 40px;
+    text-align: center;
+  }
+  .timelineItem::before {
+    left: 50%;
+    top: 15px;
+    transform: translateX(-50%);
+  }
+}
+
+/* Why Academy Section Grid */
+.whyGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-top: 40px;
+}
+
+@media (min-width: 768px) {
+  .whyGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .whyGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.whyCard {
+  background-color: var(--color-white);
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  border: 1px solid #f0f0f8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.whyCard:hover {
+  transform: translateY(-5px);
+}
+
+.whyIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: rgba(239, 106, 55, 0.1);
+  color: var(--color-orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.whyCard h3 {
+  color: var(--color-navy);
+  margin-bottom: 12px;
+}
+
+.whyCard p {
+  color: var(--text-muted);
+}
+
+/* Learning Support */
+.supportSection {
+  padding: 80px 0;
+  background-color: #f8fafc;
+}
+
+.supportGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-top: 40px;
+}
+
+@media (min-width: 768px) {
+  .supportGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.supportCard {
+  background-color: var(--color-white);
+  padding: 24px;
+  border-radius: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.supportIcon {
+  color: var(--color-orange);
+  flex-shrink: 0;
+}
+
+/* Student Life Gallery */
+.studentLifeSection {
+  padding: 80px 0;
+  background-color: var(--color-white);
+}
+
+.studentLifeGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 40px;
+}
+
+@media (min-width: 768px) {
+  .studentLifeGrid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 250px);
+  }
+  
+  .galleryItem1 { grid-column: 1 / 3; grid-row: 1 / 3; }
+  .galleryItem2 { grid-column: 3; grid-row: 1; }
+  .galleryItem3 { grid-column: 3; grid-row: 2; }
+}
+
+.galleryCard {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  height: 250px;
+}
+
+@media (min-width: 768px) {
+  .galleryItem1 { height: 100%; }
+}
+
+.galleryLabel {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-weight: 600;
+  color: var(--color-navy);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+/* News & Resources Tabs */
+.newsTabsContainer {
+  margin-top: 40px;
+}
+
+.newsTabHeader {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.newsTabBtn {
+  background: none;
+  border: 1px solid #e2e8f0;
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.newsTabBtn.active {
+  background-color: var(--color-navy);
+  color: white;
+  border-color: var(--color-navy);
+}
+
+.newsTabBtn:hover:not(.active) {
+  background-color: #f1f5f9;
+}

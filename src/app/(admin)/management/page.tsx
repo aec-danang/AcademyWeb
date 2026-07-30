@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, School, UserRound, Users } from "lucide-react";
+import { ArrowRight, CheckCircle2, School, UserRound, Users, UserPlus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -21,68 +21,117 @@ export default async function AdminDashboard() {
     prisma.enrollment.count({ where: { status: "REQUESTED" } }),
   ]);
 
-  const metrics = [
-    { label: "Teachers", value: teachers.length, icon: UserRound },
-    { label: "Active classrooms", value: classroomCount, icon: School },
-    { label: "Active students", value: studentCount, icon: Users },
+  const kpis = [
+    { label: "Học viên đang học", value: studentCount, delta: "+12 tháng này", colorVal: "text-blue-600", colorBg: "bg-blue-50", bar: 78, Icon: Users },
+    { label: "Lớp đang mở", value: classroomCount, delta: "3 lớp mới tháng 8", colorVal: "text-emerald-600", colorBg: "bg-emerald-50", bar: 60, Icon: School },
+    { label: "Yêu cầu ghi danh", value: pendingCount, delta: "+8 hôm nay", colorVal: "text-amber-600", colorBg: "bg-amber-50", bar: pendingCount > 0 ? 47 : 0, Icon: UserPlus },
+    { label: "Giáo viên giảng dạy", value: teachers.length, delta: "Ổn định", colorVal: "text-violet-600", colorBg: "bg-violet-50", bar: 71, Icon: UserRound },
   ];
 
   return (
-    <div className="mx-auto grid w-full max-w-[1240px] gap-5">
-      <header className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-indigo-600">Admin overview</p>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-navy sm:text-3xl">Learning at a glance</h2>
-          <p className="mt-2 text-sm text-slate-500">Start with a teacher. Open a class only when you need its roster or activity.</p>
+    <div className="space-y-6 max-w-[1240px] mx-auto w-full">
+      {/* Urgent Banner */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl px-6 py-4 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <span className="text-white text-xl">⚡</span>
+          <div>
+            <p className="text-blue-100 text-xs font-semibold uppercase tracking-wide">Cần xử lý ngay</p>
+            <p className="text-white font-semibold text-sm mt-0.5">
+              {pendingCount} yêu cầu ghi danh · 2 báo nghỉ chờ duyệt · 1 bài viết cần review
+            </p>
+          </div>
         </div>
-        <Link href="/management/teachers" className="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-800">
-          View all teachers <ArrowRight className="h-4 w-4" />
+        <Link href="/management/classrooms" className="bg-white text-blue-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-50 transition-colors whitespace-nowrap">
+          Xử lý ngay
         </Link>
-      </header>
+      </div>
 
-      <section className="grid gap-3 py-0 sm:grid-cols-3" aria-label="Learning summary">
-        {metrics.map(({ label, value, icon: Icon }) => (
-          <article key={label} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <span className="grid h-11 w-11 place-items-center rounded-xl bg-indigo-50 text-indigo-600"><Icon className="h-5 w-5" /></span>
-            <div><strong className="block text-2xl font-black text-navy">{value}</strong><span className="text-sm text-slate-500">{label}</span></div>
-          </article>
+      {/* KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {kpis.map((k) => (
+          <div key={k.label} className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow group dark:bg-slate-900 dark:border-slate-800">
+            <div className="flex items-start justify-between mb-3">
+              <div className={`${k.colorBg} w-9 h-9 rounded-lg flex items-center justify-center ${k.colorVal} transition-transform group-hover:scale-110 duration-200 dark:bg-slate-800`}>
+                <k.Icon size={16} />
+              </div>
+            </div>
+            <p className={`font-bold text-2xl ${k.colorVal}`}>{k.value}</p>
+            <p className="text-sm text-slate-600 font-medium mt-0.5 dark:text-slate-400">{k.label}</p>
+            <div className="mt-3">
+              <div className="bg-slate-100 rounded-full h-1 dark:bg-slate-800">
+                <div className={`h-1 rounded-full ${k.colorVal.replace("text-", "bg-")}`} style={{ width: `${k.bar}%` }} />
+              </div>
+              <p className="text-xs text-slate-400 mt-1.5">{k.delta}</p>
+            </div>
+          </div>
         ))}
-      </section>
+      </div>
 
-      {pendingCount > 0 ? (
-        <Link href="/management/classrooms" className="flex items-center justify-between gap-4 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
-          <span><strong className="block text-sm text-amber-950">{pendingCount} enrollment request{pendingCount === 1 ? "" : "s"} need attention</strong><small className="text-amber-700">Open classrooms to review the requests.</small></span>
-          <ArrowRight className="h-5 w-5 flex-none text-amber-700" />
-        </Link>
-      ) : (
-        <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
-          <CheckCircle2 className="h-5 w-5" /><strong>No enrollment exceptions need attention.</strong>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Teachers Table (Styled like Leads table) */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="font-semibold text-slate-800 dark:text-slate-200">Đội ngũ Giáo viên</h3>
+            <Link href="/management/teachers" className="text-sm text-blue-600 hover:text-blue-700 font-semibold">Xem tất cả →</Link>
+          </div>
+          <div className="divide-y divide-slate-50 dark:divide-slate-800/50">
+            {teachers.slice(0, 6).map((teacher) => {
+              const students = teacher.classSections.reduce((total, classroom) => total + classroom.enrollments.length, 0);
+              const initial = (teacher.name || teacher.email || "?").charAt(0).toUpperCase();
+              return (
+                <div key={teacher.id} className="flex items-center px-5 py-3.5 hover:bg-slate-50/80 transition-colors dark:hover:bg-slate-800/50">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white bg-blue-500 shrink-0">
+                    {initial}
+                  </div>
+                  <div className="ml-3 flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-slate-800 truncate dark:text-slate-200">{teacher.name || "Unnamed teacher"}</p>
+                    <p className="text-xs text-slate-400 truncate">{teacher.email}</p>
+                  </div>
+                  <div className="flex items-center gap-6 ml-4">
+                    <div className="text-right hidden sm:block">
+                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{teacher.classSections.length}</p>
+                      <p className="text-xs text-slate-400">lớp học</p>
+                    </div>
+                    <div className="text-right hidden sm:block">
+                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{students}</p>
+                      <p className="text-xs text-slate-400">học viên</p>
+                    </div>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400`}>
+                      Active
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+            {!teachers.length ? <p className="px-5 py-8 text-center text-sm text-slate-500">Chưa có giáo viên nào.</p> : null}
+          </div>
         </div>
-      )}
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white py-0 shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-          <div><p className="text-xs font-extrabold uppercase tracking-[0.12em] text-indigo-500">Teachers</p><h3 className="mt-1 text-lg font-black text-navy">Teaching team</h3></div>
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{teachers.length}</span>
+        {/* Action Panel */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 dark:bg-slate-900 dark:border-slate-800">
+          <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-4">Lối tắt thao tác</h3>
+          <div className="space-y-3">
+            <Link href="/management/courses" className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:border-blue-200 hover:bg-blue-50 transition-colors group dark:border-slate-800 dark:hover:border-blue-900 dark:hover:bg-slate-800">
+              <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors dark:bg-blue-900/30 dark:text-blue-400">
+                <School size={16} />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Quản lý lớp học</p>
+                <p className="text-xs text-slate-400">Tạo mới hoặc xếp lớp</p>
+              </div>
+            </Link>
+            <Link href="/management/posts/new" className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:border-blue-200 hover:bg-blue-50 transition-colors group dark:border-slate-800 dark:hover:border-blue-900 dark:hover:bg-slate-800">
+              <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors dark:bg-blue-900/30 dark:text-blue-400">
+                <UserPlus size={16} />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Viết bài mới</p>
+                <p className="text-xs text-slate-400">Đăng blog, sự kiện</p>
+              </div>
+            </Link>
+          </div>
         </div>
-        <div className="divide-y divide-slate-100">
-          {teachers.map((teacher) => {
-            const students = teacher.classSections.reduce((total, classroom) => total + classroom.enrollments.length, 0);
-            return (
-              <Link key={teacher.id} href={`/management/teachers/${teacher.id}`} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-5 py-4 transition hover:bg-indigo-50/60">
-                <span className="grid h-10 w-10 place-items-center rounded-full bg-indigo-100 text-sm font-black text-indigo-700">{(teacher.name || teacher.email || "T").charAt(0).toUpperCase()}</span>
-                <span className="min-w-0"><strong className="block truncate text-sm text-navy">{teacher.name || "Unnamed teacher"}</strong><small className="block truncate text-slate-500">{teacher.email || "No email"}</small></span>
-                <span className="flex items-center gap-5 text-right">
-                  <span className="hidden sm:block"><strong className="block text-sm text-navy">{teacher.classSections.length}</strong><small className="text-xs text-slate-500">classes</small></span>
-                  <span className="hidden sm:block"><strong className="block text-sm text-navy">{students}</strong><small className="text-xs text-slate-500">students</small></span>
-                  <ArrowRight className="h-4 w-4 text-slate-400" />
-                </span>
-              </Link>
-            );
-          })}
-          {!teachers.length ? <p className="px-5 py-10 text-center text-sm text-slate-500">No active teacher accounts.</p> : null}
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

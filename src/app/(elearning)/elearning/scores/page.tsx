@@ -16,6 +16,7 @@ import { ElearningBreadcrumbs } from "../ElearningBreadcrumbs";
 import { ReviewSubmissionForm } from "./ReviewSubmissionForm";
 import { AiGradeButton } from "./AiGradeButton";
 import { ScoreFilters } from "./ScoreFilters";
+import StudentScoresDashboard from "./student-board/StudentScoresDashboard";
 import styles from "../elearning.module.css";
 
 export const dynamic = "force-dynamic";
@@ -102,31 +103,43 @@ export default async function ScoresPage({ searchParams }: ScoresPageProps) {
     : 0;
 
   if (user.role === "STUDENT") {
-    const assignmentGrades = publishedGrades.filter((grade) => Boolean(grade.assignment));
-    const quizGrades = publishedGrades.filter((grade) => Boolean(grade.quiz));
+    const formattedGrades = allGrades.map(grade => {
+      let type: 'ASSIGNMENT' | 'QUIZ' = 'ASSIGNMENT';
+      if (grade.quiz) type = 'QUIZ';
+
+      return {
+        id: grade.id,
+        createdAt: grade.createdAt,
+        score: grade.score,
+        status: grade.status,
+        feedback: grade.feedback,
+        teacherName: grade.gradedBy?.name || grade.gradedBy?.email || "Teacher",
+        type,
+        assignment: grade.assignment ? {
+          id: grade.assignment.id,
+          title: grade.assignment.title,
+          skill: grade.assignment.skill,
+          maxScore: grade.assignment.maxScore,
+          cefrLevel: grade.assignment.cefrLevel,
+          className: grade.assignment.classSection.name,
+        } : undefined,
+        quiz: grade.quiz ? {
+          id: grade.quiz.id,
+          title: grade.quiz.title,
+          className: grade.quiz.classSection?.name || "Quiz",
+        } : undefined,
+        aiFeedback: grade.aiFeedback,
+        aiRubric: aiRubricRows(grade.aiRubric),
+      };
+    });
+
     return (
-      <main className={styles.classroomHub}>
+      <div className="min-h-screen bg-slate-50 p-6 md:p-10 w-full overflow-y-auto">
         <ElearningBreadcrumbs items={[{ label: "My scores" }]} />
-        <header className={styles.workflowHero}>
-          <div><span><Award size={16} /> Learning results</span><h1>My Scores & Feedback</h1><p>Review scores and feedback published by your teacher.</p></div>
-        </header>
-        <section className={styles.classroomSummaryGrid}>
-          <div><Award size={20} /><strong>{average ? `${average.toFixed(1)}%` : "-"}</strong><span>Average score</span></div>
-          <div><TrendingUp size={20} /><strong>{publishedGrades.length}</strong><span>Graded items</span></div>
-        </section>
-        <section className={styles.recordPanel}>
-          <header><div><span className={styles.cockpitEyebrow}><CheckCircle2 size={16} /> Quizzes</span><h2>Quiz results</h2></div></header>
-          {quizGrades.length ? <div className={styles.scoreResultList}>{quizGrades.map((grade) => (
-            <article key={grade.id}><div><strong>{grade.quiz?.title || "Quiz"}</strong><p>{formatDate(grade.createdAt)} · {grade.feedback || "No written feedback"}</p></div><b>{grade.score}</b></article>
-          ))}</div> : <p className={styles.classroomEmpty}>No quiz results have been published yet.</p>}
-        </section>
-        <section className={styles.recordPanel}>
-          <header><div><span className={styles.cockpitEyebrow}><FileText size={16} /> Assignments</span><h2>Assignment results</h2></div></header>
-          {assignmentGrades.length ? <div className={styles.scoreResultList}>{assignmentGrades.map((grade) => (
-            <article key={grade.id}><div><strong>{grade.assignment?.title || "Assignment"}</strong><p>{grade.assignment?.skill} · {grade.assignment?.cefrLevel || "No CEFR"} · {formatDate(grade.createdAt)} · {grade.feedback || "No written feedback"}</p></div><b>{grade.score}/{grade.assignment?.maxScore}</b></article>
-          ))}</div> : <p className={styles.classroomEmpty}>No assignment results have been published yet.</p>}
-        </section>
-      </main>
+        <div className="mt-8">
+          <StudentScoresDashboard grades={formattedGrades} />
+        </div>
+      </div>
     );
   }
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Clock3, FileText, Plus } from "lucide-react";
-import StudentAssignmentsBoard from "./StudentAssignmentsBoard";
+import StudentAssignmentsList from "./student-board/StudentAssignmentsList";
 import { AssignmentRowActions } from "./AssignmentRowActions";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
@@ -59,7 +59,8 @@ export default async function AssignmentsPage({ searchParams }: Props) {
     );
   }
 
-  const assignments = await prisma.assignment.findMany({
+  // STUDENT LOGIC
+  const dbAssignments = await prisma.assignment.findMany({
     where: {
       status: "PUBLISHED",
       ...(classroomId ? { classSectionId: classroomId } : {}),
@@ -68,51 +69,47 @@ export default async function AssignmentsPage({ searchParams }: Props) {
     orderBy: { dueAt: "asc" },
     include: {
       classSection: true,
-      submissions: { where: { studentId: user.id }, orderBy: { submittedAt: "desc" }, include: { grade: true } },
+      submissions: { 
+        where: { studentId: user.id }, 
+        orderBy: { submittedAt: "desc" }, 
+        include: { grade: true } 
+      },
     },
   });
 
+  const now = new Date();
+
+  const formattedAssignments = dbAssignments.map(a => {
+    const submission = a.submissions[0];
+    const isSubmitted = !!submission;
+    const isGraded = submission?.grade?.status === "PUBLISHED";
+    const isLate = !isSubmitted && a.dueAt && a.dueAt < now;
+
+    let status: 'PENDING' | 'LATE' | 'SUBMITTED' | 'GRADED' = 'PENDING';
+    if (isGraded) status = 'GRADED';
+    else if (isSubmitted) status = 'SUBMITTED';
+    else if (isLate) status = 'LATE';
+
+    return {
+      id: a.id,
+      title: a.title,
+      classCode: a.classSection.code,
+      className: a.classSection.name,
+      dueAt: a.dueAt,
+      status,
+      submissionId: submission?.id,
+      gradeScore: submission?.grade?.score ?? undefined,
+      maxScore: a.maxScore,
+      submittedAt: submission?.submittedAt,
+    };
+  });
+
   return (
-    <div className={styles.classroomHub}>
+    <div className="min-h-screen bg-slate-50 p-6 md:p-10 w-full overflow-y-auto">
       <ElearningBreadcrumbs items={[{ label: "Assignments" }]} />
-      <StudentAssignmentsBoard assignments={assignments.map((assignment) => ({
-      id: assignment.id,
-      title: assignment.title,
-      description: assignment.description,
-      type: assignment.type,
-      difficulty: assignment.difficulty,
-      skill: assignment.skill,
-      cefrLevel: assignment.cefrLevel,
-      maxScore: assignment.maxScore,
-      rubric: assignment.rubric,
-      allowLateSubmission: assignment.allowLateSubmission,
-      allowResubmission: assignment.allowResubmission,
-      category: assignment.category,
-      tags: assignment.tags,
-      instructions: assignment.instructions,
-      attachmentUrl: assignment.attachmentUrl,
-      attachmentName: assignment.attachmentName,
-      dueAt: assignment.dueAt && assignment.dueAt.getUTCFullYear() >= 2000 && assignment.dueAt.getUTCFullYear() <= 2100 ? assignment.dueAt.toISOString() : null,
-      classroomId: assignment.classSectionId,
-      classCode: assignment.classSection.code,
-      courseTitle: assignment.classSection.name,
-      submission: assignment.submissions[0] ? {
-        id: assignment.submissions[0].id,
-        content: assignment.submissions[0].content,
-        fileUrl: assignment.submissions[0].fileUrl,
-        status: assignment.submissions[0].status,
-        submittedAt: assignment.submissions[0].submittedAt.toISOString(),
-        grade: assignment.submissions[0].grade ? {
-          status: assignment.submissions[0].grade.status,
-          score: assignment.submissions[0].grade.score,
-          feedback: assignment.submissions[0].grade.feedback,
-          aiStatus: assignment.submissions[0].grade.aiStatus,
-          aiScore: assignment.submissions[0].grade.aiScore,
-          aiFeedback: assignment.submissions[0].grade.aiFeedback,
-          aiConfidence: assignment.submissions[0].grade.aiConfidence,
-        } : null,
-      } : null,
-      }))} />
+      <div className="mt-8">
+        <StudentAssignmentsList assignments={formattedAssignments} />
+      </div>
     </div>
   );
 }
