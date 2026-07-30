@@ -23,7 +23,7 @@ model Course {
   orders      Order[]
   classes     ClassSection[]
 
-  @@schema("elearning")
+  @@schema("public")
 }
 
 model Lesson {
@@ -39,7 +39,7 @@ model Lesson {
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@index([courseId])
-  @@schema("elearning")
+  @@schema("public")
 }
 
 model CourseEnrollment {
@@ -51,7 +51,7 @@ model CourseEnrollment {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
-  @@schema("elearning")
+  @@schema("public")
 }
 
 model Post {
@@ -120,7 +120,7 @@ model Order {
   course      Course?  @relation(fields: [courseId], references: [id])
   user        User?    @relation(fields: [userId], references: [id])
 
-  @@schema("elearning")
+  @@schema("public")
 }
 
 model SiteSetting {
@@ -222,7 +222,7 @@ model User {
   submissions     Submission[]     @relation("StudentSubmissions")
 
 
-  @@schema("elearning")
+  @@schema("public")
 }
 
 model Account {
@@ -269,7 +269,7 @@ enum Role {
   ADMIN
   STUDENT
 
-  @@schema("elearning")
+  @@schema("public")
 }
 
 enum ContactSubmissionStatus {
@@ -287,7 +287,7 @@ enum OrderStatus {
   FAILED
   REFUNDED
 
-  @@schema("elearning")
+  @@schema("public")
 }
 
 enum MenuPosition {
@@ -407,7 +407,7 @@ model Program {
   updatedAt   DateTime @updatedAt
   quizzes     Quiz[]
 
-  @@schema("elearning")
+  @@schema("public")
 }
 
 model ClassSection {
