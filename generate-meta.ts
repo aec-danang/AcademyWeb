@@ -78,7 +78,7 @@ async function main() {
         console.log(`⚠️ AI trả về dữ liệu lỗi cho bài ${post.slug}`);
         errors++;
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(`❌ Lỗi update bài ${post.slug}:`, err.message);
       errors++;
     }
