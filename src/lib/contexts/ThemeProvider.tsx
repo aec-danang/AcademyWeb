@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 type Theme = "light" | "dark";
 
@@ -14,11 +15,17 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
     const storedTheme = localStorage.getItem("aec-theme") as Theme | null;
-    if (storedTheme) {
+    const isManagement = pathname?.startsWith("/management");
+
+    if (!isManagement) {
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
+    } else if (storedTheme) {
       setTheme(storedTheme);
       if (storedTheme === "dark") {
         document.documentElement.classList.add("dark");
@@ -26,27 +33,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         document.documentElement.classList.remove("dark");
       }
     }
-  }, []);
+  }, [pathname]);
 
   const toggleTheme = () => {
     setTheme((prev) => {
+      const isManagement = pathname?.startsWith("/management");
       const newTheme = prev === "light" ? "dark" : "light";
       localStorage.setItem("aec-theme", newTheme);
       
-      if (newTheme === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
+      if (isManagement) {
+        if (newTheme === "dark") {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
       }
       
       return newTheme;
     });
   };
 
-  // We can just return the children wrapped in context.
-  // The mounted check prevents hydration mismatch if using theme in render,
-  // but it's safe to always render children and just avoid theme-specific UI
-  // renders on the server.
   return (
     <ThemeContext.Provider value={{ theme: mounted ? theme : "light", toggleTheme }}>
       {children}

@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 import { ThemeProvider } from "@/lib/contexts/ThemeProvider";
 import { SessionProviderWrapper } from "@/lib/contexts/SessionProviderWrapper";
 import { Toaster } from "@/components/ui/sonner";
+import { EasterEgg } from "@/components/EasterEgg";
 
 export default function EnLayout({
   children,
@@ -36,6 +37,7 @@ export default function EnLayout({
           <ThemeProvider>
             {children}
             <Toaster />
+            <EasterEgg />
           </ThemeProvider>
         </SessionProviderWrapper>
       </body>

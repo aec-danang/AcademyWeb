@@ -183,8 +183,8 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
   return (
     <div className="space-y-6 relative pb-20">
       <div className="flex flex-col gap-2">
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Manage Posts</h2>
-        <p className="text-slate-500 dark:text-slate-400">View, create, and manage all your publications.</p>
+        <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Quản lý Bài viết & Tin tức</h2>
+        <p className="text-slate-500 dark:text-slate-400">Xem, tạo mới và quản lý tất cả các bài viết tin tức, sự kiện trên website.</p>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
@@ -192,37 +192,38 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
           <div className="relative flex-1 sm:w-[320px]">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input 
-              placeholder="Search by title or type..." 
+              placeholder="Tìm kiếm theo tiêu đề..." 
               value={searchQuery}
               onChange={handleSearchChange}
               className="pl-9 bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-800 w-full h-10 shadow-sm focus-visible:ring-1 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-600 transition-shadow"
             />
           </div>
           <Select value={typeFilter} onValueChange={(val) => { setTypeFilter(val); setCurrentPage(1); setSelectedSlugs([]); setLastSelectedSlug(null); }}>
-            <SelectTrigger className="w-[120px] h-10 bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-800 shadow-sm">
-              <SelectValue placeholder="Type" />
+            <SelectTrigger className="w-[140px] h-10 bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-800 shadow-sm">
+              <SelectValue placeholder="Phân loại" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="post">Post</SelectItem>
-              <SelectItem value="news">News</SelectItem>
-              <SelectItem value="event">Event</SelectItem>
+              <SelectItem value="all">Tất cả loại</SelectItem>
+              <SelectItem value="post">Blog</SelectItem>
+              <SelectItem value="news">Tin tức</SelectItem>
+              <SelectItem value="event">Sự kiện</SelectItem>
+              <SelectItem value="recruitment">Tuyển dụng</SelectItem>
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val); setCurrentPage(1); setSelectedSlugs([]); setLastSelectedSlug(null); }}>
-            <SelectTrigger className="w-[140px] h-10 bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-800 shadow-sm">
-              <SelectValue placeholder="Status" />
+            <SelectTrigger className="w-[150px] h-10 bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-800 shadow-sm">
+              <SelectValue placeholder="Trạng thái" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="all">Tất cả trạng thái</SelectItem>
+              <SelectItem value="published">Đã xuất bản</SelectItem>
+              <SelectItem value="draft">Bản nháp</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <Button className="bg-orange hover:bg-orange-hover text-white h-10 shadow-sm w-full sm:w-auto transition-colors" onClick={() => router.push("/management/posts/new")}>
           <Plus className="mr-2 h-4 w-4" />
-          Create Post
+          Viết bài mới
         </Button>
       </div>
 
@@ -238,10 +239,10 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
             </Button>
             <div className="w-px h-5 bg-slate-700 dark:bg-slate-300 mx-2" />
             <Button size="sm" variant="ghost" onClick={() => handleBatchStatus(true)} className="h-8 hover:bg-white/10 dark:hover:bg-black/5">
-              Publish
+              Xuất bản
             </Button>
             <Button size="sm" variant="ghost" onClick={() => handleBatchStatus(false)} className="h-8 hover:bg-white/10 dark:hover:bg-black/5">
-              Unpublish
+              Hủy xuất bản
             </Button>
             <div className="w-px h-5 bg-slate-700 dark:bg-slate-300 mx-2" />
             <Select onValueChange={handleBatchType}>
@@ -252,6 +253,7 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
                 <SelectItem value="post">Post</SelectItem>
                 <SelectItem value="news">News</SelectItem>
                 <SelectItem value="event">Event</SelectItem>
+                <SelectItem value="recruitment">Recruitment</SelectItem>
               </SelectContent>
             </Select>
             <div className="w-px h-5 bg-slate-700 dark:bg-slate-300 mx-2" />
@@ -274,11 +276,11 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
                   className="border-slate-300 dark:border-slate-600 data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 data-[state=checked]:text-white dark:data-[state=checked]:text-slate-900"
                 />
               </TableHead>
-              <TableHead className="text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Title & Slug</TableHead>
-              <TableHead className="w-[140px] text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Type</TableHead>
-              <TableHead className="w-[120px] text-center text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Date</TableHead>
-              <TableHead className="w-[120px] text-center text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Status</TableHead>
-              <TableHead className="w-[80px] text-right text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4 px-6">Actions</TableHead>
+              <TableHead className="text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Tiêu đề & Slug</TableHead>
+              <TableHead className="w-[140px] text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Loại</TableHead>
+              <TableHead className="w-[120px] text-center text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Ngày tạo</TableHead>
+              <TableHead className="w-[120px] text-center text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Trạng thái</TableHead>
+              <TableHead className="w-[80px] text-right text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4 px-6">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -312,8 +314,9 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
                     <Badge variant="secondary" className="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-none font-medium px-2.5 py-0.5 shadow-none">
                       {item.type === 'news' && <Newspaper className="mr-1.5 h-3 w-3" />}
                       {item.type === 'event' && <Calendar className="mr-1.5 h-3 w-3" />}
+                      {item.type === 'recruitment' && <FileText className="mr-1.5 h-3 w-3 text-orange" />}
                       {item.type === 'post' && <FileText className="mr-1.5 h-3 w-3" />}
-                      <span className="capitalize">{item.type}</span>
+                      <span className="capitalize">{item.type === 'post' ? 'Blog' : item.type === 'news' ? 'Tin tức' : item.type === 'event' ? 'Sự kiện' : 'Tuyển dụng'}</span>
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center">
@@ -323,7 +326,7 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
                     <Badge variant="outline" className={item.published 
                       ? "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 font-medium px-2.5 py-0.5 shadow-sm" 
                       : "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20 font-medium px-2.5 py-0.5 shadow-sm"}>
-                      {item.published ? "Published" : "Draft"}
+                      {item.published ? "Đã xuất bản" : "Bản nháp"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right px-6">

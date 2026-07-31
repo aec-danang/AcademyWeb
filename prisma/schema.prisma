@@ -11,7 +11,7 @@ model Course {
   id          String             @id @default(cuid())
   title       String
   description String?
-  price       Float              @default(0)
+  price       Decimal            @default(0) @db.Decimal(10, 2)
   imageUrl    String?
   published   Boolean            @default(false)
   createdAt   DateTime           @default(now())
@@ -23,22 +23,7 @@ model Course {
   orders      Order[]
   classes     ClassSection[]
 
-  @@schema("elearning")
-}
-
-model Lesson {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  videoUrl  String?
-  order     Int      @default(0)
-  published Boolean  @default(true)
-  courseId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@schema("elearning")
+  @@schema("public")
 }
 
 model CourseEnrollment {
@@ -50,13 +35,14 @@ model CourseEnrollment {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
-  @@schema("elearning")
+  @@schema("public")
 }
 
 model Post {
+  id              String   @id @default(dbgenerated("gen_random_uuid()::text"))
   title           String
   content         String
-  slug            String   @id
+  slug            String   @unique
   type            String   @default("post")
   published       Boolean  @default(true)
   createdAt       DateTime @default(now())
@@ -64,14 +50,17 @@ model Post {
   authorId        String?
   excerpt         String?
   featuredImage   String?
+  featuredImageId String?
   metaDescription String?
   metaTitle       String?
   author          User?    @relation(fields: [authorId], references: [id])
+  featuredMedia   Media?   @relation("FeaturedImageMedia", fields: [featuredImageId], references: [id], onDelete: SetNull)
+  categories      String[] @default([])
+  tags            String[] @default([])
+  canonicalUrl    String?
 
   @@schema("public")
 }
-
-
 
 model Lead {
   id        String   @id @default(cuid())
@@ -86,35 +75,38 @@ model Lead {
 }
 
 model Order {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   userId      String?
-  totalAmount Float
-  status      String   @default("completed")
-  createdAt   DateTime @default(now())
+  totalAmount Decimal     @db.Decimal(10, 2)
+  status      OrderStatus @default(COMPLETED)
+  createdAt   DateTime    @default(now())
   courseId    String?
-  course      Course?  @relation(fields: [courseId], references: [id])
-  user        User?    @relation(fields: [userId], references: [id])
+  course      Course?     @relation(fields: [courseId], references: [id])
+  user        User?       @relation(fields: [userId], references: [id])
 
-  @@schema("elearning")
+  @@schema("public")
 }
 
 model SiteSetting {
   id        String   @id @default(cuid())
   key       String   @unique
   value     String
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@schema("public")
 }
 
 model MenuItem {
-  id        String  @id @default(cuid())
+  id        String       @id @default(cuid())
   label     String
   url       String
-  order     Int     @default(0)
-  position  String  @default("header")
+  order     Int          @default(0)
+  position  MenuPosition @default(HEADER)
   parentId  String?
-  published Boolean @default(true)
+  published Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   @@schema("public")
 }
@@ -135,6 +127,17 @@ model Testimonial {
   updatedAt    DateTime @updatedAt
   userId       String?
   user         User?    @relation(fields: [userId], references: [id])
+
+  @@schema("public")
+}
+
+model StudentLifeEvent {
+  id        String   @id @default(cuid())
+  title     String
+  imageUrl  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@schema("public")
 }
@@ -165,34 +168,40 @@ model Sponsor {
 }
 
 model User {
-  id            String             @id
-  name          String?
-  username      String?            @unique
-  email         String?            @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          Role               @default(USER)
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  courses       CourseEnrollment[]
-  orders        Order[]
-  Account       Account[]
-  posts         Post[]
-  Session       Session[]
-  testimonials  Testimonial[]
-  phone           String?
-  isActive        Boolean          @default(true)
-  activityLogs    ActivityLog[]
-  attempts        Attempt[]        @relation("StudentAttempts")
-  classSections   ClassSection[]   @relation("ClassTeacher")
-  enrollments     Enrollment[]     @relation("StudentEnrollments")
-  grades          Grade[]          @relation("StudentGrades")
-  gradesGiven     Grade[]          @relation("GradesGiven")
-  questions       Question[]       @relation("QuestionCreator")
-  quizzes         Quiz[]           @relation("QuizCreator")
-  submissions     Submission[]     @relation("StudentSubmissions")
-
+  id                     String                  @id
+  name                   String?
+  username               String?                 @unique
+  email                  String?                 @unique
+  emailVerified          DateTime?
+  image                  String?
+  password               String?
+  role                   Role                    @default(USER)
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  courses                CourseEnrollment[]
+  orders                 Order[]
+  Account                Account[]
+  posts                  Post[]
+  Session                Session[]
+  testimonials           Testimonial[]
+  phone                  String?
+  isActive               Boolean                 @default(true)
+  activityLogs           ActivityLog[]
+  attempts               Attempt[]               @relation("StudentAttempts")
+  classSections          ClassSection[]          @relation("ClassTeacher")
+  enrollments            Enrollment[]            @relation("StudentEnrollments")
+  grades                 Grade[]                 @relation("StudentGrades")
+  gradesGiven            Grade[]                 @relation("GradesGiven")
+  questions              Question[]              @relation("QuestionCreator")
+  quizzes                Quiz[]                  @relation("QuizCreator")
+  submissions            Submission[]            @relation("StudentSubmissions")
+  attendances            Attendance[]            @relation("StudentAttendances")
+  quizDeliveriesCreated  QuizDelivery[]          @relation("QuizDeliveryCreator")
+  testVersionsCreated    TestVersion[]           @relation("TestVersionCreator")
+  teacherAgentSession    TeacherAgentSession?
+  teacherAgentExecutions TeacherAgentExecution[]
+  teacherWorkflowRuns    TeacherWorkflowRun[]
+  scheduleAdjustments    ClassScheduleAdjustment[] @relation("UserScheduleAdjustments")
 
   @@schema("elearning")
 }
@@ -243,6 +252,7 @@ enum Role {
 
   @@schema("elearning")
 }
+
 enum ClassStatus {
   ACTIVE
   ARCHIVED
@@ -255,6 +265,8 @@ enum EnrollmentStatus {
   APPROVED
   REJECTED
   ACTIVE
+  CANCELLED
+  LEFT
   REMOVED
 
   @@schema("elearning")
@@ -289,7 +301,35 @@ enum SubmissionStatus {
   PENDING
   SUBMITTED
   GRADED
+  RETURNED
+  REVISION_REQUESTED
   MISSING
+
+  @@schema("elearning")
+}
+
+enum GradeStatus {
+  DRAFT
+  PUBLISHED
+  REVISION_REQUESTED
+
+  @@schema("elearning")
+}
+
+enum AiGradeStatus {
+  NOT_REQUESTED
+  PENDING
+  COMPLETED
+  FAILED
+
+  @@schema("elearning")
+}
+
+enum DeliveryStatus {
+  PENDING
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 
   @@schema("elearning")
 }
@@ -329,12 +369,39 @@ enum ExamSkill {
   WRITING
   SPEAKING
   GRAMMAR
+  VOCABULARY
+  PRONUNCIATION
   MIXED
 
   @@schema("elearning")
 }
 
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
+  EXCUSED
 
+  @@schema("elearning")
+}
+
+model Attendance {
+  id             String           @id @default(cuid())
+  classSectionId String
+  studentId      String
+  date           DateTime
+  status         AttendanceStatus @default(PRESENT)
+  note           String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  classSection ClassSection @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+  student      User         @relation("StudentAttendances", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([classSectionId, studentId, date])
+  @@index([classSectionId, date])
+  @@schema("elearning")
+}
 
 model Program {
   id          String   @id @default(cuid())
@@ -351,22 +418,42 @@ model Program {
 }
 
 model ClassSection {
-  id          String       @id @default(cuid())
-  name        String
-  code        String       @unique
-  status      ClassStatus  @default(ACTIVE)
-  courseId    String
-  teacherId   String?
-  startAt     DateTime?
-  endAt       DateTime?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  assignments Assignment[]
-  course      Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  enrollments Enrollment[]
-  quizzes     Quiz[]
-  teacher     User?        @relation("ClassTeacher", fields: [teacherId], references: [id], onDelete: SetNull)
+  id             String         @id @default(cuid())
+  name           String
+  code           String         @unique
+  status         ClassStatus    @default(ACTIVE)
+  teacherId      String?
+  startAt        DateTime?
+  endAt          DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  assignments    Assignment[]
+  enrollments    Enrollment[]
+  quizzes        Quiz[]
+  quizDeliveries QuizDelivery[]
+  meetings       ClassMeeting[]
+  attendances    Attendance[]
+  scheduleAdjustments ClassScheduleAdjustment[]
+  teacher        User?          @relation("ClassTeacher", fields: [teacherId], references: [id], onDelete: SetNull)
+  course         Course?        @relation(fields: [courseId], references: [id])
+  courseId       String?
 
+  @@schema("elearning")
+}
+
+model ClassMeeting {
+  id             String       @id @default(cuid())
+  classSectionId String
+  dayOfWeek      Int
+  startTime      String
+  endTime        String
+  location       String?
+  note           String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  classSection   ClassSection @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+
+  @@index([classSectionId, dayOfWeek, startTime])
   @@schema("elearning")
 }
 
@@ -388,25 +475,32 @@ model Enrollment {
 }
 
 model Assignment {
-  id             String               @id @default(cuid())
-  title          String
-  description    String?
-  type           AssignmentType       @default(HOMEWORK)
-  status         AssignmentStatus     @default(PUBLISHED)
-  difficulty     AssignmentDifficulty @default(MEDIUM)
-  category       String?
-  tags           String[]             @default([])
-  instructions   String?
-  attachmentUrl  String?
-  attachmentName String?
-  dueAt          DateTime?
-  classSectionId String
-  createdById    String?
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
-  classSection   ClassSection         @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
-  grades         Grade[]
-  submissions    Submission[]
+  id                  String               @id @default(cuid())
+  title               String
+  description         String?
+  type                AssignmentType       @default(HOMEWORK)
+  status              AssignmentStatus     @default(PUBLISHED)
+  difficulty          AssignmentDifficulty @default(MEDIUM)
+  skill               ExamSkill            @default(MIXED)
+  cefrLevel           String?
+  maxScore            Float                @default(100)
+  rubric              String?
+  allowLateSubmission Boolean              @default(false)
+  allowResubmission   Boolean              @default(true)
+  scheduledAt         DateTime?
+  category            String?
+  tags                String[]             @default([])
+  instructions        String?
+  attachmentUrl       String?
+  attachmentName      String?
+  dueAt               DateTime?
+  classSectionId      String
+  createdById         String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  classSection        ClassSection         @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+  grades              Grade[]
+  submissions         Submission[]
 
   @@schema("elearning")
 }
@@ -489,15 +583,55 @@ model Quiz {
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   attempts         Attempt[]
-  classSection     ClassSection?   @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+  classSection     ClassSection?  @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
   createdBy        User?          @relation("QuizCreator", fields: [createdById], references: [id], onDelete: SetNull)
   grades           Grade[]
   program          Program?       @relation(fields: [programId], references: [id], onDelete: SetNull)
   questions        QuizQuestion[]
   sections         TestSection[]
+  deliveries       QuizDelivery[]
+  versions         TestVersion[]
 
   @@index([programId])
   @@index([importSource])
+  @@schema("elearning")
+}
+
+model TestVersion {
+  id          String   @id @default(cuid())
+  quizId      String
+  createdById String?
+  version     Int
+  changeNote  String?
+  snapshot    Json
+  createdAt   DateTime @default(now())
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  createdBy   User?    @relation("TestVersionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@unique([quizId, version])
+  @@index([quizId, createdAt])
+  @@schema("elearning")
+}
+
+model QuizDelivery {
+  id             String         @id @default(cuid())
+  quizId         String
+  classSectionId String
+  assignedById   String?
+  status         DeliveryStatus @default(PUBLISHED)
+  openAt         DateTime?
+  dueAt          DateTime?
+  attemptLimit   Int            @default(1)
+  showAnswersAt  DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  quiz           Quiz           @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  classSection   ClassSection   @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+  assignedBy     User?          @relation("QuizDeliveryCreator", fields: [assignedById], references: [id], onDelete: SetNull)
+  attempts       Attempt[]
+
+  @@unique([quizId, classSectionId])
+  @@index([classSectionId, status, dueAt])
   @@schema("elearning")
 }
 
@@ -536,20 +670,28 @@ model QuizQuestion {
 }
 
 model Attempt {
-  id          String          @id @default(cuid())
-  quizId      String
-  studentId   String
-  startedAt   DateTime        @default(now())
-  submittedAt DateTime?
-  status      AttemptStatus   @default(IN_PROGRESS)
-  score       Float?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  answers     AttemptAnswer[]
-  grades      Grade[]
-  quiz        Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  student     User            @relation("StudentAttempts", fields: [studentId], references: [id], onDelete: Cascade)
+  id                String          @id @default(cuid())
+  quizId            String
+  studentId         String
+  quizDeliveryId    String?
+  isReviewPractice  Boolean         @default(false)
+  reviewScope       String?
+  sourceAttemptId   String?
+  reviewQuestionIds String[]        @default([])
+  startedAt         DateTime        @default(now())
+  submittedAt       DateTime?
+  status            AttemptStatus   @default(IN_PROGRESS)
+  score             Float?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  answers           AttemptAnswer[]
+  grades            Grade[]
+  quiz              Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  student           User            @relation("StudentAttempts", fields: [studentId], references: [id], onDelete: Cascade)
+  quizDelivery      QuizDelivery?   @relation(fields: [quizDeliveryId], references: [id], onDelete: SetNull)
 
+  @@index([quizDeliveryId, studentId])
+  @@index([studentId, isReviewPractice])
   @@schema("elearning")
 }
 
@@ -590,28 +732,36 @@ model Submission {
 }
 
 model Grade {
-  id           String      @id @default(cuid())
+  id           String        @id @default(cuid())
   studentId    String
   assignmentId String?
   quizId       String?
   attemptId    String?
-  submissionId String?     @unique
-  score        Float
+  submissionId String?       @unique
+  score        Float?
   feedback     String?
+  status       GradeStatus   @default(PUBLISHED)
+  publishedAt  DateTime?
   gradedById   String?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  assignment   Assignment? @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  attempt      Attempt?    @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  gradedBy     User?       @relation("GradesGiven", fields: [gradedById], references: [id], onDelete: SetNull)
-  quiz         Quiz?       @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  student      User        @relation("StudentGrades", fields: [studentId], references: [id], onDelete: Cascade)
-  submission   Submission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  aiStatus     AiGradeStatus @default(NOT_REQUESTED)
+  aiScore      Float?
+  aiFeedback   String?
+  aiRubric     Json?
+  aiConfidence Float?
+  aiModel      String?
+  aiError      String?
+  aiReviewedAt DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  assignment   Assignment?   @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  attempt      Attempt?      @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  gradedBy     User?         @relation("GradesGiven", fields: [gradedById], references: [id], onDelete: SetNull)
+  quiz         Quiz?         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  student      User          @relation("StudentGrades", fields: [studentId], references: [id], onDelete: Cascade)
+  submission   Submission?   @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@schema("elearning")
 }
-
-
 
 model ActivityLog {
   id         String   @id @default(cuid())
@@ -624,6 +774,107 @@ model ActivityLog {
   actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
 
   @@schema("elearning")
+}
+
+model TeacherAgentSession {
+  id              String                  @id @default(cuid())
+  teacherId       String                  @unique
+  messages        Json
+  pendingAction   Json?
+  workflow        Json?
+  workflowEditing Boolean                 @default(false)
+  currentPath     String?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  teacher         User                    @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  executions      TeacherAgentExecution[]
+  workflowRuns    TeacherWorkflowRun[]
+
+  @@schema("elearning")
+}
+
+model TeacherWorkflowRun {
+  id            String                @id @default(cuid())
+  teacherId     String
+  sessionId     String?
+  workflowId    String
+  status        String                @default("PLANNING")
+  targetType    String?
+  targetId      String?
+  targetLabel   String?
+  goal          Json
+  currentStepId String?
+  state         Json?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  completedAt   DateTime?
+  teacher       User                  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  session       TeacherAgentSession?  @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  steps         TeacherWorkflowStep[]
+
+  @@index([teacherId, status, updatedAt])
+  @@index([teacherId, workflowId, targetId])
+  @@schema("elearning")
+}
+
+model TeacherWorkflowStep {
+  id          String             @id @default(cuid())
+  runId       String
+  stepId      String
+  position    Int
+  label       String
+  status      String             @default("PENDING")
+  input       Json?
+  result      Json?
+  evidence    Json?
+  error       String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  run         TeacherWorkflowRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@unique([runId, stepId])
+  @@index([runId, position])
+  @@schema("elearning")
+}
+
+model TeacherAgentExecution {
+  id             String               @id @default(cuid())
+  teacherId      String
+  sessionId      String?
+  idempotencyKey String
+  actionType     String
+  payload        Json
+  status         String               @default("RUNNING")
+  result         Json?
+  error          String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  teacher        User                 @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  session        TeacherAgentSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@unique([teacherId, idempotencyKey])
+  @@index([teacherId, updatedAt])
+  @@schema("elearning")
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  provider  String   @default("cloudinary")
+  publicId  String   @unique
+  secureUrl String
+  width     Int?
+  height    Int?
+  bytes     Int?
+  format    String?
+  folder    String?  @default("academy_media")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  postsAsFeatured Post[] @relation("FeaturedImageMedia")
+
+  @@schema("public")
 }
 
 model SiteProgram {
@@ -653,4 +904,101 @@ model SiteFeature {
   updatedAt   DateTime @updatedAt
 
   @@schema("public")
+}
+
+model Lesson {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  videoUrl  String?
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  courseId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+  @@schema("public")
+}
+
+model ContactSubmission {
+  id        String                  @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  createdAt DateTime                @default(now())
+  message   String?
+  status    ContactSubmissionStatus @default(NEW)
+
+  @@schema("public")
+}
+
+enum LessonProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+
+  @@schema("elearning")
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+
+  @@schema("public")
+}
+
+enum MenuPosition {
+  HEADER
+  FOOTER
+
+  @@schema("public")
+}
+
+enum ContactSubmissionStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CLOSED
+
+  @@schema("public")
+}
+
+model ClassScheduleAdjustment {
+  id             String           @id @default(cuid())
+  classSectionId String
+  userId         String           // The teacher making the request
+  type           AdjustmentType
+  date           DateTime         // Original missed date
+  targetDate     DateTime?        // Proposed makeup date (only if type is MAKEUP)
+  reason         String
+  evidenceUrl    String?
+  status         AdjustmentStatus @default(PENDING)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  classSection   ClassSection     @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+  user           User             @relation("UserScheduleAdjustments", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([classSectionId])
+  @@index([userId])
+  @@schema("elearning")
+}
+
+enum AdjustmentType {
+  ABSENCE
+  MAKEUP
+
+  @@schema("elearning")
+}
+
+enum AdjustmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+
+  @@schema("elearning")
 }

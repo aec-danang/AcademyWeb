@@ -138,8 +138,8 @@ export default function SponsorsClient({ initialSponsors }: { initialSponsors: S
   return (
     <div className="space-y-6 relative pb-20">
       <div className="flex flex-col gap-2">
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Manage Sponsors</h2>
-        <p className="text-slate-500 dark:text-slate-400">Manage partner logos and website links displayed on the main page.</p>
+        <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Quản lý Đối tác & Nhà tài trợ</h2>
+        <p className="text-slate-500 dark:text-slate-400">Quản lý logo đối tác và liên kết website hiển thị ở trang chủ.</p>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
@@ -147,7 +147,7 @@ export default function SponsorsClient({ initialSponsors }: { initialSponsors: S
           <div className="relative flex-1 sm:w-[320px]">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input 
-              placeholder="Search sponsors by name..." 
+              placeholder="Tìm kiếm đối tác theo tên..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-800 w-full h-10 shadow-sm focus-visible:ring-1 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-600 transition-shadow"
@@ -162,7 +162,7 @@ export default function SponsorsClient({ initialSponsors }: { initialSponsors: S
           }}
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add Sponsor
+          Thêm đối tác
         </Button>
       </div>
 
@@ -172,9 +172,9 @@ export default function SponsorsClient({ initialSponsors }: { initialSponsors: S
             <TableRow className="border-slate-200 dark:border-slate-800 hover:bg-transparent">
               <TableHead className="w-[60px] text-center px-4"></TableHead>
               <TableHead className="w-[120px] text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Logo</TableHead>
-              <TableHead className="text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Sponsor Name</TableHead>
-              <TableHead className="text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Website</TableHead>
-              <TableHead className="w-[120px] text-right text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4 px-6">Actions</TableHead>
+              <TableHead className="text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Tên đối tác / Doanh nghiệp</TableHead>
+              <TableHead className="text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4">Website liên kết</TableHead>
+              <TableHead className="w-[120px] text-right text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase py-4 px-6">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -183,7 +183,7 @@ export default function SponsorsClient({ initialSponsors }: { initialSponsors: S
                 <TableCell colSpan={5} className="h-48 text-center text-slate-500 dark:text-slate-400">
                   <div className="flex flex-col items-center justify-center space-y-3">
                     <Search className="h-8 w-8 text-slate-300 dark:text-slate-600" />
-                    <p>No sponsors found matching your search.</p>
+                    <p>Không tìm thấy đối tác nào phù hợp.</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -259,67 +259,50 @@ export default function SponsorsClient({ initialSponsors }: { initialSponsors: S
       </div>
 
       <Dialog open={isCreating || isEditing !== null} onOpenChange={(open) => !open && cancelEdit()}>
-        <DialogContent className="sm:max-w-[550px] bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-slate-100">{isCreating ? "Add New Sponsor" : "Edit Sponsor"}</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-6 py-4 md:grid-cols-[120px_1fr]">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Logo Preview</label>
-              <div className="w-full h-[80px] rounded-lg border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center bg-slate-50 dark:bg-slate-900/50 overflow-hidden shadow-inner">
-                {formData.imageUrl ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img 
-                    src={formData.imageUrl} 
-                    alt="Preview" 
-                    className="w-full h-full object-contain p-2" 
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} 
-                  />
-                ) : (
-                  <span className="text-xs text-slate-400">No Image</span>
-                )}
-              </div>
+        <DialogContent className="sm:max-w-[500px] rounded-2xl p-0 overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-[#0b101e]">
+          <div className="bg-slate-50/80 dark:bg-slate-900/50 px-6 py-5 border-b border-slate-100 dark:border-slate-800/80">
+            <DialogTitle className="text-xl text-slate-900 dark:text-slate-100">{isCreating ? "Thêm đối tác mới" : "Chỉnh sửa đối tác"}</DialogTitle>
+          </div>
+          <div className="px-6 py-6 space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Tên đối tác / Doanh nghiệp</label>
+              <Input 
+                placeholder="Ví dụ: Tập đoàn AEC" 
+                value={formData.name} 
+                onChange={e => setFormData({...formData, name: e.target.value})} 
+                className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm"
+              />
             </div>
-
-            <div className="flex flex-col gap-4">
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Sponsor Name</label>
-                <Input 
-                  placeholder="e.g. FPT Software" 
-                  value={formData.name} 
-                  onChange={e => setFormData({...formData, name: e.target.value})} 
-                  className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
-                />
-              </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Logo URL</label>
-                <Input 
-                  placeholder="https://example.com/logo.png" 
-                  value={formData.imageUrl} 
-                  onChange={e => setFormData({...formData, imageUrl: e.target.value})} 
-                  className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
-                />
-              </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium flex items-center justify-between text-slate-700 dark:text-slate-300">
-                  Website URL
-                  <span className="text-xs text-slate-400 font-normal">(Optional)</span>
-                </label>
-                <Input 
-                  placeholder="https://example.com" 
-                  value={formData.website} 
-                  onChange={e => setFormData({...formData, website: e.target.value})} 
-                  className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
-                />
-              </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-900 dark:text-slate-200">Link Logo đối tác (Image URL)</label>
+              <Input 
+                placeholder="https://example.com/logo.png" 
+                value={formData.imageUrl} 
+                onChange={e => setFormData({...formData, imageUrl: e.target.value})} 
+                className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold flex items-center justify-between text-slate-900 dark:text-slate-200">
+                Website đối tác
+                <span className="text-xs text-slate-400 font-normal">(Không bắt buộc)</span>
+              </label>
+              <Input 
+                placeholder="https://example.com" 
+                value={formData.website} 
+                onChange={e => setFormData({...formData, website: e.target.value})} 
+                className="h-11 rounded-xl bg-slate-50/50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 focus-visible:ring-1 focus-visible:ring-orange focus-visible:border-orange dark:text-slate-100 shadow-sm"
+              />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={cancelEdit} className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100">Cancel</Button>
-            <Button className="bg-orange hover:bg-orange-hover text-white shadow-sm" onClick={isCreating ? handleCreate : handleUpdate}>
-              {isCreating ? "Add Sponsor" : "Save Changes"}
+          <div className="px-6 py-5 bg-slate-50/80 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/80 flex justify-end gap-3">
+            <Button variant="outline" onClick={cancelEdit} className="rounded-xl font-semibold h-11 px-5 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-300">
+              Hủy bỏ
             </Button>
-          </DialogFooter>
+            <Button className="rounded-xl font-semibold h-11 px-6 bg-orange hover:bg-orange-hover text-white shadow-md shadow-orange/20" onClick={isCreating ? handleCreate : handleUpdate}>
+              {isCreating ? "Thêm đối tác" : "Lưu thay đổi"}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

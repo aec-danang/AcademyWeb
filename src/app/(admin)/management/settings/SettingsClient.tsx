@@ -27,19 +27,13 @@ const DEFAULT_KEYS = [
   { key: "footer_text", label: "Footer Text", placeholder: "© 2026 Academy English Center..." },
 ];
 
-const STATS_KEYS = [
-  { key: "stats_native_teachers", label: "Native Teachers", placeholder: "e.g. 44" },
-  { key: "stats_happy_students", label: "Happy Students", placeholder: "e.g. 15,000+" },
-  { key: "stats_years_experience", label: "Years Experience", placeholder: "e.g. 15" },
-];
-
 export default function SettingsClient({ initialSettings, user }: { initialSettings: Setting[], user?: UserInfo }) {
   const [settingsMap, setSettingsMap] = useState<Record<string, string>>(
     initialSettings.reduce((acc, curr) => ({ ...acc, [curr.key]: curr.value }), {})
   );
 
   const [customSettings, setCustomSettings] = useState<Setting[]>(
-    initialSettings.filter(s => !DEFAULT_KEYS.some(dk => dk.key === s.key) && !STATS_KEYS.some(sk => sk.key === s.key))
+    initialSettings.filter(s => !DEFAULT_KEYS.some(dk => dk.key === s.key))
   );
 
   const [accountData, setAccountData] = useState({
@@ -99,12 +93,6 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
       }
     });
 
-    STATS_KEYS.forEach(sk => {
-      if (settingsMap[sk.key] !== undefined) {
-        finalSettings.push({ key: sk.key, value: settingsMap[sk.key] });
-      }
-    });
-
     customSettings.forEach(cs => {
       if (cs.key && cs.key.trim() !== "") {
         finalSettings.push({ key: cs.key.trim(), value: cs.value });
@@ -143,7 +131,7 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
         
         {/* Account Settings */}
         {user && (
-          <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
+          <Card>
             <CardHeader>
               <CardTitle>Account Information</CardTitle>
               <CardDescription>Manage your admin profile. Leave password blank to keep it unchanged.</CardDescription>
@@ -181,7 +169,7 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
         )}
 
         {/* Standard Settings */}
-        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
+        <Card>
           <CardHeader>
             <CardTitle>Standard Settings</CardTitle>
             <CardDescription>Core contact info and basic site details.</CardDescription>
@@ -213,29 +201,8 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
           </CardContent>
         </Card>
 
-        {/* Stats Counters */}
-        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
-          <CardHeader>
-            <CardTitle>Stats Counters</CardTitle>
-            <CardDescription>Manage the numeric statistics displayed on the landing page.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 grid sm:grid-cols-3 gap-6 sm:space-y-0">
-            {STATS_KEYS.map((item) => (
-              <div key={item.key} className="grid gap-2">
-                <label className="text-sm font-medium">{item.label}</label>
-                <Input 
-                  type="text" 
-                  placeholder={item.placeholder}
-                  value={settingsMap[item.key] || ""}
-                  onChange={e => handleStandardChange(item.key, e.target.value)}
-                />
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
         {/* Landing Page Content */}
-        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
+        <Card>
           <CardHeader>
             <CardTitle>Landing Page Content</CardTitle>
             <CardDescription>Configure text and imagery for the public site's homepage.</CardDescription>
@@ -272,7 +239,7 @@ export default function SettingsClient({ initialSettings, user }: { initialSetti
         </Card>
 
         {/* Custom Variables */}
-        <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] bg-white dark:bg-slate-900/50">
+        <Card>
           <CardHeader className="flex flex-row items-start justify-between space-y-0">
             <div>
               <CardTitle>Custom Settings</CardTitle>
