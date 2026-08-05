@@ -88,7 +88,7 @@ export default async function TeacherTasksPage() {
     }),
   ]);
 
-  const pendingByClass = Array.from(submissions.reduce((groups, submission) => {
+  const pendingByClass = Array.from(submissions.reduce((groups: any, submission: any) => {
     const classroom = submission.assignment.classSection;
     const current = groups.get(classroom.id) || { classroom, submissions: [] as typeof submissions };
     current.submissions.push(submission);
@@ -116,12 +116,12 @@ export default async function TeacherTasksPage() {
       <section className={styles.recordPanel}>
         <header><div><span className={styles.cockpitEyebrow}><PackageOpen size={16} /> Unpublished work</span><h2>Drafts waiting for your decision</h2></div><strong>{draftTotal}</strong></header>
         {draftTotal ? <div className={styles.recordList}>
-          {draftAssignments.map((assignment) => <article className={styles.recordRow} key={`assignment-${assignment.id}`}>
+          {draftAssignments.map((assignment: any) => <article className={styles.recordRow} key={`assignment-${assignment.id}`}>
             <span className={styles.recordIcon}><FileText size={19} /></span>
             <div className={styles.recordMain}><small>{assignment.classSection.code} · Assignment draft</small><strong>{assignment.title}</strong><p>Saved {dateTime.format(assignment.updatedAt)} · Students cannot see it yet</p></div>
             <Link className="btn-secondary" href={`/elearning/assignments/${assignment.id}/edit`}>Continue editing</Link>
           </article>)}
-          {draftQuizzes.map((quiz) => <article className={styles.recordRow} key={`quiz-${quiz.id}`}>
+          {draftQuizzes.map((quiz: any) => <article className={styles.recordRow} key={`quiz-${quiz.id}`}>
             <span className={styles.recordIcon}><ListChecks size={19} /></span>
             <div className={styles.recordMain}><small>{quiz.classSection?.code || "QUIZ LIBRARY"} · Quiz draft</small><strong>{quiz.title}</strong><p>{quiz._count.questions} questions · Saved {dateTime.format(quiz.updatedAt)}</p></div>
             <Link className="btn-secondary" href={`/elearning/practice/${quiz.id}/manage`}>Continue editing</Link>
@@ -131,10 +131,10 @@ export default async function TeacherTasksPage() {
 
       <section className={styles.recordPanel}>
         <header><div><span className={styles.cockpitEyebrow}><FileText size={16} /> Pending assignments</span><h2>Review by classroom</h2></div><strong>{submissions.length}</strong></header>
-        {pendingByClass.length ? <div className={styles.recordList}>{pendingByClass.map(({ classroom, submissions: classroomSubmissions }) => (
+        {pendingByClass.length ? <div className={styles.recordList}>{pendingByClass.map(({ classroom, submissions: classroomSubmissions }: any) => (
           <article className={styles.recordRow} key={classroom.id}>
             <span className={styles.recordIcon}><FileText size={19} /></span>
-            <div className={styles.recordMain}><small>{classroom.code}</small><strong>{classroom.name}</strong><p>{classroomSubmissions.slice(0, 3).map((item) => item.student.name || item.student.email || "Student").join(", ")}</p></div>
+            <div className={styles.recordMain}><small>{classroom.code}</small><strong>{classroom.name}</strong><p>{classroomSubmissions.slice(0, 3).map((item: any) => item.student.name || item.student.email || "Student").join(", ")}</p></div>
             <div className={styles.recordMetric}><strong>{classroomSubmissions.length}</strong><span>To grade</span></div>
             <Link className="btn-secondary" href={`/elearning/scores?classroom=${classroom.id}`}>Review</Link>
           </article>
@@ -143,7 +143,7 @@ export default async function TeacherTasksPage() {
 
       {writtenAttempts.length ? <section className={styles.recordPanel}>
         <header><div><span className={styles.cockpitEyebrow}><AlertTriangle size={16} /> Written quiz answers</span><h2>Manual review required</h2></div><strong>{writtenAttempts.length}</strong></header>
-        <div className={styles.recordList}>{writtenAttempts.map((attempt) => (
+        <div className={styles.recordList}>{writtenAttempts.map((attempt: any) => (
           <article className={styles.recordRow} key={attempt.id}>
             <span className={styles.recordIcon}><FileText size={19} /></span>
             <div className={styles.recordMain}><small>{attempt.quizDelivery?.classSection.code || "QUIZ"}</small><strong>{attempt.quiz.title}</strong><p>{attempt.student.name || attempt.student.email || "Student"}</p></div>
@@ -155,14 +155,14 @@ export default async function TeacherTasksPage() {
       <section className={styles.recordPanel}>
         <header><div><span className={styles.cockpitEyebrow}><TimerReset size={16} /> Deadline watch</span><h2>Due in the next 7 days</h2></div><strong>{deadlineTotal}</strong></header>
         {deadlineTotal ? <div className={styles.recordList}>
-          {assignmentsDue.map((assignment) => <article className={styles.recordRow} key={assignment.id}><span className={styles.recordIcon}><FileText size={19} /></span><div className={styles.recordMain}><small>{assignment.classSection.code} · Assignment</small><strong>{assignment.title}</strong><p>{assignment.dueAt ? dateTime.format(assignment.dueAt) : "No deadline"}</p></div><div className={styles.recordMetric}><strong>{assignment.submissions.length}</strong><span>Submitted</span></div></article>)}
-          {quizzesDue.map((delivery) => <article className={styles.recordRow} key={delivery.id}><span className={styles.recordIcon}><ListChecks size={19} /></span><div className={styles.recordMain}><small>{delivery.classSection.code} · Quiz</small><strong>{delivery.quiz.title}</strong><p>{delivery.dueAt ? dateTime.format(delivery.dueAt) : "No deadline"}</p></div><div className={styles.recordMetric}><strong>{delivery.attempts.length}</strong><span>Attempts</span></div></article>)}
+          {assignmentsDue.map((assignment: any) => <article className={styles.recordRow} key={assignment.id}><span className={styles.recordIcon}><FileText size={19} /></span><div className={styles.recordMain}><small>{assignment.classSection.code} · Assignment</small><strong>{assignment.title}</strong><p>{assignment.dueAt ? dateTime.format(assignment.dueAt) : "No deadline"}</p></div><div className={styles.recordMetric}><strong>{assignment.submissions.length}</strong><span>Submitted</span></div></article>)}
+          {quizzesDue.map((delivery: any) => <article className={styles.recordRow} key={delivery.id}><span className={styles.recordIcon}><ListChecks size={19} /></span><div className={styles.recordMain}><small>{delivery.classSection.code} · Quiz</small><strong>{delivery.quiz.title}</strong><p>{delivery.dueAt ? dateTime.format(delivery.dueAt) : "No deadline"}</p></div><div className={styles.recordMetric}><strong>{delivery.attempts.length}</strong><span>Attempts</span></div></article>)}
         </div> : <div className={styles.libraryEmpty}><CheckCircle2 size={36} /><h3>No urgent deadlines</h3><p>Nothing is due in the next seven days.</p></div>}
       </section>
 
       <section className={styles.recordPanel}>
         <header><div><span className={styles.cockpitEyebrow}><CheckCircle2 size={16} /> Recent quiz submissions</span><h2>Latest student activity</h2></div></header>
-        {recentAttempts.length ? <div className={styles.recordList}>{recentAttempts.map((attempt) => (
+        {recentAttempts.length ? <div className={styles.recordList}>{recentAttempts.map((attempt: any) => (
           <article className={styles.recordRow} key={attempt.id}><span className={styles.recordIcon}><CheckCircle2 size={19} /></span><div className={styles.recordMain}><small>{attempt.quizDelivery?.classSection.code || "QUIZ"}</small><strong>{attempt.student.name || attempt.student.email || "Student"} completed {attempt.quiz.title}</strong><p>{dateTime.format(attempt.submittedAt || attempt.startedAt)}</p></div><div className={styles.recordMetric}><strong>{attempt.score ?? "—"}</strong><span>Score</span></div></article>
         ))}</div> : <p className={styles.classroomEmpty}>No quiz submissions yet.</p>}
       </section>

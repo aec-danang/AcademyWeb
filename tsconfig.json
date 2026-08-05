@@ -31,5 +31,15 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "scripts",
+    "bulk-classify.ts",
+    "check.ts",
+    "fix.ts",
+    "fix_enum.ts",
+    "generate-meta.ts",
+    "reorganize.js",
+    "drop_skill.mjs"
+  ]
 }

@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { X, Upload, CheckCircle2 } from "lucide-react";
-import { submitScheduleAdjustment } from "@/lib/scheduleActions";
-import { AdjustmentType } from "@prisma/client";
+import { submitScheduleAdjustment, AdjustmentType } from "@/lib/scheduleActions";
 
 type ScheduleAdjustmentFormProps = {
   classroomId: string;

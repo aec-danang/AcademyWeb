@@ -5,10 +5,8 @@ import { FileCheck2, Plus } from "lucide-react";
 import styles from "../elearning.module.css";
 import PracticeTestList from "./PracticeTestList";
 import QuizFilters from "./QuizFilters";
-import type { Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
-type PracticeTestRecord = Prisma.QuizGetPayload<{ include: { program: true; _count: { select: { questions: true } }; deliveries: true; attempts: true } }>;
 
 export async function PracticeTestsTab({ searchParams }: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const user = await requireUser();
@@ -17,7 +15,7 @@ export async function PracticeTestsTab({ searchParams }: { searchParams?: Promis
   const program = typeof resolvedSearchParams?.program === "string" ? resolvedSearchParams.program : "";
   const unit = typeof resolvedSearchParams?.unit === "string" ? resolvedSearchParams.unit : "";
 
-  let tests: PracticeTestRecord[] = [];
+  let tests: any[] = [];
   let programs: Awaited<ReturnType<typeof prisma.program.findMany>> = [];
   let classrooms: Array<{ id: string; name: string; code: string }> = [];
 
@@ -74,9 +72,9 @@ export async function PracticeTestsTab({ searchParams }: { searchParams?: Promis
 
   const filteredTests = tests;
 
-  const programOptions = programs.filter((p) => tests.some((t) => t.programId === p.id) || p.id === program);
-  const allUnits = Array.from(new Set(tests.map((t) => t.unit).filter(Boolean))) as string[];
-  const unitOptions = allUnits.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  const programOptions = programs.filter((p: any) => tests.some((t: any) => t.programId === p.id) || p.id === program);
+  const allUnits = Array.from(new Set(tests.map((t: any) => t.unit).filter(Boolean))) as string[];
+  const unitOptions = allUnits.sort((a: any, b: any) => a.localeCompare(b, undefined, { numeric: true }));
 
   return (
     <div className={styles.quizPageShell}>
@@ -106,7 +104,7 @@ export async function PracticeTestsTab({ searchParams }: { searchParams?: Promis
 
       {/* GSAP Client Component */}
       <PracticeTestList
-        tests={filteredTests.map((test) => {
+        tests={filteredTests.map((test: any) => {
           const latestAttempt = test.attempts?.[0];
           const status = !latestAttempt ? "NOT_STARTED" as const : latestAttempt.status === "IN_PROGRESS" ? "IN_PROGRESS" as const : "COMPLETED" as const;
           return {
@@ -121,7 +119,10 @@ export async function PracticeTestsTab({ searchParams }: { searchParams?: Promis
             score: latestAttempt?.score ?? null,
             attemptId: latestAttempt?.id || null,
           };
-        }).sort((a, b) => ({ NOT_STARTED: 0, IN_PROGRESS: 1, COMPLETED: 2 })[a.status] - ({ NOT_STARTED: 0, IN_PROGRESS: 1, COMPLETED: 2 })[b.status])}
+        }).sort((a: any, b: any) => {
+          const order: any = { NOT_STARTED: 0, IN_PROGRESS: 1, COMPLETED: 2 };
+          return order[a.status] - order[b.status];
+        })}
         classrooms={classrooms}
         canAssign={user.role !== "STUDENT"}
       />

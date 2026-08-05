@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
-import { AdjustmentType } from "@prisma/client";
+export type AdjustmentType = "ABSENCE" | "MAKEUP";
 
 export async function submitScheduleAdjustment(
   classSectionId: string, 

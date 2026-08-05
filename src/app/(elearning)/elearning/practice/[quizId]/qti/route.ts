@@ -14,11 +14,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ qui
   });
   if (!quiz) return new Response("Not found", { status: 404 });
 
-  const items = quiz.questions.map((link, questionIndex) => {
+  const items = quiz.questions.map((link: any, questionIndex: number) => {
     const question = link.question;
     const identifier = `ITEM_${questionIndex + 1}`;
-    const choices = question.options.map((option, index) => `<simpleChoice identifier="${xml(option.label || String.fromCharCode(65 + index))}">${xml(option.text)}</simpleChoice>`).join("");
-    const correct = question.options.find((option) => option.isCorrect);
+    const choices = question.options.map((option: any, index: number) => `<simpleChoice identifier="${xml(option.label || String.fromCharCode(65 + index))}">${xml(option.text)}</simpleChoice>`).join("");
+    const correct = question.options.find((option: any) => option.isCorrect);
     const response = correct ? `<responseDeclaration identifier="RESPONSE" cardinality="single" baseType="identifier"><correctResponse><value>${xml(correct.label || String.fromCharCode(65 + question.options.indexOf(correct)))}</value></correctResponse></responseDeclaration>` : "";
     const body = choices ? `<choiceInteraction responseIdentifier="RESPONSE" maxChoices="1"><prompt>${xml(question.text)}</prompt>${choices}</choiceInteraction>` : `<extendedTextInteraction responseIdentifier="RESPONSE"><prompt>${xml(question.text)}</prompt></extendedTextInteraction>`;
     return `<assessmentItem identifier="${identifier}" title="${xml(question.text.slice(0, 80))}" adaptive="false" timeDependent="false">${response}<itemBody>${body}</itemBody></assessmentItem>`;

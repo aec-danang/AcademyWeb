@@ -14,7 +14,7 @@ export default async function AssessmentsPage() {
       <AdminPageHeader eyebrow="Quality view" title="Assessments" description="A compact inventory of tests and their usage. Teachers continue to assign and review learner work." />
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white py-0 shadow-sm">
         <div className="divide-y divide-slate-100">
-          {assessments.map((assessment) => (
+          {assessments.map((assessment: any) => (
             <div key={assessment.id} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-5 py-4">
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 text-indigo-600"><ClipboardCheck className="h-5 w-5" /></span>
               <span className="min-w-0"><strong className="block truncate text-sm text-navy">{assessment.title}</strong><small className="block truncate text-slate-500">{assessment.examType} · {assessment.skill}</small></span>

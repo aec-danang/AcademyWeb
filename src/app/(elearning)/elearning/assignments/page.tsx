@@ -36,12 +36,12 @@ export default async function AssignmentsPage({ searchParams }: Props) {
           <Link href="/elearning/assignments/new" className="btn-primary"><Plus size={16} /> Create assignment</Link>
         </header>
         {createdId || updatedId ? <section className={styles.assignmentSuccessBanner}><span><CheckCircle2 size={20} /></span><div><strong>{createdId ? "Assignment created" : "Changes saved"}</strong><p>{createdId ? "Students can now complete the work when it is published. The next step is reviewing submissions and feedback." : "The assignment list and student view now use the updated details."}</p></div><Link href="/elearning/scores">Review submissions <ArrowRight size={16} /></Link></section> : null}
-        <section className={styles.classroomSummaryGrid}><div><FileText size={20} /><strong>{assignments.length}</strong><span>Total assignments</span></div><div><CheckCircle2 size={20} /><strong>{assignments.filter((item) => item.status === "PUBLISHED").length}</strong><span>Published</span></div><div><Clock3 size={20} /><strong>{assignments.reduce((sum, item) => sum + item.submissions.filter((submission) => submission.grade?.status !== "PUBLISHED" && submission.status !== "GRADED").length, 0)}</strong><span>Waiting for review</span></div></section>
+        <section className={styles.classroomSummaryGrid}><div><FileText size={20} /><strong>{assignments.length}</strong><span>Total assignments</span></div><div><CheckCircle2 size={20} /><strong>{assignments.filter((item: any) => item.status === "PUBLISHED").length}</strong><span>Published</span></div><div><Clock3 size={20} /><strong>{assignments.reduce((sum: number, item: any) => sum + item.submissions.filter((submission: any) => submission.grade?.status !== "PUBLISHED" && submission.status !== "GRADED").length, 0)}</strong><span>Waiting for review</span></div></section>
         <section className={styles.recordPanel}>
           <header><div><span className={styles.cockpitEyebrow}><FileText size={16} /> Overview</span><h2>All assignments</h2></div></header>
           {assignments.length ? <div className={styles.recordList}>
-            {assignments.map((assignment) => {
-              const pending = assignment.submissions.filter((item) => item.grade?.status !== "PUBLISHED" && item.status !== "GRADED").length;
+            {assignments.map((assignment: any) => {
+              const pending = assignment.submissions.filter((item: any) => item.grade?.status !== "PUBLISHED" && item.status !== "GRADED").length;
               return (
                 <article className={styles.recordRow} key={assignment.id}>
                   <span className={styles.recordIcon}><FileText size={19} /></span>
@@ -79,7 +79,7 @@ export default async function AssignmentsPage({ searchParams }: Props) {
 
   const now = new Date();
 
-  const formattedAssignments = dbAssignments.map(a => {
+  const formattedAssignments = dbAssignments.map((a: any) => {
     const submission = a.submissions[0];
     const isSubmitted = !!submission;
     const isGraded = submission?.grade?.status === "PUBLISHED";

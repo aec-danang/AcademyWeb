@@ -18,9 +18,9 @@ export default async function ClassroomsPage() {
       <AdminPageHeader eyebrow="Oversight" title="Classrooms" description="A read-only operational list. Open a class for its roster, teacher and delivery status." />
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white py-0 shadow-sm">
         <div className="divide-y divide-slate-100">
-          {classrooms.map((classroom) => {
-            const active = classroom.enrollments.filter((item) => item.status === "ACTIVE").length;
-            const pending = classroom.enrollments.filter((item) => item.status === "REQUESTED").length;
+          {classrooms.map((classroom: any) => {
+            const active = classroom.enrollments.filter((item: any) => item.status === "ACTIVE").length;
+            const pending = classroom.enrollments.filter((item: any) => item.status === "REQUESTED").length;
             return (
               <Link key={classroom.id} href={`/management/classrooms/${classroom.id}`} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-5 py-4 transition hover:bg-indigo-50/60">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 text-indigo-600"><School className="h-5 w-5" /></span>

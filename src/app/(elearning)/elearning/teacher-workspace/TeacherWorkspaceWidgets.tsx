@@ -67,14 +67,14 @@ export async function TeacherOverviewStats({ userId, isAdmin }: { userId: string
 
     const stats = [
       { label: "Active classrooms", value: activeClasses, icon: Users, tone: "indigo" },
-      { label: "Active students", value: new Set(enrollments.map((item) => item.userId)).size, icon: GraduationCap, tone: "cyan" },
+      { label: "Active students", value: new Set(enrollments.map((item: any) => item.userId)).size, icon: GraduationCap, tone: "cyan" },
       { label: "Waiting for review", value: assignmentReviews + quizReviews, icon: ClipboardCheck, tone: "orange" },
       { label: "Submitted today", value: submissionsToday + attemptsToday, icon: Clock3, tone: "green" },
     ];
 
     return (
       <section className={styles.workspaceMetricStrip} aria-label="Teaching overview">
-        {stats.map((stat) => {
+        {stats.map((stat: any) => {
           const Icon = stat.icon;
           return (
             <div className={styles.workspaceMetric} key={stat.label}>
@@ -130,13 +130,13 @@ export async function NeedsAttentionWidget({ userId, isAdmin }: { userId: string
       { label: "AI grading confirmations", count: aiConfirmations, href: "/elearning/scores", icon: Bot, tone: "cyan" },
       { label: "Draft assignments", count: drafts, href: "/elearning/assignments", icon: FileClock, tone: "slate" },
       { label: "Quiz submissions to grade", count: quizSubmissions, href: "/elearning/scores", icon: ListChecks, tone: "orange" },
-    ].filter((item) => item.count > 0);
+    ].filter((item: any) => item.count > 0);
 
     return (
       <WorkspaceWidget eyebrow="Highest priority" title="Needs attention" icon={ClipboardCheck} href="/elearning/scores" linkLabel="Open review queue">
         {items.length ? (
           <div className={styles.attentionList}>
-            {items.map((item) => {
+            {items.map((item: any) => {
               const Icon = item.icon;
               return (
                 <Link href={item.href} key={item.label} className={styles.attentionItem}>
@@ -182,17 +182,17 @@ export async function ClassroomsWidget({ userId, isAdmin }: { userId: string; is
       <WorkspaceWidget eyebrow="Teaching now" title="My classrooms" icon={Users} href="/elearning/classrooms" linkLabel="All classrooms">
         {classrooms.length ? (
           <div className={styles.workspaceClassList}>
-            {classrooms.map((classroom) => {
-              const students = classroom.enrollments.filter((item) => item.status === "ACTIVE").length;
-              const pending = classroom.assignments.flatMap((assignment) => assignment.submissions).filter((item) => item.status !== "GRADED").length;
-              const submitted = classroom.assignments.flatMap((assignment) => assignment.submissions).length
-                + classroom.quizDeliveries.flatMap((delivery) => delivery.attempts).filter((attempt) => attempt.status !== "IN_PROGRESS").length;
+            {classrooms.map((classroom: any) => {
+              const students = classroom.enrollments.filter((item: any) => item.status === "ACTIVE").length;
+              const pending = classroom.assignments.flatMap((assignment: any) => assignment.submissions).filter((item: any) => item.status !== "GRADED").length;
+              const submitted = classroom.assignments.flatMap((assignment: any) => assignment.submissions).length
+                + classroom.quizDeliveries.flatMap((delivery: any) => delivery.attempts).filter((attempt: any) => attempt.status !== "IN_PROGRESS").length;
               const activityDates = [
                 classroom.updatedAt,
-                ...classroom.enrollments.map((item) => item.requestedAt),
-                ...classroom.assignments.flatMap((assignment) => [assignment.updatedAt, ...assignment.submissions.map((item) => item.submittedAt)]),
+                ...classroom.enrollments.map((item: any) => item.requestedAt),
+                ...classroom.assignments.flatMap((assignment: any) => [assignment.updatedAt, ...assignment.submissions.map((item: any) => item.submittedAt)]),
               ];
-              const latest = activityDates.sort((a, b) => b.getTime() - a.getTime())[0];
+              const latest = activityDates.sort((a: any, b: any) => b.getTime() - a.getTime())[0];
 
               return (
                 <Link href={`/elearning/classrooms/${classroom.id}`} key={classroom.id} className={styles.workspaceClassRow}>
@@ -263,18 +263,18 @@ export async function RecentActivityWidget({ userId, isAdmin }: { userId: string
     ]);
 
     const events = [
-      ...submissions.map((item) => ({ key: `submission-${item.id}`, date: item.submittedAt, title: `${item.student.name || item.student.email || "A student"} submitted work`, detail: `${item.assignment.title} · ${item.assignment.classSection.code}`, href: "/elearning/scores", icon: FileText })),
-      ...quizAttempts.map((item) => ({ key: `attempt-${item.id}`, date: item.submittedAt || item.startedAt, title: `${item.student.name || item.student.email || "A student"} completed a quiz`, detail: `${item.quiz.title} · ${item.quizDelivery?.classSection.code || "Open quiz"}${typeof item.score === "number" ? ` · ${item.score}` : ""}`, href: `/elearning/exercises/${item.quizId}?attempt=${item.id}${item.quizDeliveryId ? `&delivery=${item.quizDeliveryId}` : ""}`, icon: ListChecks })),
-      ...enrollments.map((item) => ({ key: `enrollment-${item.id}`, date: item.requestedAt, title: item.status === "REQUESTED" ? "New enrollment request" : "Enrollment updated", detail: `${item.student.name || item.student.email || "Student"} · ${item.classSection.code}`, href: `/elearning/classrooms/${item.classSection.id}?tab=students`, icon: UserPlus })),
-      ...grades.map((item) => ({ key: `grade-${item.id}`, date: item.createdAt, title: "Score published", detail: `${item.assignment?.title || item.quiz?.title || "Manual score"} · ${(item.score ?? 0).toFixed(1)}`, href: "/elearning/scores", icon: ClipboardCheck })),
-      ...publications.map((item) => ({ key: `publish-${item.id}`, date: item.updatedAt, title: "Assignment published", detail: `${item.title} · ${item.classSection.code}`, href: `/elearning/classrooms/${item.classSection.id}?tab=assignments`, icon: Sparkles })),
-    ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 6);
+      ...submissions.map((item: any) => ({ key: `submission-${item.id}`, date: item.submittedAt, title: `${item.student.name || item.student.email || "A student"} submitted work`, detail: `${item.assignment.title} · ${item.assignment.classSection.code}`, href: "/elearning/scores", icon: FileText })),
+      ...quizAttempts.map((item: any) => ({ key: `attempt-${item.id}`, date: item.submittedAt || item.startedAt, title: `${item.student.name || item.student.email || "A student"} completed a quiz`, detail: `${item.quiz.title} · ${item.quizDelivery?.classSection.code || "Open quiz"}${typeof item.score === "number" ? ` · ${item.score}` : ""}`, href: `/elearning/exercises/${item.quizId}?attempt=${item.id}${item.quizDeliveryId ? `&delivery=${item.quizDeliveryId}` : ""}`, icon: ListChecks })),
+      ...enrollments.map((item: any) => ({ key: `enrollment-${item.id}`, date: item.requestedAt, title: item.status === "REQUESTED" ? "New enrollment request" : "Enrollment updated", detail: `${item.student.name || item.student.email || "Student"} · ${item.classSection.code}`, href: `/elearning/classrooms/${item.classSection.id}?tab=students`, icon: UserPlus })),
+      ...grades.map((item: any) => ({ key: `grade-${item.id}`, date: item.createdAt, title: "Score published", detail: `${item.assignment?.title || item.quiz?.title || "Manual score"} · ${(item.score ?? 0).toFixed(1)}`, href: "/elearning/scores", icon: ClipboardCheck })),
+      ...publications.map((item: any) => ({ key: `publish-${item.id}`, date: item.updatedAt, title: "Assignment published", detail: `${item.title} · ${item.classSection.code}`, href: `/elearning/classrooms/${item.classSection.id}?tab=assignments`, icon: Sparkles })),
+    ].sort((a: any, b: any) => b.date.getTime() - a.date.getTime()).slice(0, 6);
 
     return (
       <WorkspaceWidget eyebrow="Across your modules" title="Recent activity" icon={Activity} href="/elearning/classrooms" linkLabel="Activity logs">
         {events.length ? (
           <div className={styles.workspaceTimeline}>
-            {events.map((event) => {
+            {events.map((event: any) => {
               const Icon = event.icon;
               return (
                 <Link href={event.href} key={event.key} className={styles.workspaceTimelineItem}>
@@ -311,17 +311,17 @@ export async function LearningInsightsWidget({ userId, isAdmin }: { userId: stri
 
     const recent = grades.slice(0, Math.min(10, grades.length));
     const previous = grades.slice(10, 20);
-    const percentScore = (grade: (typeof recent)[number]) => grade.assignment ? ((grade.score ?? 0) / grade.assignment.maxScore) * 100 : (grade.score ?? 0);
-    const average = recent.reduce((sum, grade) => sum + percentScore(grade), 0) / recent.length;
-    const previousAverage = previous.length ? previous.reduce((sum, grade) => sum + percentScore(grade), 0) / previous.length : null;
+    const percentScore = (grade: any) => grade.assignment ? ((grade.score ?? 0) / grade.assignment.maxScore) * 100 : (grade.score ?? 0);
+    const average = recent.reduce((sum: number, grade: any) => sum + percentScore(grade), 0) / recent.length;
+    const previousAverage = previous.length ? previous.reduce((sum: number, grade: any) => sum + percentScore(grade), 0) / previous.length : null;
     const trend = previousAverage === null ? null : average - previousAverage;
-    const lowScores = recent.filter((grade) => percentScore(grade) < 65);
-    const skillScores = recent.filter((grade) => grade.assignment).reduce<Record<string, number[]>>((groups, grade) => {
+    const lowScores = recent.filter((grade: any) => percentScore(grade) < 65);
+    const skillScores = recent.filter((grade: any) => grade.assignment).reduce<Record<string, number[]>>((groups: any, grade: any) => {
       const skill = grade.assignment?.skill || "MIXED";
       (groups[skill] ||= []).push(percentScore(grade));
       return groups;
     }, {});
-    const weakestSkill = Object.entries(skillScores).map(([skill, values]) => ({ skill, average: values.reduce((sum, value) => sum + value, 0) / values.length })).sort((a, b) => a.average - b.average)[0];
+    const weakestSkill = Object.entries(skillScores).map(([skill, values]: any) => ({ skill, average: values.reduce((sum: number, value: number) => sum + value, 0) / values.length })).sort((a: any, b: any) => a.average - b.average)[0];
     const insight = lowScores.length >= Math.ceil(recent.length / 2)
       ? `${lowScores.length} of the latest ${recent.length} results are below 65%. ${weakestSkill ? `${weakestSkill.skill.toLowerCase()} needs the most support.` : "A focused review is recommended."}`
       : trend !== null && trend > 2.5

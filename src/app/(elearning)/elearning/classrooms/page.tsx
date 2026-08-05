@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { BookOpen, CheckCircle2, Plus, School, UserPlus, Users } from "lucide-react";
-import type { Prisma } from "@prisma/client";
 import { cancelEnrollmentRequestAction, leaveClassroomAction, requestEnrollmentAction } from "@/lib/lmsActions";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
@@ -11,15 +10,12 @@ import styles from "../elearning.module.css";
 export const dynamic = "force-dynamic";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
-type ClassroomWithRelations = Prisma.ClassSectionGetPayload<{
-  include: { teacher: true; enrollments: { include: { student: true } } };
-}>;
 
 export default async function ClassroomsPage({ searchParams }: Props) {
   const user = await requireUser();
   const query = await searchParams;
   const isStudent = user.role === "STUDENT";
-  let classes: ClassroomWithRelations[] = [];
+  let classes: any[] = [];
 
   try {
     classes = await prisma.classSection.findMany({
@@ -34,15 +30,15 @@ export default async function ClassroomsPage({ searchParams }: Props) {
   }
 
   const activeClasses = isStudent
-    ? classes.filter((item) => item.enrollments.some((enrollment) => enrollment.userId === user.id && enrollment.status === "ACTIVE")).length
-    : classes.filter((item) => item.status === "ACTIVE").length;
-  const activeStudents = classes.reduce((sum, item) => {
-    const studentCanSeeRoster = !isStudent || item.enrollments.some((enrollment) => enrollment.userId === user.id && enrollment.status === "ACTIVE");
-    return studentCanSeeRoster ? sum + item.enrollments.filter((enrollment) => enrollment.status === "ACTIVE").length : sum;
+    ? classes.filter((item: any) => item.enrollments.some((enrollment: any) => enrollment.userId === user.id && enrollment.status === "ACTIVE")).length
+    : classes.filter((item: any) => item.status === "ACTIVE").length;
+  const activeStudents = classes.reduce((sum: number, item: any) => {
+    const studentCanSeeRoster = !isStudent || item.enrollments.some((enrollment: any) => enrollment.userId === user.id && enrollment.status === "ACTIVE");
+    return studentCanSeeRoster ? sum + item.enrollments.filter((enrollment: any) => enrollment.status === "ACTIVE").length : sum;
   }, 0);
   const pendingEnrollments = isStudent
-    ? classes.reduce((sum, item) => sum + item.enrollments.filter((enrollment) => enrollment.userId === user.id && enrollment.status === "REQUESTED").length, 0)
-    : classes.reduce((sum, item) => sum + item.enrollments.filter((enrollment) => enrollment.status === "REQUESTED").length, 0);
+    ? classes.reduce((sum: number, item: any) => sum + item.enrollments.filter((enrollment: any) => enrollment.userId === user.id && enrollment.status === "REQUESTED").length, 0)
+    : classes.reduce((sum: number, item: any) => sum + item.enrollments.filter((enrollment: any) => enrollment.status === "REQUESTED").length, 0);
 
   return <main className={styles.classroomHub}>
     <ElearningBreadcrumbs items={[{ label: isStudent ? "My Classrooms" : "Classrooms" }]} />
@@ -77,10 +73,10 @@ export default async function ClassroomsPage({ searchParams }: Props) {
 
     <section className={styles.recordPanel}>
       <header><div><span className={styles.cockpitEyebrow}><BookOpen size={16} /> Overview</span><h2>{classes.length} classroom{classes.length === 1 ? "" : "s"}</h2></div></header>
-      {classes.length ? <div className={styles.recordList}>{classes.map((classSection) => {
-        const students = classSection.enrollments.filter((enrollment) => enrollment.status === "ACTIVE").length;
-        const requested = classSection.enrollments.filter((enrollment) => enrollment.status === "REQUESTED").length;
-        const ownEnrollment = isStudent ? classSection.enrollments.find((enrollment) => enrollment.userId === user.id) : null;
+      {classes.length ? <div className={styles.recordList}>{classes.map((classSection: any) => {
+        const students = classSection.enrollments.filter((enrollment: any) => enrollment.status === "ACTIVE").length;
+        const requested = classSection.enrollments.filter((enrollment: any) => enrollment.status === "REQUESTED").length;
+        const ownEnrollment = isStudent ? classSection.enrollments.find((enrollment: any) => enrollment.userId === user.id) : null;
         const canOpen = !isStudent || ownEnrollment?.status === "ACTIVE";
         return <article className={styles.recordRow} key={classSection.id} id={`classroom-${classSection.id}`}>
           <span className={styles.recordIcon}><School size={19} /></span>

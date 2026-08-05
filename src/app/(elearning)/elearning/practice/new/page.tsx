@@ -17,6 +17,6 @@ export default async function CreateTestPage() {
   return <main className={styles.workflowPage}>
     <ElearningBreadcrumbs items={[{ label: "Quizzes", href: "/elearning/practice?tab=quizzes" }, { label: "Create quiz" }]} />
     <header className={styles.workflowHero}><div><span><Route size={16} /> Assessment workflow</span><h1>Create an English quiz</h1><p>Write from scratch, reuse your question bank, import a document or start from an exam template.</p></div><Link href="/elearning/practice?tab=quizzes" className="btn-secondary"><ArrowLeft size={16} /> Back to library</Link></header>
-    <TestBuilder classrooms={classrooms} questionBank={questions.map((item) => ({ id: item.id, text: item.text, type: item.type, points: item.points, answerKey: item.answerKey, explanation: item.explanation, options: item.options.map((option) => ({ text: option.text, isCorrect: option.isCorrect })) }))} />
+    <TestBuilder classrooms={classrooms} questionBank={questions.map((item: any) => ({ id: item.id, text: item.text, type: item.type, points: item.points, answerKey: item.answerKey, explanation: item.explanation, options: item.options.map((option: any) => ({ text: option.text, isCorrect: option.isCorrect })) }))} />
   </main>;
 }

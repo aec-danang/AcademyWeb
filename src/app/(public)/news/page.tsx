@@ -30,7 +30,7 @@ export default async function NewsPage() {
   });
 
   // Serialize dates for client component
-  const serialized = posts.map((p) => ({ ...p, createdAt: p.createdAt.toISOString() }));
+  const serialized = posts.map((p: any) => ({ ...p, createdAt: p.createdAt.toISOString() }));
 
   return (
     <div className="bg-slate-50 dark:bg-slate-950 pb-20">

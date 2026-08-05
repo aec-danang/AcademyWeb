@@ -54,7 +54,7 @@ export function TeacherWorkspace({ user }: { user: { id: string; name: string | 
               </Link>
             </div>
             <div className="divide-y divide-slate-100">
-              {todaysClasses.map(cls => (
+              {todaysClasses.map((cls: any) => (
                 <div key={cls.id} className="p-5 flex items-center justify-between hover:bg-slate-50 transition-colors">
                   <div className="flex items-start gap-4">
                     <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-md text-sm font-semibold whitespace-nowrap">
@@ -114,7 +114,7 @@ export function TeacherWorkspace({ user }: { user: { id: string; name: string | 
               Recent Submissions
             </h2>
             <div className="space-y-4">
-              {[1, 2, 3].map(i => (
+              {[1, 2, 3].map((i: any) => (
                 <div key={i} className="flex gap-3 items-start">
                   <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5" aria-hidden="true">
                     S{i}

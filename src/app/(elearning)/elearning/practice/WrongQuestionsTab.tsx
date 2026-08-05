@@ -13,14 +13,12 @@ import styles from "../elearning.module.css";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { startQuizReviewAttemptAction } from "@/lib/lmsActions";
-import type { Prisma } from "@prisma/client";
 
 type Props = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export const dynamic = "force-dynamic";
-type WrongAnswerRecord = Prisma.AttemptAnswerGetPayload<{ include: { option: true; question: { include: { options: true } }; attempt: { include: { student: true; quizDelivery: { include: { classSection: true } }; quiz: { include: { program: true; classSection: true } } } } } }>;
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -73,7 +71,7 @@ export async function WrongQuestionsTab({ searchParams }: Props) {
   const searchTerm = searchValue(resolvedSearchParams?.q);
   const normalizedSearch = searchTerm.trim().toLowerCase();
 
-  let wrongAnswers: WrongAnswerRecord[] = [];
+  let wrongAnswers: any[] = [];
 
   try {
     wrongAnswers = await prisma.attemptAnswer.findMany({
@@ -210,7 +208,7 @@ export async function WrongQuestionsTab({ searchParams }: Props) {
     }
     acc.get(groupKey)?.cards.push(card);
     return acc;
-  }, new Map()).values());
+  }, new Map<string, QuizGroup>()).values());
   type TeacherStudentGroup = {
     studentId: string;
     studentName: string;
@@ -230,23 +228,23 @@ export async function WrongQuestionsTab({ searchParams }: Props) {
       classroomId: card.classroomId,
       classroomName: card.classroomName,
       classCode: card.classCode,
-      students: [],
-      cards: [],
+      students: [] as TeacherStudentGroup[],
+      cards: [] as WrongQuestionCard[],
     };
     classroom.cards.push(card);
-    let student = classroom.students.find((item) => item.studentId === card.studentId);
+    let student = classroom.students.find((item: any) => item.studentId === card.studentId);
     if (!student) {
       student = {
         studentId: card.studentId,
         studentName: card.studentName,
         studentEmail: card.studentEmail,
-        quizzes: [],
-        cards: [],
+        quizzes: [] as QuizGroup[],
+        cards: [] as WrongQuestionCard[],
       };
       classroom.students.push(student);
     }
     student.cards.push(card);
-    let studentQuiz = student.quizzes.find((item) => item.quizId === card.quizId);
+    let studentQuiz = student.quizzes.find((item: any) => item.quizId === card.quizId);
     if (!studentQuiz) {
       studentQuiz = {
         quizId: card.quizId,
@@ -263,7 +261,7 @@ export async function WrongQuestionsTab({ searchParams }: Props) {
     studentQuiz.cards.push(card);
     classMap.set(card.classroomId, classroom);
     return classMap;
-  }, new Map()).values()).sort((a, b) => a.classroomName.localeCompare(b.classroomName, "en", { numeric: true }));
+  }, new Map<string, TeacherClassGroup>()).values()).sort((a: any, b: any) => a.classroomName.localeCompare(b.classroomName, "en", { numeric: true }));
 
   return (
     <div className={styles.quizPageShell}>
@@ -360,7 +358,7 @@ export async function WrongQuestionsTab({ searchParams }: Props) {
           </section>
         ) : (
           <section className={styles.teacherWrongExplorer}>
-            {teacherClassGroups.map((classroom) => (
+            {teacherClassGroups.map((classroom: any) => (
               <details key={classroom.classroomId} className={styles.teacherClassGroup}>
                 <summary>
                   <span className={styles.teacherClassIcon}><ClipboardList size={20} /></span>
@@ -372,7 +370,7 @@ export async function WrongQuestionsTab({ searchParams }: Props) {
                   <ChevronDown size={20} />
                 </summary>
                 <div className={styles.teacherStudentList}>
-                  {classroom.students.map((student) => (
+                  {classroom.students.map((student: any) => (
                     <details key={student.studentId} className={styles.teacherStudentGroup}>
                       <summary>
                         <span className={styles.teacherStudentAvatar}>{student.studentName.charAt(0).toUpperCase()}</span>
@@ -381,7 +379,7 @@ export async function WrongQuestionsTab({ searchParams }: Props) {
                         <ChevronDown size={18} />
                       </summary>
                       <div className={styles.teacherQuizList}>
-                        {student.quizzes.map((quiz) => (
+                        {student.quizzes.map((quiz: any) => (
                           <details key={quiz.quizId} className={styles.teacherQuizGroup}>
                             <summary>
                               <span className={styles.teacherQuizIcon}><Target size={17} /></span>
@@ -393,7 +391,7 @@ export async function WrongQuestionsTab({ searchParams }: Props) {
                               <ChevronDown size={17} />
                             </summary>
                             <div className={styles.teacherWrongList}>
-                              {quiz.cards.map((card, index) => (
+                              {quiz.cards.map((card: any, index: number) => (
                                 <article key={card.key} className={styles.teacherWrongRow}>
                                   <span className={styles.teacherWrongNumber}>{index + 1}</span>
                                   <div className={styles.teacherWrongMain}>

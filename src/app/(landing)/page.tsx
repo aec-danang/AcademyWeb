@@ -40,7 +40,7 @@ export default async function LandingPage() {
     orderBy: { order: 'asc' }
   });
 
-  const testimonials = dbTestimonials.map(t => ({
+  const testimonials = dbTestimonials.map((t: any) => ({
     id: t.id,
     authorName: t.authorName,
     authorRole: t.authorRole,

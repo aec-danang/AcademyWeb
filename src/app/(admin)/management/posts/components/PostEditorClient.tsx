@@ -4,7 +4,11 @@ import { useState, KeyboardEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createPost, updatePost, autoClassifyByAI } from "../actions";
 import { ArrowLeft, Save, Image as ImageIcon, Settings, X, Tag as TagIcon, Eye, Check, Calendar, Globe, AlertCircle, Sparkles, MoreHorizontal, Wand2, Loader2 } from "lucide-react";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import dynamic from "next/dynamic";
+const RichTextEditor = dynamic(() => import("@/components/ui/rich-text-editor").then(mod => mod.RichTextEditor), {
+  ssr: false,
+  loading: () => <div className="h-[400px] w-full animate-pulse bg-slate-100 dark:bg-slate-800 rounded-xl" />
+});
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

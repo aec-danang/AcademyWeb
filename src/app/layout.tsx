@@ -32,6 +32,21 @@ export default function EnLayout({
 }>) {
   return (
     <html lang="en" className={`${montserrat.variable} ${inter.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (window.location.pathname.startsWith('/management') && localStorage.getItem('aec-theme') === 'dark') {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
+      </head>
       <body className={montserrat.className} suppressHydrationWarning>
         <SessionProviderWrapper>
           <ThemeProvider>

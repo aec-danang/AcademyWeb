@@ -74,7 +74,7 @@ export default async function ScoresPage({ searchParams }: ScoresPageProps) {
     orderBy: { createdAt: "desc" },
     include: { student: true, assignment: { include: { classSection: true } }, quiz: { include: { classSection: true } }, attempt: { include: { quizDelivery: true } }, gradedBy: true },
   });
-  const grades = allGrades.filter((grade) => {
+  const grades = allGrades.filter((grade: any) => {
     if (selectedStudent && grade.studentId !== selectedStudent) return false;
     const classroomId = grade.assignment?.classSectionId
       || grade.quiz?.classSectionId
@@ -92,18 +92,18 @@ export default async function ScoresPage({ searchParams }: ScoresPageProps) {
     ].filter(Boolean).join(" ").toLowerCase().includes(searchTerm)) return false;
     return true;
   });
-  const publishedGrades = grades.filter((grade): grade is (typeof grades)[number] & { score: number } => (
+  const publishedGrades = grades.filter((grade: any): grade is (typeof grades)[number] & { score: number } => (
     grade.status === "PUBLISHED" && typeof grade.score === "number"
   ));
-  const asPercentage = (grade: (typeof publishedGrades)[number]) => (
+  const asPercentage = (grade: any) => (
     grade.assignment ? (grade.score / grade.assignment.maxScore) * 100 : grade.score
   );
   const average = publishedGrades.length
-    ? publishedGrades.reduce((sum, grade) => sum + asPercentage(grade), 0) / publishedGrades.length
+    ? publishedGrades.reduce((sum: number, grade: any) => sum + asPercentage(grade), 0) / publishedGrades.length
     : 0;
 
   if (user.role === "STUDENT") {
-    const formattedGrades = allGrades.map(grade => {
+    const formattedGrades = allGrades.map((grade: any) => {
       let type: 'ASSIGNMENT' | 'QUIZ' = 'ASSIGNMENT';
       if (grade.quiz) type = 'QUIZ';
 
@@ -158,7 +158,7 @@ export default async function ScoresPage({ searchParams }: ScoresPageProps) {
     orderBy: { submittedAt: "asc" },
     include: { student: true, quiz: true, quizDelivery: { include: { classSection: true } } },
   });
-  const pending = pendingAll.filter((submission) => (
+  const pending = pendingAll.filter((submission: any) => (
     (!selectedClassroom || submission.assignment.classSectionId === selectedClassroom)
     && (!selectedStudent || submission.studentId === selectedStudent)
     && (!searchTerm || [
@@ -169,7 +169,7 @@ export default async function ScoresPage({ searchParams }: ScoresPageProps) {
       submission.assignment.classSection.code,
     ].filter(Boolean).join(" ").toLowerCase().includes(searchTerm))
   ));
-  const pendingQuizAttempts = pendingQuizAttemptsAll.filter((attempt) => (
+  const pendingQuizAttempts = pendingQuizAttemptsAll.filter((attempt: any) => (
     (!selectedClassroom || attempt.quizDelivery?.classSectionId === selectedClassroom)
     && (!selectedStudent || attempt.studentId === selectedStudent)
     && (!searchTerm || [
@@ -193,9 +193,9 @@ export default async function ScoresPage({ searchParams }: ScoresPageProps) {
       },
     },
   });
-  const students = Array.from(new Map(
-    classrooms.flatMap((classroom) => classroom.enrollments.map(({ student }) => [student.id, student] as const)),
-  ).values()).sort((a, b) => (a.name || a.email || "").localeCompare(b.name || b.email || ""));
+  const students = Array.from(new Map<string, any>(
+    classrooms.flatMap((classroom: any) => classroom.enrollments.map(({ student }: any) => [student.id, student] as const)),
+  ).values()).sort((a: any, b: any) => (a.name || a.email || "").localeCompare(b.name || b.email || ""));
 
   return (
     <main className={styles.classroomHub}>
@@ -212,15 +212,15 @@ export default async function ScoresPage({ searchParams }: ScoresPageProps) {
         q={queryValue(query?.q)}
         classroom={selectedClassroom}
         student={selectedStudent}
-        classrooms={classrooms.map((classroom) => ({ id: classroom.id, label: `${classroom.name} (${classroom.code})` }))}
-        students={students.map((student) => ({ id: student.id, label: student.name || student.email || "Student" }))}
+        classrooms={classrooms.map((classroom: any) => ({ id: classroom.id, label: `${classroom.name} (${classroom.code})` }))}
+        students={students.map((student: any) => ({ id: student.id, label: student.name || student.email || "Student" }))}
       />
 
       <section className={styles.recordPanel}>
         <header><div><span className={styles.cockpitEyebrow}><Clock3 size={16} /> Needs attention</span><h2>Review queue</h2></div><strong>{pending.length + pendingQuizAttempts.length}</strong></header>
         {pending.length || pendingQuizAttempts.length ? (
           <div className={styles.reviewDisclosureList}>
-            {pending.map((submission) => {
+            {pending.map((submission: any) => {
               const isWriting = submission.assignment.type === "WRITING" || submission.assignment.skill === "WRITING";
               const rubric = aiRubricRows(submission.grade?.aiRubric);
               const aiStatus = submission.grade?.aiStatus || "NOT_REQUESTED";
@@ -260,7 +260,7 @@ export default async function ScoresPage({ searchParams }: ScoresPageProps) {
                             <p className={styles.aiAdvisory}>Advisory only · Confidence {Math.round((submission.grade?.aiConfidence || 0) * 100)}% · {submission.grade?.aiModel || "AI model"}</p>
                             {rubric.length ? (
                               <div className={styles.aiRubricGrid}>
-                                {rubric.map((item) => (
+                                {rubric.map((item: any) => (
                                   <article key={item.criterion}>
                                     <div><strong>{item.criterion}</strong><b>{item.score}{typeof item.maxScore === "number" ? `/${item.maxScore}` : ""}</b></div>
                                     <p>{item.comment}</p>
@@ -289,7 +289,7 @@ export default async function ScoresPage({ searchParams }: ScoresPageProps) {
                 </details>
               );
             })}
-            {pendingQuizAttempts.map((attempt) => (
+            {pendingQuizAttempts.map((attempt: any) => (
               <article key={attempt.id} className={styles.reviewQueueRow}>
                 <span className={styles.recordIcon}><FileText size={18} /></span>
                 <div><small>{attempt.quizDelivery?.classSection.code || "Test"} · Written response</small><strong>{attempt.quiz.title}</strong><p>{attempt.student.name || attempt.student.email || "Student"} · {formatDate(attempt.submittedAt || attempt.startedAt)}</p></div>
@@ -304,7 +304,7 @@ export default async function ScoresPage({ searchParams }: ScoresPageProps) {
         <header><div><span className={styles.cockpitEyebrow}><CheckCircle2 size={16} /> Completed</span><h2>Recently published</h2></div></header>
         {publishedGrades.length ? (
           <div className={styles.scoreResultList}>
-            {publishedGrades.slice(0, 20).map((grade) => (
+            {publishedGrades.slice(0, 20).map((grade: any) => (
               <article key={grade.id}>
                 <div><strong>{grade.student.name || grade.student.email || "Student"} · {grade.assignment?.title || grade.quiz?.title || "Assessment"}</strong><p>{grade.feedback || "No written feedback"}</p></div>
                 <b>{grade.score}</b>

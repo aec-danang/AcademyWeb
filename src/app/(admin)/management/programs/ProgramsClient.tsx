@@ -8,7 +8,11 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import dynamic from "next/dynamic";
+const RichTextEditor = dynamic(() => import("@/components/ui/rich-text-editor").then(mod => mod.RichTextEditor), {
+  ssr: false,
+  loading: () => <div className="h-[200px] w-full animate-pulse bg-slate-100 dark:bg-slate-800 rounded-xl" />
+});
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { IconSelector } from "@/components/ui/icon-selector";

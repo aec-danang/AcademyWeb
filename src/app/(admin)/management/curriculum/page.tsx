@@ -13,7 +13,7 @@ export default async function CurriculumPage() {
       <AdminPageHeader eyebrow="Read-only overview" title="Curriculum" description="Course templates and usage only. Content authoring remains outside this operational overview." />
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white py-0 shadow-sm">
         <div className="divide-y divide-slate-100">
-          {courses.map((course) => (
+          {courses.map((course: any) => (
             <div key={course.id} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-5 py-4">
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 text-indigo-600"><BookOpenCheck className="h-5 w-5" /></span>
               <span className="min-w-0"><strong className="block truncate text-sm text-navy">{course.title}</strong><small className="block truncate text-slate-500">{course.program || "General program"}</small></span>

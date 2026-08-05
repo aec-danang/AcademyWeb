@@ -25,8 +25,8 @@ export default async function AdminClassroomDetailPage({ params }: Props) {
   });
   if (!classroom) notFound();
 
-  const activeStudents = classroom.enrollments.filter((item) => item.status === "ACTIVE");
-  const pendingStudents = classroom.enrollments.filter((item) => item.status === "REQUESTED");
+  const activeStudents = classroom.enrollments.filter((item: any) => item.status === "ACTIVE");
+  const pendingStudents = classroom.enrollments.filter((item: any) => item.status === "REQUESTED");
   const metrics = [
     { label: "Students", value: activeStudents.length, icon: Users },
     { label: "Assignments", value: classroom.assignments.length, icon: FileText },
@@ -65,7 +65,7 @@ export default async function AdminClassroomDetailPage({ params }: Props) {
           </div>
           <AdminAddStudentForm classroomId={classroom.id} />
           <div className="divide-y divide-slate-100">
-            {classroom.enrollments.map((enrollment) => (
+            {classroom.enrollments.map((enrollment: any) => (
               <div key={enrollment.id} className="flex items-center justify-between gap-4 px-5 py-3.5">
                 <div className="min-w-0"><strong className="block truncate text-sm text-navy">{enrollment.student.name || "Unnamed student"}</strong><small className="block truncate text-slate-500">{enrollment.student.email || "No email"}</small></div>
                 <div className="flex items-center gap-2">

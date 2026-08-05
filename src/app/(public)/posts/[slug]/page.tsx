@@ -170,7 +170,7 @@ export default async function BlogPostPage({ params }: Props) {
             {post.tags && post.tags.length > 0 && (
               <div className="mt-12 flex flex-wrap items-center gap-3">
                 <Tag size={18} className="text-navy/40" />
-                {post.tags.map((tag) => (
+                {post.tags.map((tag: any) => (
                   <span key={tag} className="px-3 py-1 bg-gray-50 text-navy/70 rounded-full text-sm font-semibold tracking-wide border border-gray-100 hover:bg-orange hover:text-white hover:border-orange transition-colors cursor-pointer">
                     #{tag}
                   </span>
@@ -224,7 +224,7 @@ export default async function BlogPostPage({ params }: Props) {
               Bài viết liên quan
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {relatedPosts.map((rp) => (
+              {relatedPosts.map((rp: any) => (
                 <Link key={rp.id} href={`/posts/${rp.slug}`} className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-card transition-all h-full">
                   <div className="relative aspect-video overflow-hidden">
                     {rp.featuredImage ? (

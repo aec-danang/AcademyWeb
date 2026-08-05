@@ -23,6 +23,7 @@ model Course {
   orders      Order[]
   classes     ClassSection[]
 
+  @@index([published])
   @@schema("public")
 }
 
@@ -35,6 +36,7 @@ model CourseEnrollment {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
+  @@index([courseId])
   @@schema("public")
 }
 
@@ -59,6 +61,8 @@ model Post {
   tags            String[] @default([])
   canonicalUrl    String?
 
+  @@index([published, createdAt])
+  @@index([authorId])
   @@schema("public")
 }
 
@@ -502,6 +506,8 @@ model Assignment {
   grades              Grade[]
   submissions         Submission[]
 
+  @@index([classSectionId])
+  @@index([createdById])
   @@schema("elearning")
 }
 
@@ -760,6 +766,10 @@ model Grade {
   student      User          @relation("StudentGrades", fields: [studentId], references: [id], onDelete: Cascade)
   submission   Submission?   @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
+  @@index([studentId])
+  @@index([assignmentId])
+  @@index([quizId])
+  @@index([attemptId])
   @@schema("elearning")
 }
 

@@ -200,49 +200,49 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
 
   const now = new Date();
   const requestedDelivery = resolvedSearchParams?.delivery;
-  const activeDelivery = quiz.deliveries.find((delivery) => {
+  const activeDelivery = quiz.deliveries.find((delivery: any) => {
     if (requestedDelivery && delivery.id !== requestedDelivery) return false;
     if (delivery.status !== "PUBLISHED") return false;
     if (delivery.openAt && delivery.openAt > now) return false;
     if (delivery.dueAt && delivery.dueAt < now) return false;
     return user.role !== "STUDENT" || (delivery.classSection.status === "ACTIVE" && delivery.classSection.enrollments.some(
-      (enrollment) => enrollment.userId === user.id && enrollment.status === "ACTIVE",
+      (enrollment: any) => enrollment.userId === user.id && enrollment.status === "ACTIVE",
     ));
   }) || null;
 
   let canView = true;
   if (user.role === "STUDENT") {
     const hasLegacyAccess = quiz.classSection?.status === "ACTIVE" && quiz.classSection.enrollments.some(
-      (enrollment) => enrollment.userId === user.id && enrollment.status === "ACTIVE",
+      (enrollment: any) => enrollment.userId === user.id && enrollment.status === "ACTIVE",
     );
     const ownsRequestedReview = resolvedSearchParams?.review === "1"
-      && quiz.attempts.some((attempt) => attempt.id === resolvedSearchParams.attempt && attempt.studentId === user.id && attempt.isReviewPractice);
+      && quiz.attempts.some((attempt: any) => attempt.id === resolvedSearchParams.attempt && attempt.studentId === user.id && attempt.isReviewPractice);
     if (!activeDelivery && !quiz.isOpenQuiz && !hasLegacyAccess && !ownsRequestedReview) canView = false;
   }
   
   if (!canView) notFound();
 
-  const officialAttempts = quiz.attempts.filter((attempt) => !attempt.isReviewPractice);
-  const practiceAttempts = quiz.attempts.filter((attempt) => attempt.isReviewPractice);
+  const officialAttempts = quiz.attempts.filter((attempt: any) => !attempt.isReviewPractice);
+  const practiceAttempts = quiz.attempts.filter((attempt: any) => attempt.isReviewPractice);
   const deliveryAttempts = activeDelivery
-    ? officialAttempts.filter((attempt) => attempt.quizDeliveryId === activeDelivery.id)
-    : officialAttempts.filter((attempt) => !attempt.quizDeliveryId);
+    ? officialAttempts.filter((attempt: any) => attempt.quizDeliveryId === activeDelivery.id)
+    : officialAttempts.filter((attempt: any) => !attempt.quizDeliveryId);
   const attemptCount = deliveryAttempts.length;
   const attemptLimit = activeDelivery?.attemptLimit || quiz.attemptLimit;
   const selectedAttemptId = resolvedSearchParams?.attempt;
-  const reviewAttempt = selectedAttemptId ? quiz.attempts.find((attempt) => attempt.id === selectedAttemptId) || null : null;
+  const reviewAttempt = selectedAttemptId ? quiz.attempts.find((attempt: any) => attempt.id === selectedAttemptId) || null : null;
   const isReviewPracticeSession = Boolean(reviewAttempt?.isReviewPractice && reviewAttempt.status === "IN_PROGRESS");
   const reviewMode = Boolean(reviewAttempt && !isReviewPracticeSession);
   const canTakeQuiz = user.role === "STUDENT";
   const canAnswer = canTakeQuiz && (isReviewPracticeSession || (!reviewMode && attemptCount < attemptLimit));
   const activeQuestionIds = isReviewPracticeSession ? new Set(reviewAttempt?.reviewQuestionIds || []) : null;
-  const activeQuestions = activeQuestionIds ? quiz.questions.filter((link) => activeQuestionIds.has(link.questionId)) : quiz.questions;
-  const reviewAnswerMap = new Map(reviewAttempt?.answers.map((answer) => [answer.questionId, answer]) || []);
+  const activeQuestions = activeQuestionIds ? quiz.questions.filter((link: any) => activeQuestionIds.has(link.questionId)) : quiz.questions;
+  const reviewAnswerMap = new Map<any, any>(reviewAttempt?.answers.map((answer: any) => [answer.questionId, answer]) || []);
   const resultQuestions = reviewAttempt?.isReviewPractice
-    ? quiz.questions.filter((link) => reviewAttempt.reviewQuestionIds.includes(link.questionId))
+    ? quiz.questions.filter((link: any) => reviewAttempt.reviewQuestionIds.includes(link.questionId))
     : quiz.questions;
-  const totalPoints = (reviewMode ? resultQuestions : activeQuestions).reduce((sum, link) => sum + link.points, 0);
-  const reviewedQuestions = resultQuestions.map((link, index) => {
+  const totalPoints = (reviewMode ? resultQuestions : activeQuestions).reduce((sum: number, link: any) => sum + link.points, 0);
+  const reviewedQuestions = resultQuestions.map((link: any, index: number) => {
     const answer = reviewAnswerMap.get(link.question.id);
     const isBlank = !answer || (!answer.optionId && !hasAnswerText(answer.answerText));
     const state: QuestionState = isBlank
@@ -254,24 +254,24 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
           : "pending";
     return { link, answer, index: index + 1, state };
   });
-  const scoredReviewedQuestions = reviewedQuestions.filter((item) => item.link.points > 0);
-  const correctCount = scoredReviewedQuestions.filter((item) => item.state === "correct").length;
-  const wrongCount = scoredReviewedQuestions.filter((item) => item.state === "wrong").length;
-  const blankCount = scoredReviewedQuestions.filter((item) => item.state === "blank").length;
-  const pendingCount = scoredReviewedQuestions.filter((item) => item.state === "pending").length;
-  const awardedPoints = reviewAttempt?.answers.reduce((sum, answer) => sum + (answer.pointsAwarded || 0), 0) || 0;
+  const scoredReviewedQuestions = reviewedQuestions.filter((item: any) => item.link.points > 0);
+  const correctCount = scoredReviewedQuestions.filter((item: any) => item.state === "correct").length;
+  const wrongCount = scoredReviewedQuestions.filter((item: any) => item.state === "wrong").length;
+  const blankCount = scoredReviewedQuestions.filter((item: any) => item.state === "blank").length;
+  const pendingCount = scoredReviewedQuestions.filter((item: any) => item.state === "pending").length;
+  const awardedPoints = reviewAttempt?.answers.reduce((sum: number, answer: any) => sum + (answer.pointsAwarded || 0), 0) || 0;
   const attemptGrade = reviewAttempt?.grades[0] || null;
   const officialScore = attemptGrade?.status === "PUBLISHED" && typeof attemptGrade.score === "number" ? attemptGrade.score : null;
   const scoreValue = officialScore ?? reviewAttempt?.score ?? (reviewAttempt ? awardedPoints : null);
   const scorePercent = reviewAttempt && totalPoints > 0 ? Math.round(((scoreValue || 0) / totalPoints) * 100) : 0;
   const visibleQuestions = reviewMode ? resultQuestions : activeQuestions;
   const sectionGroups = quiz.sections
-    .map((section) => ({
+    .map((section: any) => ({
       section,
-      links: visibleQuestions.filter((link) => link.sectionId === section.id),
+      links: visibleQuestions.filter((link: any) => link.sectionId === section.id),
     }))
-    .filter((group) => group.links.length > 0);
-  const unsectionedQuestions = visibleQuestions.filter((link) => !link.sectionId);
+    .filter((group: any) => group.links.length > 0);
+  const unsectionedQuestions = visibleQuestions.filter((link: any) => !link.sectionId);
   type QuestionLink = NonNullable<typeof quiz>["questions"][number];
 
   function renderQuestion(link: QuestionLink, questionNumber: number) {
@@ -288,8 +288,8 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
         : reviewAnswer.isCorrect === false
           ? "wrong"
           : "pending";
-    const correctOptions = question.options.filter((option) => option.isCorrect);
-    const correctOptionText = correctOptions.map((option) => `${option.label ? `${option.label}. ` : ""}${option.text}`).join(", ");
+    const correctOptions = question.options.filter((option: any) => option.isCorrect);
+    const correctOptionText = correctOptions.map((option: any) => `${option.label ? `${option.label}. ` : ""}${option.text}`).join(", ");
     const studentOptionText = reviewAnswer?.option
       ? `${reviewAnswer.option.label ? `${reviewAnswer.option.label}. ` : ""}${reviewAnswer.option.text}`
       : null;
@@ -315,7 +315,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
 
         {isMultipleChoice && (
           <div className={styles.reviewOptions}>
-            {question.options.map((option) => {
+            {question.options.map((option: any) => {
               const wasSelected = reviewAnswer?.optionId === option.id;
               const isCorrectOption = option.isCorrect;
               const optionClass = reviewMode
@@ -352,7 +352,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
           <div className={styles.reviewTextAnswerBlock}>
             {question.options.length > 0 && (
               <div className={styles.quizBadgeRow}>
-                {question.options.map((option) => (
+                {question.options.map((option: any) => (
                   <span key={option.id}>
                     {option.label ? `${option.label}. ` : ""}
                     {option.text}
@@ -572,7 +572,7 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
             <h2>Question map</h2>
             <p>Jump to any question and inspect the result.</p>
             <div>
-              {reviewedQuestions.map((item) => (
+              {reviewedQuestions.map((item: any) => (
                 <a
                   href={`#question-${item.link.question.id}`}
                   key={item.link.id}
@@ -585,16 +585,16 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
             </div>
           </ReviewQuestionMap>
           <div className={styles.reviewQuestionList}>
-            {sectionGroups.map((group) => (
+            {sectionGroups.map((group: any) => (
               <section key={group.section.id} className={styles.reviewSection}>
                 <h2>{group.section.title}</h2>
                 {group.section.instructions ? <div className={styles.reviewQuestionText}>{parseMediaTags(group.section.instructions)}</div> : null}
                 {group.section.passage ? <div className={styles.reviewPassage}>{group.section.passage}</div> : null}
                 {group.section.audioUrl ? renderMediaSource(group.section.audioUrl) : null}
-                {group.links.map((link) => renderQuestion(link, visibleQuestions.findIndex((item) => item.id === link.id) + 1))}
+                {group.links.map((link: any) => renderQuestion(link, visibleQuestions.findIndex((item: any) => item.id === link.id) + 1))}
               </section>
             ))}
-            {unsectionedQuestions.map((link) => renderQuestion(link, visibleQuestions.findIndex((item) => item.id === link.id) + 1))}
+            {unsectionedQuestions.map((link: any) => renderQuestion(link, visibleQuestions.findIndex((item: any) => item.id === link.id) + 1))}
           </div>
         </div>
       ) : (
@@ -603,16 +603,16 @@ export default async function QuizAttemptPage({ params, searchParams }: Props) {
           {isReviewPracticeSession && reviewAttempt ? <input type="hidden" name="reviewAttemptId" value={reviewAttempt.id} /> : null}
           {activeDelivery ? <input type="hidden" name="quizDeliveryId" value={activeDelivery.id} /> : null}
           <div className={styles.reviewQuestionList}>
-            {sectionGroups.map((group) => (
+            {sectionGroups.map((group: any) => (
               <section key={group.section.id} className={styles.reviewSection}>
                 <h2>{group.section.title}</h2>
                 {group.section.instructions ? <div className={styles.reviewQuestionText}>{parseMediaTags(group.section.instructions)}</div> : null}
                 {group.section.passage ? <div className={styles.reviewPassage}>{group.section.passage}</div> : null}
                 {group.section.audioUrl ? renderMediaSource(group.section.audioUrl) : null}
-                {group.links.map((link) => renderQuestion(link, visibleQuestions.findIndex((item) => item.id === link.id) + 1))}
+                {group.links.map((link: any) => renderQuestion(link, visibleQuestions.findIndex((item: any) => item.id === link.id) + 1))}
               </section>
             ))}
-            {unsectionedQuestions.map((link) => renderQuestion(link, visibleQuestions.findIndex((item) => item.id === link.id) + 1))}
+            {unsectionedQuestions.map((link: any) => renderQuestion(link, visibleQuestions.findIndex((item: any) => item.id === link.id) + 1))}
           </div>
           {canAnswer && (
             <div className={styles.reviewSubmitBar}>

@@ -38,9 +38,9 @@ export default async function TeacherDetailPage({ params }: Props) {
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{teacher.classSections.length}</span>
         </div>
         <div className="divide-y divide-slate-100">
-          {teacher.classSections.map((classroom) => {
-            const active = classroom.enrollments.filter((item) => item.status === "ACTIVE").length;
-            const pending = classroom.enrollments.filter((item) => item.status === "REQUESTED").length;
+          {teacher.classSections.map((classroom: any) => {
+            const active = classroom.enrollments.filter((item: any) => item.status === "ACTIVE").length;
+            const pending = classroom.enrollments.filter((item: any) => item.status === "REQUESTED").length;
             const activities = classroom._count.assignments + classroom._count.quizDeliveries;
             return (
               <Link key={classroom.id} href={`/management/classrooms/${classroom.id}`} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-5 py-4 transition hover:bg-indigo-50/60">

@@ -31,7 +31,7 @@ export default async function AccountsPage() {
 
   return (
     <AccountManagerClient
-      initialUsers={users.map((user) => ({
+      initialUsers={users.map((user: any) => ({
         ...user,
         name: user.name ?? "",
         username: user.username ?? "",

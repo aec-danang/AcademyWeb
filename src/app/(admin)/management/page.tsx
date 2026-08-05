@@ -75,8 +75,8 @@ export default async function AdminDashboard() {
             <Link href="/management/teachers" className="text-sm text-blue-600 hover:text-blue-700 font-semibold">Xem tất cả →</Link>
           </div>
           <div className="divide-y divide-slate-50 dark:divide-slate-800/50">
-            {teachers.slice(0, 6).map((teacher) => {
-              const students = teacher.classSections.reduce((total, classroom) => total + classroom.enrollments.length, 0);
+            {teachers.slice(0, 6).map((teacher: any) => {
+              const students = teacher.classSections.reduce((total: number, classroom: any) => total + classroom.enrollments.length, 0);
               const initial = (teacher.name || teacher.email || "?").charAt(0).toUpperCase();
               return (
                 <div key={teacher.id} className="flex items-center px-5 py-3.5 hover:bg-slate-50/80 transition-colors dark:hover:bg-slate-800/50">

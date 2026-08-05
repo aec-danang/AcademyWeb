@@ -24,10 +24,10 @@ export default async function TeachersPage() {
       <AdminPageHeader eyebrow="People" title="Teachers" description="One compact entry per teacher. Open a teacher to inspect their classes and delivery load." />
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white py-0 shadow-sm">
         <div className="divide-y divide-slate-100">
-          {teachers.map((teacher) => {
-            const activeClasses = teacher.classSections.filter((item) => item.status === "ACTIVE");
-            const students = activeClasses.reduce((sum, item) => sum + item.enrollments.length, 0);
-            const activities = activeClasses.reduce((sum, item) => sum + item._count.assignments + item._count.quizDeliveries, 0);
+          {teachers.map((teacher: any) => {
+            const activeClasses = teacher.classSections.filter((item: any) => item.status === "ACTIVE");
+            const students = activeClasses.reduce((sum: number, item: any) => sum + item.enrollments.length, 0);
+            const activities = activeClasses.reduce((sum: number, item: any) => sum + item._count.assignments + item._count.quizDeliveries, 0);
             return (
               <Link key={teacher.id} href={`/management/teachers/${teacher.id}`} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-5 py-4 transition hover:bg-indigo-50/60">
                 <span className="grid h-11 w-11 place-items-center rounded-xl bg-indigo-50 text-indigo-600"><UserRound className="h-5 w-5" /></span>

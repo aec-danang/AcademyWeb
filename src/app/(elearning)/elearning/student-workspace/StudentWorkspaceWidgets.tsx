@@ -116,9 +116,9 @@ export async function HomeworkStatusWidget({ userId }: { userId: string }) {
 
   const now = new Date();
   
-  const pending = assignments.filter(a => a.submissions.length === 0);
-  const dueToday = pending.filter(a => a.dueAt && a.dueAt.toDateString() === now.toDateString());
-  const late = pending.filter(a => a.dueAt && a.dueAt < now && a.dueAt.toDateString() !== now.toDateString());
+  const pending = assignments.filter((a: any) => a.submissions.length === 0);
+  const dueToday = pending.filter((a: any) => a.dueAt && a.dueAt.toDateString() === now.toDateString());
+  const late = pending.filter((a: any) => a.dueAt && a.dueAt < now && a.dueAt.toDateString() !== now.toDateString());
   // other pending...
 
   return (
@@ -134,10 +134,10 @@ export async function HomeworkStatusWidget({ userId }: { userId: string }) {
       </div>
 
       <div className="divide-y divide-slate-100">
-        {late.length > 0 && late.map(a => (
+        {late.length > 0 && late.map((a: any) => (
           <HomeworkItem key={a.id} assignment={a} status="Late" statusColor="text-red-600 bg-red-50" />
         ))}
-        {dueToday.length > 0 && dueToday.map(a => (
+        {dueToday.length > 0 && dueToday.map((a: any) => (
           <HomeworkItem key={a.id} assignment={a} status="Due Today" statusColor="text-amber-600 bg-amber-50" />
         ))}
         {dueToday.length === 0 && late.length === 0 && (
@@ -203,7 +203,7 @@ export async function RecentFeedbackWidget({ userId }: { userId: string }) {
         Recent Feedback
       </h2>
       <div className="space-y-4">
-        {grades.map(grade => (
+        {grades.map((grade: any) => (
           <div key={grade.id} className="p-3 border border-slate-100 rounded-lg bg-slate-50">
             <div className="flex justify-between items-start mb-2">
               <h4 className="font-medium text-slate-900 text-sm truncate pr-4">{grade.assignment?.title || "Assignment"}</h4>

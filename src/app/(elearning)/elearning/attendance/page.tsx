@@ -38,7 +38,7 @@ export default async function GlobalAttendanceDashboard() {
 
       {classes.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {classes.map((cls) => (
+          {classes.map((cls: any) => (
             <div key={cls.id} className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
               <div className="p-5 border-b border-slate-100 flex-1">
                 <div className="flex justify-between items-start mb-3">
