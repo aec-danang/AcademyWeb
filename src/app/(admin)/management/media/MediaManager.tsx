@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { Plus, Image as ImageIcon, Trash2, UploadCloud, X, Loader2 } from "lucide-react";
-import { createStudentLifeEvent, deleteStudentLifeEvent, uploadImageToCloudinary } from "@/lib/mediaActions";
+import { createStudentLifeEvent, deleteStudentLifeEvent } from "@/lib/mediaActions";
 import { useRouter } from "next/navigation";
 
 type StudentLifeEvent = {
@@ -31,64 +31,36 @@ export function MediaManager({ initialEvents }: { initialEvents: StudentLifeEven
     setIsUploading(true);
 
     try {
-      // Convert file to base64 to send to server action
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const img = new window.Image();
-        img.onload = async () => {
-          try {
-            // Compress image to max 1200px width
-            const canvas = document.createElement("canvas");
-            let width = img.width;
-            let height = img.height;
-            const MAX_WIDTH = 1200;
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "student_life");
 
-            if (width > MAX_WIDTH) {
-              height = Math.round((height * MAX_WIDTH) / width);
-              width = MAX_WIDTH;
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext("2d");
-            if (ctx) ctx.drawImage(img, 0, 0, width, height);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-            const base64Image = canvas.toDataURL("image/jpeg", 0.85); // 85% quality JPEG
-            
-            const secureUrl = await uploadImageToCloudinary(base64Image);
-            
-            if (secureUrl) {
-              // Save to Database
-              const newOrder = events.length > 0 ? Math.max(...events.map(e => e.order)) + 1 : 0;
-              const savedEvent = await createStudentLifeEvent(newTitle, secureUrl, newOrder);
-              setEvents([...events, savedEvent]);
-              setIsModalOpen(false);
-              setNewTitle("");
-              router.refresh();
-            }
-          } catch (err: any) {
-            console.error(err);
-            alert(err.message || "Lỗi tải ảnh lên Cloudinary!");
-          } finally {
-            setIsUploading(false);
-            if (fileInputRef.current) fileInputRef.current.value = "";
-          }
-        };
-        img.onerror = () => {
-          alert("Không thể đọc định dạng ảnh.");
-          setIsUploading(false);
-        };
-        img.src = reader.result as string;
-      };
-      reader.onerror = () => {
-        alert("Lỗi khi đọc file ảnh.");
-        setIsUploading(false);
-      };
-    } catch (error) {
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "Lỗi tải ảnh lên Cloudinary!");
+      }
+
+      const secureUrl = data.secureUrl;
+      if (secureUrl) {
+        // Save to Database
+        const newOrder = events.length > 0 ? Math.max(...events.map(e => e.order)) + 1 : 0;
+        const savedEvent = await createStudentLifeEvent(newTitle, secureUrl, newOrder);
+        setEvents([...events, savedEvent]);
+        setIsModalOpen(false);
+        setNewTitle("");
+        router.refresh();
+      }
+    } catch (error: any) {
       console.error(error);
-      alert("Có lỗi xảy ra khi tải ảnh.");
+      alert(error.message || "Có lỗi xảy ra khi tải ảnh.");
+    } finally {
       setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 

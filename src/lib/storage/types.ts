@@ -1,5 +1,7 @@
+export type StorageFolder = 'courses' | 'teachers' | 'blog' | 'ui' | 'student_life' | 'academy_media';
+
 export interface UploadOptions {
-  folder?: string;
+  folder?: StorageFolder;
   publicId?: string;
   tags?: string[];
 }
