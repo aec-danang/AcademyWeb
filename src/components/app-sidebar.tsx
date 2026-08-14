@@ -154,7 +154,7 @@ export function AppSidebar() {
         <div className="flex justify-between items-center h-12">
           <Link href="/management" className="flex items-center">
             <Image
-              src="/logos/aec/aec-logo-reverse-horizontal.png"
+              src="/aec/aec-logo-reverse-horizontal.png"
               alt="AEC Admin"
               width={110}
               height={32}
@@ -163,7 +163,7 @@ export function AppSidebar() {
               style={{ height: 'auto' }}
             />
             <Image
-              src="/logos/aec/aec-logo-horizontal.png"
+              src="/aec/aec-logo-horizontal.png"
               alt="AEC Admin"
               width={110}
               height={32}

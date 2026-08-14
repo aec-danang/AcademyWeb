@@ -165,7 +165,7 @@ export function ElearningSidebar({ user }: { user: SidebarUser }) {
       <div className="p-6 pb-2 ">
         <div className="flex items-center gap-3 mb-6">
           <Image
-            src="/logos/aec/cropped-Logo-main-vertical-sRGB.png"
+            src="/aec/cropped-Logo-main-vertical-sRGB.png"
             alt="AEC Logo"
             width={40}
             height={40}

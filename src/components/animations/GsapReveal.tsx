@@ -31,7 +31,7 @@ export default function GsapReveal({
   useGSAP(() => {
     if (!container.current) return;
 
-    let fromVars: gsap.TweenVars = { opacity: 0 };
+    const fromVars: gsap.TweenVars = { opacity: 0 };
     if (animation === "fade-up") fromVars.y = 30;
     if (animation === "fade-left") fromVars.x = 30;
     if (animation === "fade-right") fromVars.x = -30;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, KeyboardEvent, useEffect } from "react";
+import { useState, KeyboardEvent, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createPost, updatePost, autoClassifyByAI } from "../actions";
 import { ArrowLeft, Save, Image as ImageIcon, Settings, X, Tag as TagIcon, Eye, Check, Calendar, Globe, AlertCircle, Sparkles, MoreHorizontal, Wand2, Loader2 } from "lucide-react";
@@ -60,17 +60,7 @@ export default function PostEditorClient({ initialData }: { initialData?: Post }
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
 
-  // Keyboard shortcut Ctrl+S
-  useEffect(() => {
-    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault();
-        handleSave(formData.published);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [formData]);
+
 
   // Auto-save draft local timer notification
   useEffect(() => {
@@ -82,7 +72,7 @@ export default function PostEditorClient({ initialData }: { initialData?: Post }
     return () => clearTimeout(timer);
   }, [formData]);
 
-  const handleSave = async (publishState: boolean = formData.published) => {
+  const handleSave = useCallback(async (publishState: boolean = formData.published) => {
     if (!formData.title || !formData.slug) {
       toast.error("Title and URL Slug are required.");
       return;
@@ -114,7 +104,20 @@ export default function PostEditorClient({ initialData }: { initialData?: Post }
     } finally {
       setIsSaving(false);
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData, isEditing, initialData]);
+
+  // Keyboard shortcut Ctrl+S
+  useEffect(() => {
+    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        handleSave(formData.published);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSave, formData.published]);
 
   const generateSlug = (title: string) => {
     return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');

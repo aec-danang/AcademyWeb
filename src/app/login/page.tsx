@@ -116,7 +116,7 @@ function AuthContent() {
 
         <div className={styles.logoContainer}>
           <Image
-            src="/logos/aec/aec-logo-vertical.png"
+            src="/aec/aec-logo-vertical.png"
             alt="AEC Logo"
             width={140}
             height={140}

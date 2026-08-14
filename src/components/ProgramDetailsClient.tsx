@@ -39,10 +39,11 @@ export default function ProgramDetailsClient({ contentJson }: { contentJson: str
   const timelineRef = useRef<HTMLDivElement>(null);
 
   let data: ProgramData | null = null;
+  let parseError = false;
   try {
     data = JSON.parse(contentJson);
   } catch (e) {
-    return <div dangerouslySetInnerHTML={{ __html: contentJson }} className="prose max-w-none" />;
+    parseError = true;
   }
 
   useGSAP(() => {
@@ -89,6 +90,7 @@ export default function ProgramDetailsClient({ contentJson }: { contentJson: str
     });
   }, { scope: containerRef });
 
+  if (parseError) return <div dangerouslySetInnerHTML={{ __html: contentJson }} className="prose max-w-none" />;
   if (!data || !data.overview) return null;
 
   return (

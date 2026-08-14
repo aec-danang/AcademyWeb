@@ -32,7 +32,7 @@ export default function Navbar() {
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link href="/" className="relative z-50 flex items-center" onClick={() => setIsMenuOpen(false)}>
           <Image
-            src="/logos/aec/aec-logo-horizontal.png"
+            src="/aec/aec-logo-horizontal.png"
             alt="AEC Academy Logo"
             width={180}
             height={48}

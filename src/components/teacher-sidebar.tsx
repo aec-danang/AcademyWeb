@@ -46,7 +46,7 @@ export function TeacherSidebar() {
     <Sidebar className="border-r border-slate-200 dark:border-slate-800">
       <SidebarHeader className="p-4 py-6 bg-navy text-white">
         <Image
-          src="/logos/aec/aec-logo-reverse-horizontal.png"
+          src="/aec/aec-logo-reverse-horizontal.png"
           alt="AEC Teacher"
           width={160}
           height={45}

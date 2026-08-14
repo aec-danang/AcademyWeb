@@ -160,9 +160,7 @@ export default function LandingClient({
     <div ref={containerRef}>
       {/* 1. Hero Section */}
       <section className={styles.hero}>
-        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: -1 }}>
-          <Image src="/images/hero_demo.png" alt="Academy Hero" fill style={{ objectFit: 'cover' }} priority />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(240, 240, 248, 0.95) 0%, rgba(240, 240, 248, 0.6) 100%)" }}></div>
+        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: -1, background: "linear-gradient(to right, rgba(240, 240, 248, 1) 0%, rgba(240, 240, 248, 0.8) 100%)" }}>
         </div>
         <div className={`container ${styles.heroContainer}`}>
           <div className={styles.heroContent}>

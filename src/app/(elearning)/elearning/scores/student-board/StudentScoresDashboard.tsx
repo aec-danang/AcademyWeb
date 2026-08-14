@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { 
   Award,
@@ -70,16 +70,15 @@ export default function StudentScoresDashboard({ grades }: { grades: GradeItem[]
     return true;
   });
 
-  const averagePercentage = useMemo(() => {
-    if (publishedGrades.length === 0) return 0;
+  const averagePercentage = publishedGrades.length === 0 ? 0 : (() => {
     const sum = publishedGrades.reduce((acc, g) => {
       if (g.type === 'ASSIGNMENT' && g.assignment?.maxScore) {
         return acc + ((g.score || 0) / g.assignment.maxScore) * 100;
       }
-      return acc + (g.score || 0); // Assuming quiz score is already out of 100 or something, wait we should just use raw if no maxScore
+      return acc + (g.score || 0);
     }, 0);
     return sum / publishedGrades.length;
-  }, [publishedGrades]);
+  })();
 
   return (
     <div className="max-w-5xl mx-auto w-full">

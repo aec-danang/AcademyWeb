@@ -36,7 +36,7 @@ export default function Footer({ sponsors = [], programs = [] }: { sponsors?: Sp
           <div className="lg:col-span-4 flex flex-col">
             <Link href="/" className="inline-block mb-8">
               <Image 
-                src="/logos/aec/aec-logo-reverse-vertical.png" 
+                src="/aec/aec-logo-reverse-vertical.png" 
                 alt="AEC Academy Logo" 
                 width={160} 
                 height={160} 
