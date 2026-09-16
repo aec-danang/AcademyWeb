@@ -171,8 +171,8 @@ export default function LandingClient({
             </h1>
             <p style={{ color: "var(--color-navy)", fontWeight: 500, fontSize: "1.15rem", marginBottom: "40px", opacity: 0.85 }}>Từ tiền thân Hồng Đức năm 2001, thương hiệu Academy English Center từ 2006. Tự hào mang đến nền tảng ngôn ngữ vững chắc cho các thế hệ học viên.</p>
             <div className={styles.heroButtons}>
-              <Link href="/contact#register" className="btn-primary" style={{ boxShadow: "0 8px 20px rgba(239, 106, 55, 0.3)" }}>Đăng ký học thử</Link>
-              <Link href="/contact#test" className="btn-secondary" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: "blur(10px)", border: "1px solid rgba(255, 255, 255, 0.5)" }}>Kiểm tra trình độ</Link>
+              <Link href="/contact#register" prefetch={false} className="btn-primary" style={{ boxShadow: "0 8px 20px rgba(239, 106, 55, 0.3)" }}>Đăng ký học thử</Link>
+              <Link href="/contact#test" prefetch={false} className="btn-secondary" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: "blur(10px)", border: "1px solid rgba(255, 255, 255, 0.5)" }}>Kiểm tra trình độ</Link>
             </div>
           </div>
           <div className={styles.heroVisual}>
@@ -249,7 +249,7 @@ export default function LandingClient({
             </div>
           </div>
           <div style={{ textAlign: "center", marginTop: "40px" }}>
-            <Link href="/about" className="btn-secondary">Xem hành trình</Link>
+            <Link href="/about" prefetch={false} className="btn-secondary">Xem hành trình</Link>
           </div>
         </div>
       </section>
@@ -268,7 +268,7 @@ export default function LandingClient({
               const IconComponent = LucideIcon ? <LucideIcon size={48} strokeWidth={1.5} /> : <LucideIcons.FileQuestion size={48} strokeWidth={1.5} />;
 
               return (
-                <Link key={program.slug} href={`/programs/${program.slug}`} style={{ display: "block", textDecoration: "none" }}>
+                <Link key={program.slug} href={`/programs/${program.slug}`} prefetch={false} style={{ display: "block", textDecoration: "none" }}>
                   <Card className={styles.programCard}>
                     <div className={styles.programIcon}>{IconComponent}</div>
                     <h3>{program.title}</h3>
@@ -410,10 +410,16 @@ export default function LandingClient({
             <div className={styles.newsGrid}>
               {activeItems.length > 0 ? (
                 activeItems.slice(0, 3).map((item) => (
-                  <Link key={item.slug} href={`/${activeNewsTab}/${item.slug}`} className={styles.newsCard}>
+                  <Link key={item.slug} href={`/${activeNewsTab}/${item.slug}`} prefetch={false} className={styles.newsCard}>
                     {item.featuredImage ? (
                       <div className={styles.newsImageWrapper}>
-                        <Image src={item.featuredImage} alt={item.title} fill style={{ objectFit: 'cover' }} />
+                        <Image
+                          src={item.featuredImage}
+                          alt={item.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          style={{ objectFit: 'cover' }}
+                        />
                       </div>
                     ) : (
                       <div className={styles.newsImageWrapper}>
@@ -457,7 +463,13 @@ export default function LandingClient({
                   <div className={styles.testimonialAuthor}>
                     <div className={styles.authorAvatar}>
                       {t.avatarUrl ? (
-                        <Image src={t.avatarUrl} alt={t.authorName} fill style={{ objectFit: 'cover' }} />
+                        <Image
+                          src={t.avatarUrl}
+                          alt={t.authorName}
+                          fill
+                          sizes="48px"
+                          style={{ objectFit: 'cover' }}
+                        />
                       ) : (
                         <LucideIcons.User size={32} color="#f0f0f8" />
                       )}
@@ -484,8 +496,8 @@ export default function LandingClient({
           <h2>Ready to Start Your English Journey?</h2>
           <p style={{ fontSize: "var(--text-xl)" }}>Đăng ký ngay để nhận tư vấn và lộ trình học tập miễn phí.</p>
           <div className={styles.ctaButtons}>
-            <Link href="/contact#consult" className="btn-secondary" style={{ backgroundColor: 'white', color: 'var(--color-navy)', border: 'none' }}>Đăng ký tư vấn</Link>
-            <Link href="/contact" className="btn-dark" style={{ backgroundColor: 'var(--color-navy-dark)', color: 'white', border: 'none' }}>Liên hệ Academy</Link>
+            <Link href="/contact#consult" prefetch={false} className="btn-secondary" style={{ backgroundColor: 'white', color: 'var(--color-navy)', border: 'none' }}>Đăng ký tư vấn</Link>
+            <Link href="/contact" prefetch={false} className="btn-dark" style={{ backgroundColor: 'var(--color-navy-dark)', color: 'white', border: 'none' }}>Liên hệ Academy</Link>
           </div>
         </div>
       </section>

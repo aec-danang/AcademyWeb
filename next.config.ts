@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "5mb",
     },
+    turbopackFileSystemCacheForBuild: true,
   },
   images: {
     formats: ["image/avif", "image/webp"],
@@ -12,6 +13,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
+        pathname: "/:cloudName/**",
       },
     ],
   },

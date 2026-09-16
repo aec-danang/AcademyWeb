@@ -7,13 +7,10 @@ import { ElearningBreadcrumbs } from "../ElearningBreadcrumbs";
 import { ConfirmSubmitButton } from "./[classroomId]/ConfirmSubmitButton";
 import styles from "../elearning.module.css";
 
-export const dynamic = "force-dynamic";
-
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
 export default async function ClassroomsPage({ searchParams }: Props) {
-  const user = await requireUser();
-  const query = await searchParams;
+  const [user, query] = await Promise.all([requireUser(), searchParams]);
   const isStudent = user.role === "STUDENT";
   let classes: any[] = [];
 
@@ -44,7 +41,7 @@ export default async function ClassroomsPage({ searchParams }: Props) {
     <ElearningBreadcrumbs items={[{ label: isStudent ? "My Classrooms" : "Classrooms" }]} />
     <header className={styles.workflowHero}>
       <div><span><School size={16} /> {isStudent ? "Your learning groups" : "Teaching workspace"}</span><h1>{isStudent ? "My Classrooms" : "Classrooms"}</h1><p>{isStudent ? "Open a classroom to see assignments, quizzes and the weekly schedule." : "Manage rosters and open one classroom when you need to assign or review work."}</p></div>
-      {!isStudent ? <Link href="/elearning/classrooms/new" className="btn-primary"><Plus size={16} /> Create classroom</Link> : null}
+      {!isStudent ? <Link href="/elearning/classrooms/new" prefetch={false} className="btn-primary"><Plus size={16} /> Create classroom</Link> : null}
     </header>
 
     <section className={styles.classroomSummaryGrid} aria-label="Classroom summary">
@@ -80,12 +77,12 @@ export default async function ClassroomsPage({ searchParams }: Props) {
         const canOpen = !isStudent || ownEnrollment?.status === "ACTIVE";
         return <article className={styles.recordRow} key={classSection.id} id={`classroom-${classSection.id}`}>
           <span className={styles.recordIcon}><School size={19} /></span>
-          <div className={styles.recordMain}><small>{classSection.code}</small><strong>{canOpen ? <Link href={`/elearning/classrooms/${classSection.id}`}>{classSection.name}</Link> : classSection.name}</strong><p>{classSection.teacher?.name || classSection.teacher?.email || "Teacher not assigned"}</p></div>
+          <div className={styles.recordMain}><small>{classSection.code}</small><strong>{canOpen ? <Link href={`/elearning/classrooms/${classSection.id}`} prefetch={false}>{classSection.name}</Link> : classSection.name}</strong><p>{classSection.teacher?.name || classSection.teacher?.email || "Teacher not assigned"}</p></div>
           <div className={styles.recordMetric}><strong>{canOpen ? students : "–"}</strong><span>{isStudent ? "Classmates" : "Students"}</span></div>
           <div className={styles.recordMetric}><strong>{isStudent ? (ownEnrollment?.status === "REQUESTED" ? "1" : "0") : requested}</strong><span>Pending</span></div>
           <span className={`${styles.statusBadge} ${canOpen ? styles.statusCompleted : styles.statusPending}`}>{isStudent ? ownEnrollment?.status : classSection.status}</span>
           <div className={styles.recordActions}>
-            {canOpen ? <Link href={`/elearning/classrooms/${classSection.id}`} className="btn-secondary">Open</Link> : <span className={styles.statusBadge}>Awaiting approval</span>}
+            {canOpen ? <Link href={`/elearning/classrooms/${classSection.id}`} prefetch={false} className="btn-secondary">Open</Link> : <span className={styles.statusBadge}>Awaiting approval</span>}
             {isStudent && ownEnrollment?.status === "REQUESTED" ? (
               <form action={cancelEnrollmentRequestAction}>
                 <input type="hidden" name="enrollmentId" value={ownEnrollment.id} />
@@ -98,10 +95,10 @@ export default async function ClassroomsPage({ searchParams }: Props) {
                 <ConfirmSubmitButton className={styles.rosterRemoveButton} message={`Leave ${classSection.name}? You will lose access, but your submitted work and score history will be kept.`}>Leave class</ConfirmSubmitButton>
               </form>
             ) : null}
-            {!isStudent ? <Link href={`/elearning/classrooms/${classSection.id}?tab=students`}>Roster</Link> : null}
+            {!isStudent ? <Link href={`/elearning/classrooms/${classSection.id}?tab=students`} prefetch={false}>Roster</Link> : null}
           </div>
         </article>;
-      })}</div> : <div className={styles.libraryEmpty}><CheckCircle2 size={36} /><h3>No classrooms yet</h3><p>{isStudent ? "Your classrooms appear here after enrollment." : "Create your first classroom to begin."}</p>{!isStudent ? <Link href="/elearning/classrooms/new" className="btn-primary">Create classroom</Link> : null}</div>}
+      })}</div> : <div className={styles.libraryEmpty}><CheckCircle2 size={36} /><h3>No classrooms yet</h3><p>{isStudent ? "Your classrooms appear here after enrollment." : "Create your first classroom to begin."}</p>{!isStudent ? <Link href="/elearning/classrooms/new" prefetch={false} className="btn-primary">Create classroom</Link> : null}</div>}
     </section>
   </main>;
 }

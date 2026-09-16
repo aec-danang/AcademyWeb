@@ -61,6 +61,7 @@ export default async function NewsPostPage({ params }: Props) {
             alt={post.title}
             fill
             priority
+            sizes="100vw"
             style={{ objectFit: 'cover' }}
             className="brightness-75"
           />
@@ -71,6 +72,7 @@ export default async function NewsPostPage({ params }: Props) {
           <div className="absolute top-8 left-0 right-0 container mx-auto px-6">
             <Link
               href="/news"
+              prefetch={false}
               className="inline-flex items-center gap-2 text-white/90 hover:text-white font-semibold text-sm transition-colors group"
             >
               <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
@@ -113,6 +115,7 @@ export default async function NewsPostPage({ params }: Props) {
           <div className="container mx-auto px-6 max-w-3xl">
             <Link
               href="/news"
+              prefetch={false}
               className="inline-flex items-center gap-2 text-orange hover:text-orange-hover font-semibold text-sm transition-colors group mb-8"
             >
               <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
@@ -151,6 +154,7 @@ export default async function NewsPostPage({ params }: Props) {
         {post.featuredImage && (
           <Link
             href="/news"
+            prefetch={false}
             className="inline-flex items-center gap-2 text-orange hover:text-orange-hover font-semibold text-sm transition-colors group mb-10"
           >
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
@@ -183,6 +187,7 @@ export default async function NewsPostPage({ params }: Props) {
         <div className="mt-14 pt-8 border-t border-gray-200 flex items-center justify-between">
           <Link
             href="/news"
+            prefetch={false}
             className="inline-flex items-center gap-2 text-orange hover:text-orange-hover font-bold text-sm uppercase tracking-wider transition-colors group"
           >
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />

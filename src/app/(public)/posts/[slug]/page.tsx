@@ -93,9 +93,9 @@ export default async function BlogPostPage({ params }: Props) {
         <header className="container mx-auto px-6 max-w-4xl mb-12">
           {/* Breadcrumbs */}
           <nav aria-label="Breadcrumb" className="flex items-center text-sm text-navy/60 font-semibold mb-8">
-            <Link href="/" className="hover:text-orange transition-colors">Trang chủ</Link>
+            <Link href="/" prefetch={false} className="hover:text-orange transition-colors">Trang chủ</Link>
             <ChevronRight size={14} className="mx-2 opacity-50" />
-            <Link href="/posts" className="hover:text-orange transition-colors">Blog</Link>
+            <Link href="/posts" prefetch={false} className="hover:text-orange transition-colors">Blog</Link>
             <ChevronRight size={14} className="mx-2 opacity-50" />
             <span className="text-orange uppercase tracking-wide">{category}</span>
           </nav>
@@ -136,6 +136,7 @@ export default async function BlogPostPage({ params }: Props) {
                 alt={post.title}
                 fill
                 priority
+                sizes="(max-width: 1024px) 100vw, 896px"
                 style={{ objectFit: 'cover' }}
               />
             </figure>
@@ -186,7 +187,7 @@ export default async function BlogPostPage({ params }: Props) {
             {/* Prev/Next Navigation */}
             <nav className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6" aria-label="Pagination">
               {prevPost ? (
-                <Link href={`/posts/${prevPost.slug}`} className="group flex flex-col p-6 rounded-2xl border border-gray-100 bg-white hover:border-orange/30 hover:shadow-card transition-all">
+                <Link href={`/posts/${prevPost.slug}`} prefetch={false} className="group flex flex-col p-6 rounded-2xl border border-gray-100 bg-white hover:border-orange/30 hover:shadow-card transition-all">
                   <span className="flex items-center text-xs font-bold text-navy/40 uppercase tracking-widest mb-3">
                     <ArrowLeft size={14} className="mr-2 group-hover:-translate-x-1 transition-transform" /> Bài trước
                   </span>
@@ -196,7 +197,7 @@ export default async function BlogPostPage({ params }: Props) {
                 </Link>
               ) : <div />}
               {nextPost && (
-                <Link href={`/posts/${nextPost.slug}`} className="group flex flex-col p-6 rounded-2xl border border-gray-100 bg-white hover:border-orange/30 hover:shadow-card transition-all text-right items-end">
+                <Link href={`/posts/${nextPost.slug}`} prefetch={false} className="group flex flex-col p-6 rounded-2xl border border-gray-100 bg-white hover:border-orange/30 hover:shadow-card transition-all text-right items-end">
                   <span className="flex items-center text-xs font-bold text-navy/40 uppercase tracking-widest mb-3">
                     Bài tiếp theo <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
                   </span>
@@ -225,13 +226,14 @@ export default async function BlogPostPage({ params }: Props) {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {relatedPosts.map((rp: any) => (
-                <Link key={rp.id} href={`/posts/${rp.slug}`} className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-card transition-all h-full">
+                <Link key={rp.id} href={`/posts/${rp.slug}`} prefetch={false} className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-card transition-all h-full">
                   <div className="relative aspect-video overflow-hidden">
                     {rp.featuredImage ? (
                       <Image 
                         src={rp.featuredImage} 
                         alt={rp.title} 
                         fill 
+                        sizes="(max-width: 768px) 100vw, 33vw"
                         style={{ objectFit: 'cover' }} 
                         className="group-hover:scale-105 transition-transform duration-500" 
                       />

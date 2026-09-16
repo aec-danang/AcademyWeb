@@ -3,8 +3,6 @@ import { ArrowRight, UserRound } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { AdminPageHeader } from "../AdminPageHeader";
 
-export const dynamic = "force-dynamic";
-
 export default async function TeachersPage() {
   const teachers = await prisma.user.findMany({
     where: { role: "TEACHER", isActive: true },
@@ -29,7 +27,7 @@ export default async function TeachersPage() {
             const students = activeClasses.reduce((sum: number, item: any) => sum + item.enrollments.length, 0);
             const activities = activeClasses.reduce((sum: number, item: any) => sum + item._count.assignments + item._count.quizDeliveries, 0);
             return (
-              <Link key={teacher.id} href={`/management/teachers/${teacher.id}`} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-5 py-4 transition hover:bg-indigo-50/60">
+              <Link key={teacher.id} href={`/management/teachers/${teacher.id}`} prefetch={false} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-5 py-4 transition hover:bg-indigo-50/60">
                 <span className="grid h-11 w-11 place-items-center rounded-xl bg-indigo-50 text-indigo-600"><UserRound className="h-5 w-5" /></span>
                 <span className="min-w-0"><strong className="block truncate text-sm text-navy">{teacher.name || "Unnamed teacher"}</strong><small className="block truncate text-slate-500">{teacher.email || "No email"}</small></span>
                 <span className="flex items-center gap-6">

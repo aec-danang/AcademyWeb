@@ -40,9 +40,11 @@ function formatDate(value: Date | null | undefined) {
 }
 
 export default async function ClassroomHubPage({ params, searchParams }: Props) {
-  const user = await requireUser();
-  const { classroomId } = await params;
-  const query = await searchParams;
+  const [user, { classroomId }, query] = await Promise.all([
+    requireUser(),
+    params,
+    searchParams,
+  ]);
   const requestedTab = typeof query.tab === "string" ? query.tab : "overview";
 
   const classroom = await prisma.classSection.findUnique({
@@ -118,7 +120,7 @@ export default async function ClassroomHubPage({ params, searchParams }: Props) 
 
       <nav className={styles.classroomTabs} aria-label="Classroom sections">
         {tabs.map((tab) => (
-          <Link href={`/elearning/classrooms/${classroom.id}?tab=${tab}`} key={tab} className={activeTab === tab ? styles.classroomTabActive : ""}>
+          <Link href={`/elearning/classrooms/${classroom.id}?tab=${tab}`} prefetch={false} key={tab} className={activeTab === tab ? styles.classroomTabActive : ""}>
             {tabIcon[tab]} {tab.charAt(0).toUpperCase() + tab.slice(1)}
             {tab === "students" && pendingEnrollments.length ? <b>{pendingEnrollments.length}</b> : null}
             {tab === "assignments" && pendingSubmissions.length ? <b>{pendingSubmissions.length}</b> : null}
@@ -132,13 +134,13 @@ export default async function ClassroomHubPage({ params, searchParams }: Props) 
             <section className={styles.classroomGuide}>
               <span><UserPlus size={22} /></span>
               <div><strong>Start by adding students</strong><p>This classroom is ready. Add learners before assigning work and quizzes.</p></div>
-              <Link href={`/elearning/classrooms/${classroom.id}?tab=students`} className="btn-primary">Add students</Link>
+              <Link href={`/elearning/classrooms/${classroom.id}?tab=students`} prefetch={false} className="btn-primary">Add students</Link>
             </section>
           ) : isManager && classroom.assignments.length === 0 && classroom.quizDeliveries.length === 0 ? (
             <section className={styles.classroomGuide}>
               <span><Sparkles size={22} /></span>
               <div><strong>Your roster is ready</strong><p>Continue by creating an assignment or assigning the first test to this class.</p></div>
-              <div className={styles.classroomGuideActions}><Link href={`/elearning/classrooms/${classroom.id}?tab=assignments`}>Create assignment</Link><Link href={`/elearning/classrooms/${classroom.id}?tab=quizzes`}>Assign quiz</Link></div>
+              <div className={styles.classroomGuideActions}><Link href={`/elearning/classrooms/${classroom.id}?tab=assignments`} prefetch={false}>Create assignment</Link><Link href={`/elearning/classrooms/${classroom.id}?tab=quizzes`} prefetch={false}>Assign quiz</Link></div>
             </section>
           ) : null}
           <section className={`${styles.classroomSummaryGrid} ${styles.classroomDetailSummary}`}>
@@ -180,11 +182,11 @@ export default async function ClassroomHubPage({ params, searchParams }: Props) 
       ) : null}
 
       {activeTab === "assignments" && isManager ? <section className={styles.dashboardPanel}><div className={styles.dashboardPanelHeader}><div><span className={styles.cockpitEyebrow}><FileText size={16} /> New work</span><h2>Create assignment</h2></div></div><AssignmentComposer classroomId={classroom.id} /></section> : null}
-      {activeTab === "assignments" ? <section className={styles.dashboardPanel}>{classroom.assignments.length ? <div className={styles.focusList}>{classroom.assignments.map((item: any) => <Link className={styles.focusItem} href={isManager ? "/elearning/assignments" : `/elearning/assignments?classroom=${classroom.id}`} key={item.id}><div className={styles.taskIcon}><FileText size={17} /></div><div><strong>{item.title}</strong><p>{item.status} · Due {formatDate(item.dueAt)} · {item.submissions.length} submissions</p></div><span>{isManager ? `${item.submissions.filter((submission: any) => submission.status !== "GRADED").length} pending` : "Open"}</span></Link>)}</div> : <p className={styles.classroomEmpty}>No assignments have been added to this classroom.</p>}</section> : null}
+      {activeTab === "assignments" ? <section className={styles.dashboardPanel}>{classroom.assignments.length ? <div className={styles.focusList}>{classroom.assignments.map((item: any) => <Link className={styles.focusItem} href={isManager ? "/elearning/assignments" : `/elearning/assignments?classroom=${classroom.id}`} prefetch={false} key={item.id}><div className={styles.taskIcon}><FileText size={17} /></div><div><strong>{item.title}</strong><p>{item.status} · Due {formatDate(item.dueAt)} · {item.submissions.length} submissions</p></div><span>{isManager ? `${item.submissions.filter((submission: any) => submission.status !== "GRADED").length} pending` : "Open"}</span></Link>)}</div> : <p className={styles.classroomEmpty}>No assignments have been added to this classroom.</p>}</section> : null}
 
       {activeTab === "quizzes" ? <div className={styles.classroomHubContent}>
         {isManager ? <section className={styles.dashboardPanel}>
-          <div className={styles.dashboardPanelHeader}><div><span className={styles.cockpitEyebrow}><ClipboardList size={16} /> Quiz Library</span><h2>Assign a quiz to this class</h2></div><Link href="/elearning/practice?tab=quizzes">Open quiz library</Link></div>
+          <div className={styles.dashboardPanelHeader}><div><span className={styles.cockpitEyebrow}><ClipboardList size={16} /> Quiz Library</span><h2>Assign a quiz to this class</h2></div><Link href="/elearning/practice?tab=quizzes" prefetch={false}>Open quiz library</Link></div>
           <form action={assignQuizToClassAction} className={styles.workflowFieldGrid}>
             <input type="hidden" name="classSectionId" value={classroom.id} />
             <label className={`${styles.workflowField} ${styles.workflowFieldWide}`}><span>Test <b>*</b></span><select name="quizId" required defaultValue=""><option value="" disabled>Select a published test</option>{testLibrary.map((quiz: any) => <option value={quiz.id} key={quiz.id}>{quiz.title} ({quiz._count.questions} questions)</option>)}</select></label>
@@ -196,11 +198,11 @@ export default async function ClassroomHubPage({ params, searchParams }: Props) 
         </section> : null}
         <section className={styles.dashboardPanel}>
           <div className={styles.dashboardPanelHeader}><div><span className={styles.cockpitEyebrow}><ClipboardList size={16} /> Assigned assessments</span><h2>Quizzes for this class</h2></div></div>
-          {classroom.quizDeliveries.length ? <div className={styles.focusList}>{classroom.quizDeliveries.map((delivery: any) => <Link className={styles.focusItem} href={`/elearning/exercises/${delivery.quiz.id}?delivery=${delivery.id}`} key={delivery.id}><div className={styles.taskIcon}><ClipboardList size={17} /></div><div><strong>{delivery.quiz.title}</strong><p>{delivery.dueAt ? `Due ${formatDate(delivery.dueAt)}` : "No deadline"} · {delivery.quiz.questions.length} questions · {delivery.attempts.filter((item: any) => item.status !== "IN_PROGRESS").length}/{activeEnrollments.length} submitted</p></div><span>Open</span></Link>)}</div> : <p className={styles.classroomEmpty}>No quizzes are assigned to this class.</p>}
+          {classroom.quizDeliveries.length ? <div className={styles.focusList}>{classroom.quizDeliveries.map((delivery: any) => <Link className={styles.focusItem} href={`/elearning/exercises/${delivery.quiz.id}?delivery=${delivery.id}`} prefetch={false} key={delivery.id}><div className={styles.taskIcon}><ClipboardList size={17} /></div><div><strong>{delivery.quiz.title}</strong><p>{delivery.dueAt ? `Due ${formatDate(delivery.dueAt)}` : "No deadline"} · {delivery.quiz.questions.length} questions · {delivery.attempts.filter((item: any) => item.status !== "IN_PROGRESS").length}/{activeEnrollments.length} submitted</p></div><span>Open</span></Link>)}</div> : <p className={styles.classroomEmpty}>No quizzes are assigned to this class.</p>}
         </section>
       </div> : null}
 
-      {activeTab === "scores" ? <section className={styles.dashboardPanel}>{grades.length ? <div className={styles.classroomRoster}>{grades.slice(0, 20).map((grade: any) => <div key={grade.id}><div><strong>{grade.student.name || grade.student.email || "Student"}</strong><p>Graded {formatDate(grade.createdAt)}</p></div><span className={styles.scorePill}>{grade.score.toFixed(1)}</span></div>)}</div> : <p className={styles.classroomEmpty}>No graded submissions yet.</p>}<Link href="/elearning/scores" className={styles.classroomFooterLink}>Open all scores</Link></section> : null}
+      {activeTab === "scores" ? <section className={styles.dashboardPanel}>{grades.length ? <div className={styles.classroomRoster}>{grades.slice(0, 20).map((grade: any) => <div key={grade.id}><div><strong>{grade.student.name || grade.student.email || "Student"}</strong><p>Graded {formatDate(grade.createdAt)}</p></div><span className={styles.scorePill}>{grade.score.toFixed(1)}</span></div>)}</div> : <p className={styles.classroomEmpty}>No graded submissions yet.</p>}<Link href="/elearning/scores" prefetch={false} className={styles.classroomFooterLink}>Open all scores</Link></section> : null}
 
       {activeTab === "activity" && isManager ? <section className={styles.dashboardPanel}>{activityItems.length ? <div className={styles.workspaceTimeline}>{activityItems.map((item) => <div className={styles.workspaceTimelineItem} key={item.key}><span><Activity size={16} /></span><div><strong>{item.title}</strong><p>{item.detail}</p></div><time>{formatDate(item.date)}</time></div>)}</div> : <p className={styles.classroomEmpty}>No classroom activity yet.</p>}</section> : null}
 
