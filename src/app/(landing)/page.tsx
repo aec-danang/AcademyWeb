@@ -10,43 +10,55 @@ export const metadata: Metadata = {
 export const revalidate = 60; // Revalidate cache every 60 seconds
 
 export default async function LandingPage() {
-  const [
-    programs,
-    settingsArray,
-    events,
-    news,
-    dbTestimonials,
-    posts,
-    studentLifeEvents,
-  ] = await Promise.all([
-    prisma.siteProgram.findMany({
-      where: { published: true },
-      orderBy: { order: 'asc' },
-    }),
-    prisma.siteSetting.findMany(),
-    prisma.post.findMany({
-      where: { type: 'event', published: true },
-      orderBy: { createdAt: 'desc' },
-      take: 6,
-    }),
-    prisma.post.findMany({
-      where: { type: 'news', published: true },
-      orderBy: { createdAt: 'desc' },
-      take: 3,
-    }),
-    prisma.testimonial.findMany({
-      where: { published: true },
-      orderBy: { order: 'asc' },
-    }),
-    prisma.post.findMany({
-      where: { type: 'post', published: true },
-      orderBy: { createdAt: 'desc' },
-      take: 3,
-    }),
-    prisma.studentLifeEvent.findMany({
-      orderBy: { order: 'asc' },
-    }),
-  ]);
+  let programs: any[] = [];
+  let settingsArray: any[] = [];
+  let events: any[] = [];
+  let news: any[] = [];
+  let dbTestimonials: any[] = [];
+  let posts: any[] = [];
+  let studentLifeEvents: any[] = [];
+
+  try {
+    [
+      programs,
+      settingsArray,
+      events,
+      news,
+      dbTestimonials,
+      posts,
+      studentLifeEvents,
+    ] = await Promise.all([
+      prisma.siteProgram.findMany({
+        where: { published: true },
+        orderBy: { order: 'asc' },
+      }),
+      prisma.siteSetting.findMany(),
+      prisma.post.findMany({
+        where: { type: 'event', published: true },
+        orderBy: { createdAt: 'desc' },
+        take: 6,
+      }),
+      prisma.post.findMany({
+        where: { type: 'news', published: true },
+        orderBy: { createdAt: 'desc' },
+        take: 3,
+      }),
+      prisma.testimonial.findMany({
+        where: { published: true },
+        orderBy: { order: 'asc' },
+      }),
+      prisma.post.findMany({
+        where: { type: 'post', published: true },
+        orderBy: { createdAt: 'desc' },
+        take: 3,
+      }),
+      prisma.studentLifeEvent.findMany({
+        orderBy: { order: 'asc' },
+      }),
+    ]);
+  } catch (error) {
+    console.warn("Database offline: using default landing page data");
+  }
 
   const features: any[] = []; 
 

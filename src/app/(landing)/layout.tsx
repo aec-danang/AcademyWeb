@@ -8,15 +8,26 @@ export default async function LandingLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const sponsors = await prisma.sponsor.findMany({
-    where: { published: true },
-    orderBy: { order: "asc" },
-  });
+  let sponsors: any[] = [];
+  let programs: any[] = [];
 
-  const programs = await prisma.siteProgram.findMany({
-    where: { published: true },
-    orderBy: { order: "asc" },
-  });
+  try {
+    sponsors = await prisma.sponsor.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" },
+    });
+  } catch (error) {
+    console.warn("Database offline: sponsors fallback used");
+  }
+
+  try {
+    programs = await prisma.siteProgram.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" },
+    });
+  } catch (error) {
+    console.warn("Database offline: programs fallback used");
+  }
 
   return (
     <div className="flex flex-col min-h-screen">

@@ -18,10 +18,10 @@ export async function getCurrentUser() {
     const TEST_ROLE: AppRole = (demoRoleCookie as AppRole) || "TEACHER"; 
     
     return {
-      id: TEST_ROLE === "TEACHER" ? "mock-teacher-id" : "mock-student-id",
-      name: TEST_ROLE === "TEACHER" ? "Mock Teacher" : "Mock Student",
-      email: TEST_ROLE === "TEACHER" ? "teacher@example.com" : "student@example.com",
-      phone: "0123456789",
+      id: TEST_ROLE === "TEACHER" ? "mock-teacher-id" : TEST_ROLE === "ADMIN" ? "mock-admin-id" : "mock-student-id",
+      name: TEST_ROLE === "TEACHER" ? "Teacher Sarah" : TEST_ROLE === "ADMIN" ? "Admin Manager" : "Student Minh",
+      email: TEST_ROLE === "TEACHER" ? "teacher@academy.edu.vn" : TEST_ROLE === "ADMIN" ? "admin@academy.edu.vn" : "student@academy.edu.vn",
+      phone: "0901234567",
       role: TEST_ROLE,
       isActive: true,
     };
@@ -56,6 +56,17 @@ export async function requireUser(roles?: AppRole[]): Promise<{ id: string; name
 }
 
 export async function requireAdmin() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email && process.env.NODE_ENV !== "production") {
+    return {
+      id: "mock-admin-id",
+      name: "Admin Manager",
+      email: "admin@academy.edu.vn",
+      phone: "0901234567",
+      role: "ADMIN" as AppRole,
+      isActive: true,
+    };
+  }
   return requireUser(["ADMIN"]);
 }
 

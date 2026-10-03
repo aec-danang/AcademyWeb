@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
+# Dependencies
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -10,34 +10,57 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# Next.js build & output
+.next/
+out/
+build/
+dist/
 
-# next.js
-/.next/
-/out/
+# Environment Variables
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# production
-/build
+# Vercel
+.vercel
 
-# misc
-.DS_Store
-*.pem
+# Testing & Coverage
+coverage/
+*.lcov
 
-# debug
+# TypeScript build info
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma generated outputs (if generating outside node_modules)
+/src/generated/prisma
+
+# Logs & Debugging
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+pnpm-debug.log*
+*.log
 
-# env files (can opt-in for committing if needed)
-.env*
+# Operating System Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
 
-# vercel
-.vercel
+# IDE & Editor files
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-/src/generated/prisma
+# Temporary & Secret keys
+*.pem
+*.key
+*.cert
+*.local
