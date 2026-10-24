@@ -4,9 +4,9 @@ import { StorageProvider, UploadOptions, UploadResult } from "./types";
 export class CloudinaryStorageProvider implements StorageProvider {
   constructor() {
     cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "nc7qd859",
-      api_key: process.env.CLOUDINARY_API_KEY || "915659763844291",
-      api_secret: process.env.CLOUDINARY_API_SECRET || "v45YojgDK2Tw5jZpXeAbi3_sikg",
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
       secure: true,
     });
   }

@@ -217,7 +217,7 @@ export default function SponsorsClient({ initialSponsors }: { initialSponsors: S
                     </TableCell>
                     <TableCell className="py-3">
                       <div className="w-[80px] h-[40px] flex items-center justify-center bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-md p-1.5 shadow-sm">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        { }
                         <img 
                           src={item.imageUrl} 
                           alt={item.name} 

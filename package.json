@@ -44,8 +44,6 @@
     "mammoth": "1.13.0",
     "next": "16.4.2",
     "next-auth": "4.24.15",
-    "next-cloudinary": "6.19.3",
-    "next-intl": "4.14.9",
     "next-themes": "0.4.6",
     "pdf-parse": "2.4.5",
     "pg": "8.23.1",
@@ -75,4 +73,3 @@
   },
   "packageManager": "pnpm@12.14.0"
 }
-

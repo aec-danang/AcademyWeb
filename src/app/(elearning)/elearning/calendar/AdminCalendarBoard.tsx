@@ -47,7 +47,7 @@ export function AdminCalendarBoard() {
 
   useEffect(() => {
     if (timelineRef.current) {
-      const scrollTo = Math.max(0, (now.getHours() - 1) * 64);
+      const scrollTo = Math.max(0, (new Date().getHours() - 1) * 64);
       timelineRef.current.scrollTop = scrollTo;
     }
   }, [viewMode]); 

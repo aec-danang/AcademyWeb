@@ -360,7 +360,7 @@ export default function PostEditorClient({ initialData }: { initialData?: Post }
               <Input type="text" placeholder="https://..." value={formData.featuredImage} onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })} className="bg-white dark:bg-slate-900 text-xs h-9" />
               {formData.featuredImage && (
                 <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-video">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  { }
                   <img src={formData.featuredImage} alt="Featured" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                 </div>
               )}

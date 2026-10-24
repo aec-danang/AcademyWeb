@@ -74,7 +74,7 @@ export function DevicePreviewModal({ isOpen, onClose, title, content, featuredIm
             <div className="p-8 md:p-12 space-y-6">
               {featuredImage && (
                 <div className="rounded-xl overflow-hidden aspect-video bg-slate-100 dark:bg-slate-800">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  { }
                   <img src={featuredImage} alt={title} className="w-full h-full object-cover" />
                 </div>
               )}
