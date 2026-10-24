@@ -1,10 +1,10 @@
 # Academy English Center (AEC) — Web Platform
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.2.7-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.4.2-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2.4-blue?style=flat&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat&logo=tailwind-css)](https://tailwindcss.com/)
-[![Prisma](https://img.shields.io/badge/Prisma-7.8-2D3748?style=flat&logo=prisma)](https://www.prisma.io/)
+[![Prisma](https://img.shields.io/badge/Prisma-7.10-2D3748?style=flat&logo=prisma)](https://www.prisma.io/)
 [![Neon](https://img.shields.io/badge/Neon-Serverless_Postgres-00E599?style=flat&logo=postgresql)](https://neon.tech/)
 [![Vercel Doctor](https://img.shields.io/badge/Vercel_Doctor-93%2F100-success?style=flat&logo=vercel)](https://vercel-doctor.com)
 
@@ -62,25 +62,14 @@ pnpm install
 ```
 
 ### 2. Environment Configuration
-Create a `.env` file in the project root:
-```env
-# Database
-NEON_DATABASE_URL="postgresql://user:password@endpoint.neon.tech/neondb?sslmode=require"
-
-# NextAuth
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-generated-secret-key"
-
-# Storage / Cloudinary (Optional)
-CLOUDINARY_URL="cloudinary://..."
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="..."
-```
+Copy [`.env.example`](.env.example) to `.env` and fill in the values. It lists every variable the app reads; only the database, NextAuth and Cloudinary groups are required.
 
 ### 3. Database Migration
 ```bash
 pnpm prisma generate
 pnpm prisma migrate deploy
 ```
+`prisma/migrations/0_init` is a baseline of the current schema. On an existing database, mark it applied once with `pnpm prisma migrate resolve --applied 0_init` (see [MAINTENANCE.md](MAINTENANCE.md)).
 
 ### 4. Start Development Server
 ```bash
@@ -98,6 +87,9 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | `pnpm build` | Compiles and builds the production bundle |
 | `pnpm start` | Runs the built production server |
 | `pnpm lint` | Runs ESLint analysis across the repository |
+| `pnpm typecheck` | Type-checks the project without emitting |
+| `pnpm build:check` | Compile-only build (no database needed); used by CI |
+| `pnpm smoke` | Checks a deployed site's key routes (`SMOKE_BASE_URL=https://… pnpm smoke`) |
 | `pnpm doctor:vercel` | Runs Vercel Doctor diagnostic audit for cost and performance footguns |
 
 ---

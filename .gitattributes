@@ -1,0 +1,5 @@
+# Normalize line endings so Windows and CI produce identical diffs.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary

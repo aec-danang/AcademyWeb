@@ -47,7 +47,7 @@ AcademyWeb/
 3. **Authentication & Session:**
    - Handled via `src/lib/session.ts` and NextAuth (`src/lib/authOptions.ts`).
    - Supports role-based access: `ADMIN`, `TEACHER`, `STUDENT`.
-   - Local development incorporates a non-intrusive demo role switcher via the `demo_role` cookie or default role mapping without requiring live DB accounts.
+   - Local development incorporates a non-intrusive demo role switcher via the `demo_role` cookie or default role mapping without requiring live DB accounts. This is gated by `isDemoMode` in `src/lib/session.ts` and is always off in production; never add auth paths that bypass it. Every server action and API route that mutates data must call `requireAdmin`/`requireUser` itself, since layouts do not protect actions.
 4. **Vercel & Infrastructure Optimization:**
    - Regularly run `npm run doctor:vercel` (or `npx vercel-doctor .`) to audit compute duration, link prefetching, large static assets, and caching.
    - Target maintaining a 90+ Vercel Doctor score.
