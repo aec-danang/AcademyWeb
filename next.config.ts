@@ -19,9 +19,11 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      { source: '/new/gioi-thieu', destination: '/about', permanent: true },
+      // No dedicated about/schedule/study-abroad pages exist; send visitors to the closest live page.
+      { source: '/about', destination: '/contact', permanent: false },
+      { source: '/new/gioi-thieu', destination: '/contact', permanent: true },
       { source: '/new/tin-tuc-su-kien', destination: '/news', permanent: true },
-      { source: '/new/lich-khai-giang', destination: '/schedule', permanent: true },
+      { source: '/new/lich-khai-giang', destination: '/contact', permanent: true },
       { source: '/new/tieng-anh', destination: '/programs', permanent: true },
       { source: '/new/tieng-anh-thieu-nhi', destination: '/programs/kids', permanent: true },
       { source: '/new/tieng-anh-thieu-nien', destination: '/programs/teens', permanent: true },
@@ -30,9 +32,10 @@ const nextConfig: NextConfig = {
       { source: '/new/tieng-anh-can-ban-giao-tiep', destination: '/programs/communication', permanent: true },
       { source: '/new/tieng-anh-doanh-nghiep', destination: '/programs/corporate', permanent: true },
       { source: '/new/dien-thuyet-truoc-cong-chung', destination: '/programs/public-speaking', permanent: true },
-      { source: '/new/du-hoc-he', destination: '/study-abroad', permanent: true },
-      // Redirect old blog posts to the dynamic blog slug
-      { source: '/new/:year(\\d{4})/:month(\\d{2})/:day(\\d{2})/:slug', destination: '/blog/:slug', permanent: true },
+      { source: '/new/du-hoc-he', destination: '/programs', permanent: true },
+      // Redirect old WordPress blog posts to the posts route
+      { source: '/new/:year(\\d{4})/:month(\\d{2})/:day(\\d{2})/:slug', destination: '/posts/:slug', permanent: true },
+      { source: '/blog/:slug', destination: '/posts/:slug', permanent: true },
     ];
   },
 };
