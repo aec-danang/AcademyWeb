@@ -1,5 +1,7 @@
 packages:
   - "."
+# Supply-chain guard: ignore package versions published less than 3 days ago.
+minimumReleaseAge: 4320
 allowBuilds:
   '@parcel/watcher': true
   '@prisma/engines': true

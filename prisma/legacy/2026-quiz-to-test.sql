@@ -1,3 +1,6 @@
+-- ARCHIVED: one-off manual migration already applied to production (Quiz -> Test restructure).
+-- Kept for history only. Prisma ignores this folder; do not re-run.
+
 -- 1. Move Next-Auth tables to public schema
 ALTER TABLE "elearning"."Account" SET SCHEMA "public";
 ALTER TABLE "elearning"."Session" SET SCHEMA "public";
