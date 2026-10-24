@@ -1,10 +1,12 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { storageService } from "@/lib/storage/storage.service";
 
 export async function autoClassifyByAI(title: string, contentSnippet: string) {
+  await requireAdmin();
   const prompt = `Phân tích tiêu đề và nội dung ngắn gọn sau đây để phân loại vào 1 trong 4 loại: "post", "news", "event", "recruitment".
 Đồng thời xuất ra mảng tối đa 4 thẻ (tags) phù hợp.
 
@@ -50,6 +52,7 @@ Tuyệt đối không giải thích, không chào hỏi, không thêm bất kỳ
 }
 
 export async function createPost(data: any) {
+  await requireAdmin();
   let uniqueSlug = data.slug;
   let counter = 1;
   while (true) {
@@ -67,6 +70,7 @@ export async function createPost(data: any) {
 }
 
 export async function updatePost(slug: string, data: any) {
+  await requireAdmin();
   await prisma.post.update({
     where: { slug },
     data,
@@ -75,6 +79,7 @@ export async function updatePost(slug: string, data: any) {
 }
 
 export async function deletePost(slug: string) {
+  await requireAdmin();
   const post = await prisma.post.findUnique({
     where: { slug },
     select: { featuredImageId: true },
@@ -98,6 +103,7 @@ export async function deletePost(slug: string) {
 }
 
 export async function batchDeletePosts(slugs: string[]) {
+  await requireAdmin();
   const posts = await prisma.post.findMany({
     where: { slug: { in: slugs } },
     select: { featuredImageId: true },
@@ -123,6 +129,7 @@ export async function batchDeletePosts(slugs: string[]) {
 }
 
 export async function batchUpdatePosts(slugs: string[], data: any) {
+  await requireAdmin();
   await prisma.post.updateMany({
     where: { slug: { in: slugs } },
     data,

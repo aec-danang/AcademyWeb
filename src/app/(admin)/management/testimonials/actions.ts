@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
 export async function createTestimonial(data: { 
@@ -15,6 +16,7 @@ export async function createTestimonial(data: {
   isHallOfFame: boolean; 
   isFeatured: boolean; 
 }) {
+  await requireAdmin();
   await prisma.testimonial.create({ data });
   revalidatePath("/management/testimonials");
   revalidatePath("/");
@@ -32,12 +34,14 @@ export async function updateTestimonial(id: string, data: {
   isHallOfFame: boolean; 
   isFeatured: boolean; 
 }) {
+  await requireAdmin();
   await prisma.testimonial.update({ where: { id }, data });
   revalidatePath("/management/testimonials");
   revalidatePath("/");
 }
 
 export async function deleteTestimonial(id: string) {
+  await requireAdmin();
   await prisma.testimonial.delete({ where: { id } });
   revalidatePath("/management/testimonials");
   revalidatePath("/");

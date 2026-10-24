@@ -1,15 +1,18 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 
 export async function getPrograms() {
+  await requireAdmin();
   return await prisma.siteProgram.findMany({
     orderBy: { order: "asc" },
   });
 }
 
 export async function getProgram(id: string) {
+  await requireAdmin();
   return await prisma.siteProgram.findUnique({
     where: { id },
   });
@@ -25,6 +28,7 @@ export async function createProgram(data: {
   order: number;
   published: boolean;
 }) {
+  await requireAdmin();
   const result = await prisma.siteProgram.create({
     data,
   });
@@ -47,6 +51,7 @@ export async function updateProgram(
     published: boolean;
   }
 ) {
+  await requireAdmin();
   const result = await prisma.siteProgram.update({
     where: { id },
     data,
@@ -59,6 +64,7 @@ export async function updateProgram(
 }
 
 export async function deleteProgram(id: string) {
+  await requireAdmin();
   const result = await prisma.siteProgram.delete({
     where: { id },
   });

@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { storageService } from "@/lib/storage/storage.service";
 import { StorageFolder } from "@/lib/storage/types";
+import { requireTeacherOrAdmin } from "@/lib/session";
 
 const ALLOWED_FOLDERS: StorageFolder[] = ["courses", "teachers", "blog", "ui", "student_life", "academy_media"];
 
 export async function POST(request: Request) {
+  await requireTeacherOrAdmin();
+
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;

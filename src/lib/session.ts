@@ -6,16 +6,23 @@ import { prisma } from "@/lib/prisma";
 
 export type AppRole = "ADMIN" | "TEACHER" | "STUDENT" | "USER";
 
+const DEMO_ROLES: AppRole[] = ["ADMIN", "TEACHER", "STUDENT"];
+
+// Demo users exist only in local development; production always requires a real session.
+export const isDemoMode = process.env.NODE_ENV !== "production";
+
 export async function getCurrentUser() {
   const session = await getServerSession(authOptions);
   const email = session?.user?.email;
 
   if (!email) {
+    if (!isDemoMode) return null;
+
     // --- MOCK FOR E-LEARNING DEV ---
     // Reads demo_role cookie set by the DemoRoleSwitcher
     const cookieStore = await cookies();
-    const demoRoleCookie = cookieStore.get("demo_role")?.value;
-    const TEST_ROLE: AppRole = (demoRoleCookie as AppRole) || "TEACHER"; 
+    const demoRoleCookie = cookieStore.get("demo_role")?.value as AppRole | undefined;
+    const TEST_ROLE: AppRole = demoRoleCookie && DEMO_ROLES.includes(demoRoleCookie) ? demoRoleCookie : "TEACHER";
     
     return {
       id: TEST_ROLE === "TEACHER" ? "mock-teacher-id" : TEST_ROLE === "ADMIN" ? "mock-admin-id" : "mock-student-id",
@@ -57,7 +64,7 @@ export async function requireUser(roles?: AppRole[]): Promise<{ id: string; name
 
 export async function requireAdmin() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.email && process.env.NODE_ENV !== "production") {
+  if (!session?.user?.email && isDemoMode) {
     return {
       id: "mock-admin-id",
       name: "Admin Manager",
