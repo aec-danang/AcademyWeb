@@ -24,32 +24,20 @@ import { ThemeProvider } from "@/lib/contexts/ThemeProvider";
 import { SessionProviderWrapper } from "@/lib/contexts/SessionProviderWrapper";
 import { Toaster } from "@/components/ui/sonner";
 import { EasterEgg } from "@/components/EasterEgg";
+import { getSiteTheme } from "@/lib/siteTheme.server";
 
-export default function EnLayout({
+export default async function EnLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const siteTheme = await getSiteTheme();
   return (
-    <html lang="en" className={`${montserrat.variable} ${inter.variable}`} suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                if (window.location.pathname.startsWith('/management') && localStorage.getItem('aec-theme') === 'dark') {
-                  document.documentElement.classList.add('dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                }
-              } catch (_) {}
-            `,
-          }}
-        />
-      </head>
+    <html lang="en" data-seasonal-theme={siteTheme} data-scroll-behavior="smooth" className={`${montserrat.variable} ${inter.variable}`} suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: `try{document.documentElement.classList.toggle('dark',window.location.pathname.startsWith('/management')&&localStorage.getItem('aec-theme')==='dark');document.documentElement.dataset.seasonalEffects=String(localStorage.getItem('aec-seasonal-effects')!=='false')}catch(e){}` }} /></head>
       <body className={montserrat.className} suppressHydrationWarning>
         <SessionProviderWrapper>
-          <ThemeProvider>
+          <ThemeProvider initialSeasonalTheme={siteTheme}>
             {children}
             <Toaster />
             <EasterEgg />

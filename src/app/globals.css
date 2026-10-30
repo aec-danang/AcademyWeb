@@ -3,17 +3,25 @@
 @source "../";
 
 :root {
+  --aec-orange: #f68d2e;
+  --aec-orange-hover: #d96200;
+  --aec-orange-light: #fef4eb;
+  --aec-navy: #2c2d65;
+  --aec-navy-dark: #1d1e44;
+  --aec-navy-deep: #0e0f22;
+  --aec-navy-light: #f0f0f8;
+  --aec-surface: #ffffff;
   /* AEC Bright Learning System Colors */
-  --color-orange: #f68d2e;
-  --color-orange-hover: #ea740a;
-  --color-navy: #2c2d65;
-  --color-navy-dark: #1d1e44;
-  --color-navy-deep: #0e0f22;
-  --color-orange-light: #fef4eb;
-  --color-navy-light: #f0f0f8;
-  --color-white: #ffffff;
+  --color-orange: var(--aec-orange);
+  --color-orange-hover: var(--aec-orange-hover);
+  --color-navy: var(--aec-navy);
+  --color-navy-dark: var(--aec-navy-dark);
+  --color-navy-deep: var(--aec-navy-deep);
+  --color-orange-light: var(--aec-orange-light);
+  --color-navy-light: var(--aec-navy-light);
+  --color-white: var(--aec-surface);
 
-  --text-main: #2c2d65;
+  --text-main: var(--aec-navy);
   --text-muted: #5f607a;
   --text-white: #ffffff;
 
@@ -251,15 +259,15 @@ section[aria-label="Notifications alt+T"] {
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --color-navy: #2c2d65;
-  --color-navy-dark: #1d1e44;
-  --color-navy-deep: #0e0f22;
-  --color-navy-light: #f0f0f8;
-  --color-orange: #f68d2e;
-  --color-orange-hover: #ea740a;
-  --color-orange-light: #fef4eb;
-  --color-text-main: #2c2d65;
-  --color-text-muted: #5f607a;
+  --color-navy: var(--aec-navy);
+  --color-navy-dark: var(--aec-navy-dark);
+  --color-navy-deep: var(--aec-navy-deep);
+  --color-navy-light: var(--aec-navy-light);
+  --color-orange: var(--aec-orange);
+  --color-orange-hover: var(--aec-orange-hover);
+  --color-orange-light: var(--aec-orange-light);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
 
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
@@ -269,4 +277,185 @@ section[aria-label="Notifications alt+T"] {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Seasonal palettes are independent from light/dark mode and scoped to this browser. */
+html[data-seasonal-theme="halloween"] {
+  --aec-orange: #a85009;
+  --aec-orange-hover: #823a08;
+  --aec-orange-light: #fff2e2;
+  --aec-navy: #40245f;
+  --aec-navy-dark: #301949;
+  --aec-navy-deep: #21112f;
+  --aec-navy-light: #f3ebfa;
+  --background: #fcf9ff;
+  --foreground: #2b173e;
+  --card: #ffffff;
+  --card-foreground: #2b173e;
+  --popover: #ffffff;
+  --popover-foreground: #2b173e;
+  --primary: #a85009;
+  --primary-foreground: #ffffff;
+  --accent: #f3ebfa;
+  --accent-foreground: #40245f;
+  --border: #d9cce5;
+  --input: #d9cce5;
+  --ring: #a85009;
+  --sidebar: #f6effa;
+  --sidebar-foreground: #37204b;
+  --sidebar-accent: #e8d9f1;
+  --sidebar-accent-foreground: #37204b;
+  --sidebar-primary: #723c8d;
+  --sidebar-border: #d9cce5;
+  --color-indigo-50: #f4ecf8;
+  --color-indigo-500: #874ca7;
+  --color-indigo-600: #713b91;
+  --color-indigo-700: #5c2f77;
+}
+
+html[data-seasonal-theme="christmas"] {
+  --aec-orange: #b7243d;
+  --aec-orange-hover: #901b30;
+  --aec-orange-light: #fff0f1;
+  --aec-navy: #18513c;
+  --aec-navy-dark: #123e2e;
+  --aec-navy-deep: #0d2d22;
+  --aec-navy-light: #eaf5ee;
+  --background: #f8fcf9;
+  --foreground: #153c2e;
+  --card: #ffffff;
+  --card-foreground: #153c2e;
+  --popover: #ffffff;
+  --popover-foreground: #153c2e;
+  --primary: #b7243d;
+  --primary-foreground: #ffffff;
+  --accent: #e8f4ec;
+  --accent-foreground: #18513c;
+  --border: #c8dfd0;
+  --input: #c8dfd0;
+  --ring: #b7243d;
+  --sidebar: #eaf5ee;
+  --sidebar-foreground: #174533;
+  --sidebar-accent: #d9ede0;
+  --sidebar-accent-foreground: #174533;
+  --sidebar-primary: #18513c;
+  --sidebar-border: #c8dfd0;
+  --color-indigo-50: #eaf5ee;
+  --color-indigo-500: #287353;
+  --color-indigo-600: #18513c;
+  --color-indigo-700: #123e2e;
+}
+
+html.dark[data-seasonal-theme="halloween"] {
+  --aec-orange: #ef9b37;
+  --aec-orange-hover: #ffc06b;
+  --aec-orange-light: #3d2b21;
+  --aec-navy: #dec7f1;
+  --aec-navy-dark: #b796d2;
+  --aec-navy-light: #332242;
+  --background: #1b1424;
+  --foreground: #f4eafa;
+  --card: #281d32;
+  --card-foreground: #f4eafa;
+  --popover: #281d32;
+  --popover-foreground: #f4eafa;
+  --primary: #ef9b37;
+  --primary-foreground: #241626;
+  --accent: #3b294b;
+  --accent-foreground: #f4eafa;
+  --border: #554464;
+  --input: #554464;
+  --ring: #ef9b37;
+  --sidebar: #24192f;
+  --sidebar-foreground: #f4eafa;
+  --sidebar-accent: #3b294b;
+  --sidebar-accent-foreground: #f4eafa;
+  --sidebar-primary: #ef9b37;
+  --sidebar-border: #554464;
+  --color-indigo-50: #362744;
+  --color-indigo-500: #c9a0e2;
+  --color-indigo-600: #b780d4;
+  --color-indigo-700: #deb9ed;
+}
+
+html.dark[data-seasonal-theme="christmas"] {
+  --aec-orange: #f07d8a;
+  --aec-orange-hover: #ffa7b0;
+  --aec-orange-light: #39252c;
+  --aec-navy: #c8ead3;
+  --aec-navy-dark: #95d2aa;
+  --aec-navy-light: #243d32;
+  --background: #10251c;
+  --foreground: #edf9f0;
+  --card: #19382a;
+  --card-foreground: #edf9f0;
+  --popover: #19382a;
+  --popover-foreground: #edf9f0;
+  --primary: #f07d8a;
+  --primary-foreground: #351b24;
+  --accent: #28503a;
+  --accent-foreground: #edf9f0;
+  --border: #426851;
+  --input: #426851;
+  --ring: #f07d8a;
+  --sidebar: #173326;
+  --sidebar-foreground: #edf9f0;
+  --sidebar-accent: #28503a;
+  --sidebar-accent-foreground: #edf9f0;
+  --sidebar-primary: #f07d8a;
+  --sidebar-border: #426851;
+  --color-indigo-50: #244638;
+  --color-indigo-500: #99d8b0;
+  --color-indigo-600: #7ac799;
+  --color-indigo-700: #bce6c9;
+}
+
+html[data-seasonal-theme="halloween"] .admin-layout,
+html[data-seasonal-theme="christmas"] .admin-layout,
+html[data-seasonal-theme="halloween"] .elearningContainer,
+html[data-seasonal-theme="christmas"] .elearningContainer {
+  color: var(--foreground);
+  background-color: var(--background);
+}
+
+html[data-seasonal-theme="halloween"] .admin-layout :where(.bg-white, .bg-slate-50),
+html[data-seasonal-theme="christmas"] .admin-layout :where(.bg-white, .bg-slate-50) {
+  background-color: var(--card);
+}
+
+html.dark[data-seasonal-theme="halloween"] .admin-layout :where(.text-slate-900, .text-slate-800, .text-slate-700),
+html.dark[data-seasonal-theme="christmas"] .admin-layout :where(.text-slate-900, .text-slate-800, .text-slate-700) {
+  color: var(--foreground);
+}
+
+@keyframes halloween-button-hold {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(248 143 43 / 0%), 0 0 0 rgb(132 74 167 / 0%); }
+  35% { box-shadow: 0 0 0 3px rgb(248 143 43 / 35%), 0 0 18px rgb(248 143 43 / 45%); }
+  70% { box-shadow: 0 0 0 5px rgb(132 74 167 / 28%), 0 0 26px rgb(132 74 167 / 42%); }
+}
+
+@keyframes halloween-button-shake {
+  0%, 100% { rotate: 0deg; translate: 0 0; }
+  25% { rotate: -1.5deg; translate: -1px 0; }
+  75% { rotate: 1.5deg; translate: 1px 0; }
+}
+
+html[data-seasonal-theme="halloween"][data-seasonal-effects="true"] :is(button, a, [role="button"]):not(:disabled):not([aria-disabled="true"]):active {
+  animation: halloween-button-hold 1.2s ease-in-out infinite, halloween-button-shake 240ms 420ms ease-in-out 3;
+  scale: .96;
+  transition: scale 100ms ease-out;
+}
+
+html[data-seasonal-theme="halloween"][data-seasonal-effects="true"] :is(button, a, [role="button"]):focus-visible {
+  outline: 2px solid #c56cdb;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgb(197 108 219 / 20%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-seasonal-theme="halloween"][data-seasonal-effects="true"] :is(button, a, [role="button"]):not(:disabled):not([aria-disabled="true"]):active {
+    animation: none;
+    scale: none;
+    transition: none;
+  }
 }

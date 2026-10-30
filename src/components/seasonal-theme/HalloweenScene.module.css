@@ -1,0 +1,15 @@
+.scene { display: none; }
+:global(html[data-seasonal-theme="halloween"]) .scene { display: grid; place-items: center; width: 100%; max-width: 480px; pointer-events: none; }
+.art { width: 100%; height: auto; overflow: visible; }
+.moon { fill: #ffe8ba; }
+.moonHalo { fill: #8b5cf6; opacity: .12; }
+.caption { color: #e7d7f5; font-size: .75rem; letter-spacing: .04em; margin-top: -12px; text-align: center; }
+:global(html[data-seasonal-effects="true"]) .ghost { animation: ghost-float 5s ease-in-out infinite; }
+:global(html[data-seasonal-effects="true"]) .face { animation: lantern 3.6s ease-in-out infinite alternate; }
+:global(html[data-seasonal-effects="true"]) .farBat { animation: bat-float 14s ease-in-out infinite alternate; }
+:global(html[data-seasonal-effects="true"]) .nearBat { animation: bat-float 18s ease-in-out -5s infinite alternate-reverse; }
+@keyframes ghost-float { 50% { transform: translateY(-10px); } }
+@keyframes lantern { from { opacity: .65; } to { opacity: 1; filter: drop-shadow(0 0 6px #ffcc70); } }
+@keyframes bat-float { to { transform: translate(-18px, 8px); } }
+@media (max-width: 767px) { .scene { max-width: 290px !important; } .farBat, .stars { display: none; } .caption { font-size: .65rem; } }
+@media (prefers-reduced-motion: reduce) { .scene * { animation: none !important; } }

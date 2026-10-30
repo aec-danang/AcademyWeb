@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Phone, Mail, ChevronRight, ArrowRight } from "lucide-react";
 import { FaFacebook, FaYoutube, FaInstagram } from "react-icons/fa";
+import { useState } from "react";
 
 type Sponsor = {
   name: string;
@@ -16,6 +17,12 @@ type SiteProgram = {
   title: string;
   slug: string;
 };
+
+function SponsorLogo({ sponsor }: { sponsor: Sponsor }) {
+  const [failed, setFailed] = useState(false);
+  return failed ? <span className="flex h-full items-center justify-center text-center text-xs font-semibold text-slate-700">{sponsor.name}</span> :
+    <img src={sponsor.imageUrl} alt={`${sponsor.name} logo`} className="h-full w-full object-contain mix-blend-multiply" loading="lazy" onError={() => setFailed(true)} />;
+}
 
 export default function Footer({ sponsors = [], programs = [] }: { sponsors?: Sponsor[], programs?: SiteProgram[] }) {
 
@@ -58,13 +65,13 @@ export default function Footer({ sponsors = [], programs = [] }: { sponsors?: Sp
                 <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-orange group-hover:border-orange transition-colors duration-300">
                   <Phone size={18} />
                 </div>
-                <span>(0236) 123 4567</span>
+                <span>0905 021 878</span>
               </div>
               <div className="flex items-center gap-4 group">
                 <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-orange group-hover:border-orange transition-colors duration-300">
                   <Mail size={18} />
                 </div>
-                <span>info@academy.edu.vn</span>
+                <span>academy.englishcenter@gmail.com</span>
               </div>
             </div>
 
@@ -117,26 +124,10 @@ export default function Footer({ sponsors = [], programs = [] }: { sponsors?: Sp
                     <div key={sponsor.name} className="bg-white p-3 rounded-xl flex items-center justify-center aspect-video hover:scale-105 hover:shadow-[0_8px_25px_rgba(246,141,46,0.3)] transition-all duration-300 cursor-pointer" title={sponsor.name}>
                       {sponsor.website ? (
                         <a href={sponsor.website} target="_blank" rel="noopener noreferrer" className="block w-full h-full relative">
-                          <img 
-                            suppressHydrationWarning
-                            src={sponsor.imageUrl} 
-                            alt={`${sponsor.name} logo`}
-                            className="w-full h-full object-contain mix-blend-multiply"
-                            onError={(e) => {
-                              e.currentTarget.src = `https://placehold.co/120x60/ffffff/ff7a00?text=${encodeURIComponent(sponsor.name)}`;
-                            }}
-                          />
+                          <SponsorLogo sponsor={sponsor} />
                         </a>
                       ) : (
-                        <img 
-                          suppressHydrationWarning
-                          src={sponsor.imageUrl} 
-                          alt={`${sponsor.name} logo`}
-                          className="w-full h-full object-contain mix-blend-multiply"
-                          onError={(e) => {
-                            e.currentTarget.src = `https://placehold.co/120x60/ffffff/ff7a00?text=${encodeURIComponent(sponsor.name)}`;
-                          }}
-                        />
+                        <SponsorLogo sponsor={sponsor} />
                       )}
                     </div>
                   ))}

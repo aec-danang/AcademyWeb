@@ -113,7 +113,8 @@ const navGroups: NavGroup[] = [
     title: "Hệ thống & Cấu hình",
     items: [
       { name: "Tài khoản người dùng", path: "/management/accounts", icon: Users },
-      { name: "Cài đặt trang", path: "/management/settings", icon: Settings }
+      { name: "Cài đặt trang", path: "/management/settings", icon: Settings },
+      { name: "Chủ đề website", path: "/management/themes", icon: ImageIcon }
     ]
   }
 ];

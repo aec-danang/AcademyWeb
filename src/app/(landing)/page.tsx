@@ -11,7 +11,7 @@ export const revalidate = 60; // Revalidate cache every 60 seconds
 
 export default async function LandingPage() {
   let programs: any[] = [];
-  let settingsArray: any[] = [];
+  let sponsorCount = 0;
   let events: any[] = [];
   let news: any[] = [];
   let dbTestimonials: any[] = [];
@@ -21,18 +21,17 @@ export default async function LandingPage() {
   try {
     [
       programs,
-      settingsArray,
       events,
       news,
       dbTestimonials,
       posts,
       studentLifeEvents,
+      sponsorCount,
     ] = await Promise.all([
       prisma.siteProgram.findMany({
         where: { published: true },
         orderBy: { order: 'asc' },
       }),
-      prisma.siteSetting.findMany(),
       prisma.post.findMany({
         where: { type: 'event', published: true },
         orderBy: { createdAt: 'desc' },
@@ -55,17 +54,11 @@ export default async function LandingPage() {
       prisma.studentLifeEvent.findMany({
         orderBy: { order: 'asc' },
       }),
+      prisma.sponsor.count({ where: { published: true } }),
     ]);
   } catch (error) {
     console.warn("Database offline: using default landing page data");
   }
-
-  const features: any[] = []; 
-
-  const settings = settingsArray.reduce((acc: Record<string, string>, curr: any) => {
-    acc[curr.key] = curr.value;
-    return acc;
-  }, {} as Record<string, string>);
 
   const testimonials = dbTestimonials.map((t: any) => ({
     id: t.id,
@@ -74,20 +67,20 @@ export default async function LandingPage() {
     content: t.content,
     avatarUrl: t.avatarUrl,
     score: t.rating ? `${t.rating}/5` : null,
-    isHallOfFame: true,
-    isFeatured: true
+    isHallOfFame: t.isHallOfFame,
+    isFeatured: t.isFeatured,
   }));
 
   return (
     <LandingClient 
       programs={programs} 
-      features={features} 
-      settings={settings}
       events={events}
       news={news}
       posts={posts}
       testimonials={testimonials}
       studentLifeEvents={studentLifeEvents}
+      sponsorCount={sponsorCount}
+      yearsOfExperience={new Date().getFullYear() - 2001}
     />
   );
 }

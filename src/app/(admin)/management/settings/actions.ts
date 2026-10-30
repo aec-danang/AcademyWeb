@@ -1,11 +1,11 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/session";
 import { revalidatePath } from "next/cache";
+import { requireSiteThemeAdmin } from "@/lib/siteTheme.server";
 
 export async function saveSettings(settings: { key: string; value: string }[]) {
-  await requireAdmin();
+  await requireSiteThemeAdmin();
   await prisma.$transaction(
     settings.map((setting) => 
       prisma.siteSetting.upsert({
@@ -23,7 +23,7 @@ export async function updateAdminAccount(
   userId: string, 
   data: { name?: string; email?: string; password?: string }
 ) {
-  await requireAdmin();
+  await requireSiteThemeAdmin();
   const updateData: any = {};
   if (data.name) updateData.name = data.name;
   if (data.email) updateData.email = data.email;
