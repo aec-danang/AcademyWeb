@@ -6,6 +6,7 @@ import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useTheme } from "@/lib/contexts/ThemeProvider";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -13,8 +14,12 @@ if (typeof window !== "undefined") {
 
 export default function ContactPageClient({ programs }: { programs: any[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { effectsEnabled } = useTheme();
 
   useGSAP(() => {
+    if (!effectsEnabled) return;
+    const media = gsap.matchMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
     // Hero Animation
     gsap.fromTo(".hero-content > *",
       { y: 30, opacity: 0 },
@@ -31,7 +36,9 @@ export default function ContactPageClient({ programs }: { programs: any[] }) {
       { x: 30, opacity: 0 },
       { x: 0, opacity: 1, duration: 0.8, delay: 0.5, ease: "power3.out" }
     );
-  }, { scope: containerRef });
+    });
+    return () => media.revert();
+  }, { scope: containerRef, dependencies: [effectsEnabled], revertOnUpdate: true });
 
   return (
     <div ref={containerRef}>
@@ -85,7 +92,7 @@ export default function ContactPageClient({ programs }: { programs: any[] }) {
                     </div>
                     <div>
                       <h4 className="text-lg font-bold text-navy dark:text-slate-200">Điện thoại</h4>
-                      <p className="text-slate-600 dark:text-slate-400 mt-1">(0236) 123 4567</p>
+                      <p className="text-slate-600 dark:text-slate-400 mt-1">0905 021 878</p>
                     </div>
                   </div>
                   
@@ -95,7 +102,7 @@ export default function ContactPageClient({ programs }: { programs: any[] }) {
                     </div>
                     <div>
                       <h4 className="text-lg font-bold text-navy dark:text-slate-200">Email</h4>
-                      <p className="text-slate-600 dark:text-slate-400 mt-1">info@academy.edu.vn</p>
+                      <p className="text-slate-600 dark:text-slate-400 mt-1">academy.englishcenter@gmail.com</p>
                     </div>
                   </div>
                   
@@ -113,7 +120,7 @@ export default function ContactPageClient({ programs }: { programs: any[] }) {
             </div>
             
             {/* Registration Form Column */}
-            <div id="register" className="form-card">
+            <div id="register" className="form-card scroll-mt-28">
               <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-200/60 dark:border-slate-800">
                 <h2 className="text-2xl font-bold text-navy dark:text-white mb-2">Đăng ký thi xếp lớp</h2>
                 <p className="text-slate-600 dark:text-slate-400 mb-8">Vui lòng điền vào biểu mẫu dưới đây và các tư vấn viên của chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.</p>

@@ -1,0 +1,180 @@
+/* Hallmark · pre-emit critique: P5 H4 E5 S5 R5 V4 · component-scope: atmospheric seasonal accents · contrast: decorative-only */
+.canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  overflow: clip;
+  pointer-events: none;
+  user-select: none;
+}
+
+.halloween {
+  --decor-pumpkin: #db741f;
+  --decor-pumpkin-light: #fff0b2;
+  --decor-ink: #513368;
+  --decor-web: #8b749c;
+}
+
+.christmas {
+  --decor-fir: #176b4b;
+  --decor-fir-light: #338765;
+  --decor-red: #bd363e;
+  --decor-cream: #f9f2df;
+  --decor-gold: #d5a844;
+}
+
+.pumpkin {
+  position: absolute;
+  inline-size: clamp(5rem, 8vw, 7rem);
+  inset-inline-end: 1rem;
+  inset-block-end: 1rem;
+  opacity: .42;
+  filter: drop-shadow(0 0 .5rem var(--decor-pumpkin-light));
+}
+
+.pumpkinBody { fill: var(--decor-pumpkin); }
+.pumpkinStem { fill: none; stroke: var(--decor-ink); stroke-width: 5; stroke-linecap: round; }
+.pumpkinRib { fill: none; stroke: var(--decor-ink); stroke-width: 2; opacity: .42; }
+.pumpkinFace { fill: var(--decor-pumpkin-light); }
+
+.web {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  inline-size: clamp(5rem, 10vw, 9rem);
+  fill: none;
+  stroke: var(--decor-web);
+  stroke-width: 1.25;
+  opacity: .36;
+}
+
+.bat, .batSecondary {
+  position: absolute;
+  fill: var(--decor-ink);
+  opacity: .4;
+}
+
+.bat {
+  inline-size: 3.5rem;
+  inset-block-start: 18%;
+  inset-inline-end: 12%;
+}
+
+.batSecondary {
+  inline-size: 2.25rem;
+  inset-block-start: 28%;
+  inset-inline-end: 24%;
+}
+
+.tree {
+  position: absolute;
+  inline-size: clamp(5rem, 8vw, 7rem);
+  inset-inline-end: 1rem;
+  inset-block-end: 1rem;
+  opacity: .42;
+}
+
+.treeTrunk { fill: var(--decor-gold); }
+.treeFoliage { fill: var(--decor-fir); }
+.treeTier { fill: none; stroke: var(--decor-fir-light); stroke-width: 2; }
+.treeStar, .baubleLight { fill: var(--decor-gold); }
+.baubleRed { fill: var(--decor-red); }
+
+.gift {
+  position: absolute;
+  inline-size: 3.5rem;
+  inset-inline-start: 1rem;
+  inset-block-end: 1rem;
+  opacity: .4;
+}
+
+.giftBody, .giftBow { fill: var(--decor-red); }
+.giftLid { fill: var(--decor-fir); }
+.giftRibbon { fill: var(--decor-cream); }
+
+.snow {
+  position: absolute;
+  inset: 0;
+}
+
+.snowflake {
+  position: absolute;
+  inset-block-start: -1rem;
+  inline-size: .25rem;
+  block-size: .25rem;
+  border-radius: 50%;
+  background: var(--decor-cream);
+  box-shadow: 0 0 0 1px var(--decor-fir-light);
+  opacity: .55;
+}
+
+.snowflake:nth-child(12n + 1) { inset-inline-start: 5%; --drift: 1rem; --duration: 17s; --delay: -3s; }
+.snowflake:nth-child(12n + 2) { inset-inline-start: 14%; --drift: -1rem; --duration: 20s; --delay: -12s; }
+.snowflake:nth-child(12n + 3) { inset-inline-start: 23%; --drift: .5rem; --duration: 18s; --delay: -7s; }
+.snowflake:nth-child(12n + 4) { inset-inline-start: 32%; --drift: -1.5rem; --duration: 22s; --delay: -16s; }
+.snowflake:nth-child(12n + 5) { inset-inline-start: 41%; --drift: 1.25rem; --duration: 19s; --delay: -11s; }
+.snowflake:nth-child(12n + 6) { inset-inline-start: 50%; --drift: -1rem; --duration: 23s; --delay: -5s; }
+.snowflake:nth-child(12n + 7) { inset-inline-start: 59%; --drift: .75rem; --duration: 21s; --delay: -14s; }
+.snowflake:nth-child(12n + 8) { inset-inline-start: 68%; --drift: -1.25rem; --duration: 18s; --delay: -8s; }
+.snowflake:nth-child(12n + 9) { inset-inline-start: 77%; --drift: 1rem; --duration: 24s; --delay: -18s; }
+.snowflake:nth-child(12n + 10) { inset-inline-start: 85%; --drift: -1rem; --duration: 20s; --delay: -4s; }
+.snowflake:nth-child(12n + 11) { inset-inline-start: 92%; --drift: .5rem; --duration: 22s; --delay: -15s; }
+.snowflake:nth-child(12n + 12) { inset-inline-start: 97%; --drift: -1rem; --duration: 19s; --delay: -9s; }
+
+.motion .bat { animation: bat-drift 15s cubic-bezier(.65, 0, .35, 1) infinite alternate; }
+.motion .batSecondary { animation: bat-drift 19s cubic-bezier(.65, 0, .35, 1) -7s infinite alternate-reverse; }
+.motion .pumpkin { animation: pumpkin-glow 4s ease-in-out infinite alternate; }
+.motion .pumpkinFace { animation: candle-flicker 2.7s ease-in-out infinite; }
+.motion .bat path, .motion .batSecondary path { transform-origin: center; animation: wingbeat .7s ease-in-out infinite alternate; }
+.motion .snowflake { animation: snow-fall var(--duration) linear var(--delay) infinite; }
+
+@keyframes bat-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-6rem, 2rem, 0) rotate(-12deg); }
+}
+
+@keyframes pumpkin-glow {
+  from { opacity: .42; filter: drop-shadow(0 0 .4rem #f08f30); }
+  to { opacity: .7; filter: drop-shadow(0 0 1.2rem #f08f30); }
+}
+
+.fog { position: absolute; inset: auto 0 0; height: 18vh; opacity: .4; }
+.fog span { position: absolute; inset: 0 -20%; background: radial-gradient(ellipse at 25% 100%, #bd94d64d, transparent 60%), radial-gradient(ellipse at 75% 100%, #f0ab5a38, transparent 60%); }
+.fog span:nth-child(2) { transform: scaleX(-1); opacity: .55; }
+.motion .fog span { animation: fog-drift 18s ease-in-out infinite alternate; }
+.motion .fog span:nth-child(2) { animation-duration: 25s; animation-direction: alternate-reverse; }
+.embers { position: absolute; inset: 0; }
+.embers span { position: absolute; bottom: -12px; width: 4px; height: 4px; border-radius: 50%; background: #e99b42; box-shadow: 0 0 8px #ed9c49; opacity: 0; }
+.motion .embers span { animation: ember-rise 17s linear infinite; }
+
+/* This layer floats above menus without intercepting any interaction. */
+.interactions { position: fixed; inset: 0; z-index: 100; pointer-events: none; overflow: clip; }
+.controlGlow { position: absolute; opacity: 0; border-radius: 16px; border: 1px solid #ec9b5266; box-shadow: 0 0 16px #f0933b55, inset 0 0 10px #a66ad333; }
+.batBurst { position: absolute; }
+.batBurst svg { position: absolute; left: -16px; top: -8px; width: 32px; height: 16px; opacity: 0; fill: #623387; filter: drop-shadow(0 0 2px #f5b554); }
+.batBurst path { transform-origin: center; animation: wingbeat .18s ease-in-out infinite alternate; }
+@keyframes wingbeat { to { transform: scaleY(.45); } }
+@keyframes candle-flicker { 0%, 100% { opacity: 1; } 30%, 65% { opacity: .65; } 35%, 70% { opacity: .9; } }
+@keyframes fog-drift { from { translate: -4% 0; } to { translate: 4% -8%; } }
+@keyframes ember-rise { 0%, 100% { opacity: 0; } 15%, 65% { opacity: .5; } 95% { transform: translate3d(28px, -75vh, 0); opacity: 0; } }
+
+@keyframes snow-fall {
+  from { transform: translate3d(0, -1rem, 0); }
+  to { transform: translate3d(var(--drift), 105dvh, 0); }
+}
+
+@media (max-width: 40rem) {
+  .batSecondary, .gift, .snowflake:nth-child(n + 5) { display: none; }
+  .bat { inset-inline-end: 25%; }
+  .pumpkin, .tree { inline-size: 4.5rem; opacity: .28; }
+  .web { inline-size: 5rem; }
+  .embers span:nth-child(n + 5) { display: none; }
+  .fog { height: 12vh; opacity: .25; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion .bat, .motion .batSecondary, .motion .pumpkin, .motion .snowflake { animation: none; }
+  .snowflake { display: none; }
+  .fog, .embers, .interactions { display: none; }
+  .motion .pumpkinFace, .motion .bat path, .motion .batSecondary path { animation: none; }
+}

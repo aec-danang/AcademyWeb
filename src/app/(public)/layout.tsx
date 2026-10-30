@@ -2,25 +2,29 @@ import { Inter } from "next/font/google";
 import Navbar from "@/lib/layout/Navbar";
 import Footer from "@/lib/layout/Footer";
 import { prisma } from "@/lib/prisma";
+import publicStyles from "@/components/seasonal-theme/PublicHalloween.module.css";
+import { PublicHalloweenAccents } from "@/components/seasonal-theme/PublicHalloweenAccents";
 
 export default async function PublicLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const sponsors = await prisma.sponsor.findMany({
-    where: { published: true },
-    orderBy: { order: "asc" },
-  });
-
-  const programs = await prisma.siteProgram.findMany({
-    where: { published: true },
-    orderBy: { order: "asc" },
-  });
+  const [sponsors, programs] = await Promise.all([
+    prisma.sponsor.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" },
+    }),
+    prisma.siteProgram.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" },
+    }),
+  ]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className={`${publicStyles.frame} flex flex-col min-h-screen`}>
       <Navbar />
+      <PublicHalloweenAccents />
       <main className="flex-1">{children}</main>
       <Footer sponsors={sponsors} programs={programs} />
     </div>

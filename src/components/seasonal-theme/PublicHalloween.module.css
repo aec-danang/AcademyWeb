@@ -1,0 +1,39 @@
+.frame { position: relative; min-width: 0; overflow-x: clip; }
+.accents { display: none; }
+.mist { position: absolute; top: 50px; left: 0; right: 0; height: 280px; overflow: clip; opacity: .28; }
+.mist span { position: absolute; inset: 0 -15%; background: radial-gradient(ellipse at 20% 80%, #8b5cf633, transparent 55%), radial-gradient(ellipse at 80% 30%, #f68d2e22, transparent 55%); }
+.mist span:nth-child(2) { transform: scaleX(-1); opacity: .6; }
+:global(html[data-seasonal-effects="true"]) .mist span { animation: public-mist 20s ease-in-out infinite alternate; }
+:global(html[data-seasonal-effects="true"]) .mist span:nth-child(2) { animation-duration: 28s; animation-direction: alternate-reverse; }
+@keyframes public-mist { to { translate: 6% 14px; } }
+@media (max-width: 767px) { .mist { opacity: .16; height: 180px; } .mist span:nth-child(2) { display: none; } }
+@media (prefers-reduced-motion: reduce) { .mist span { animation: none !important; } }
+:global(html[data-seasonal-theme="halloween"]) .accents { display: block; position: absolute; inset: 82px 0 auto; height: 200px; pointer-events: none; z-index: 2; }
+.web { position: absolute; left: 0; top: 0; width: 72px; stroke: #b59acf; fill: none; stroke-width: .7; opacity: .32; }
+.web:nth-child(2) { left: auto; right: 0; transform: scaleX(-1); }
+.spider { position: absolute; right: 4px; top: -145px; width: 24px; height: 150px; opacity: 0; fill: #8b5cf6; stroke: #8b5cf6; stroke-width: 1.5; }
+.spider circle { fill: #fff7ed; stroke: none; }
+:global(html[data-seasonal-effects="true"]) .spider { animation: spider-visit 36s ease-in-out infinite 4s; }
+@keyframes spider-visit { 0%, 25%, 100% { transform: translateY(0); opacity: 0; } 6%, 17% { transform: translateY(110px); opacity: .65; } }
+/* Public UI uses a gentle press halo rather than the workspace's shaking controls. */
+:global(html[data-seasonal-theme="halloween"][data-seasonal-effects="true"]) .frame :is(button, a, [role="button"]):not(:disabled):not([aria-disabled="true"]):active { animation: none; scale: .98; }
+@media (prefers-reduced-motion: reduce) { .spider { animation: none !important; display: none; } :global(html[data-seasonal-theme="halloween"][data-seasonal-effects="true"]) .frame :is(button, a, [role="button"]):active { scale: none; } }
+@media (max-width: 767px) { .web { width: 38px; opacity: .2; } .web:nth-child(2), .spider { display: none; } }
+:global(html[data-seasonal-theme="halloween"]) .frame {
+  --aec-navy: #40245f; --aec-navy-dark: #301949; --aec-navy-light: #f3ebfa;
+  --aec-orange: #a85009; --color-white: #fff; --color-navy: #40245f;
+  --card: #fff; --card-foreground: #2b173e; --foreground: #2b173e; --border: #e1d7e9;
+  background: #fff; color: #2b173e;
+}
+:global(html[data-seasonal-theme="halloween"]) .frame > header { background: #fff7ed; color: #40245f; }
+:global(html[data-seasonal-theme="halloween"]) .frame > footer { background: #171325; }
+:global(html[data-seasonal-theme="halloween"]) .frame :global(.btn-primary) { background: #f68d2e; color: #24162e; border: 1px solid #f68d2e; }
+@media (hover: hover) {
+  :global(html[data-seasonal-theme="halloween"]) .frame :global(.btn-primary:hover) { box-shadow: 0 0 0 3px #f68d2e33, 0 8px 22px #f68d2e33; }
+}
+.logoBadge { display: none; }
+:global(html[data-seasonal-theme="halloween"]) .logoBadge { display: inline-flex; margin-left: 8px; flex-shrink: 0; }
+.effects { display: none; }
+:global(html[data-seasonal-theme="halloween"]) .effects { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px 10px; border: 1px solid #d8c5e5; border-radius: 999px; background: transparent; color: #40245f; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.effects:focus-visible { outline: 2px solid #8b5cf6; outline-offset: 3px; }
+@media(max-width: 767px) { .logoBadge { margin-left: 2px !important; } .logoBadge svg { width: 22px; } :global(html[data-seasonal-theme="halloween"]) .effects { padding: 6px; font-size: 10px; } }

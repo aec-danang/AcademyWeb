@@ -3,28 +3,66 @@
 import React, { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import * as LucideIcons from "lucide-react";
+import {
+  Trophy,
+  Baby,
+  UserCircle,
+  Award,
+  FileText,
+  MessageCircle,
+  Briefcase,
+  FileQuestion,
+  Clock,
+  Users,
+  Map,
+  BarChart,
+  Tent,
+  Laptop,
+  PenTool,
+  TrendingUp,
+  MessageSquare,
+  Smartphone,
+  BookOpen,
+  LifeBuoy,
+  Quote,
+  User,
+  type LucideIcon,
+} from "lucide-react";
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Baby,
+  UserCircle,
+  Award,
+  FileText,
+  MessageCircle,
+  Briefcase,
+  Clock,
+  Users,
+  Map,
+  BarChart,
+  Tent,
+  Laptop,
+  PenTool,
+  TrendingUp,
+  MessageSquare,
+  Smartphone,
+  BookOpen,
+  LifeBuoy,
+};
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import styles from "./page.module.css";
 import Card from "@/lib/ui/Card";
+import { useTheme } from "@/lib/contexts/ThemeProvider";
+import { HalloweenScene } from "@/components/seasonal-theme/HalloweenScene";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
-const HARDCODED_PROGRAMS = [
-  { slug: "kids", title: "Kids", description: "Tiếng Anh mầm non và thiếu nhi.", icon: "Baby" },
-  { slug: "teens", title: "Teens", description: "Tiếng Anh thiếu niên, phát triển toàn diện.", icon: "UserCircle" },
-  { slug: "ielts", title: "IELTS", description: "Luyện thi IELTS chuẩn quốc tế.", icon: "Award" },
-  { slug: "toeic-toefl", title: "TOEIC / TOEFL", description: "Chứng chỉ tiếng Anh học thuật & công việc.", icon: "FileText" },
-  { slug: "communication", title: "Communication", description: "Tiếng Anh giao tiếp ứng dụng.", icon: "MessageCircle" },
-  { slug: "business-english", title: "Business English", description: "Tiếng Anh doanh nghiệp chuyên sâu.", icon: "Briefcase" },
-];
-
 const WHY_ACADEMY_POINTS = [
-  { title: "Hơn 25 năm kinh nghiệm", desc: "Thành lập từ 2001, tự hào là đơn vị tiên phong đào tạo Anh ngữ.", icon: "Clock" },
+  { title: "Kinh nghiệm giảng dạy", desc: "Thành lập từ 2001, tự hào là đơn vị tiên phong đào tạo Anh ngữ.", icon: "Clock" },
   { title: "Giáo viên giàu kinh nghiệm", desc: "Đội ngũ giáo viên bản ngữ và Việt Nam chuyên môn cao.", icon: "Users" },
   { title: "Lộ trình học rõ ràng", desc: "Cá nhân hóa theo từng độ tuổi và năng lực của học viên.", icon: "Map" },
   { title: "Đánh giá năng lực định kỳ", desc: "Hệ thống bài kiểm tra theo dõi sự tiến bộ liên tục.", icon: "BarChart" },
@@ -43,71 +81,48 @@ const LEARNING_SUPPORT = [
 
 export default function LandingClient({ 
   programs,
-  features,
-  settings,
   events,
   news,
   posts,
   testimonials,
-  studentLifeEvents = []
+  studentLifeEvents = [],
+  sponsorCount,
+  yearsOfExperience,
 }: { 
   programs: any[];
-  features: any[];
-  settings: Record<string, string>;
   events: any[];
   news: any[];
   posts: any[];
   testimonials: any[];
   studentLifeEvents?: any[];
+  sponsorCount: number;
+  yearsOfExperience: number;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeNewsTab, setActiveNewsTab] = useState<'news' | 'events' | 'posts'>('news');
+  const { effectsEnabled, seasonalTheme } = useTheme();
 
   useGSAP(() => {
+    if (!effectsEnabled) return;
+    const media = gsap.matchMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
     // 1. Hero Section Animation
     const heroTl = gsap.timeline();
     heroTl.from(`.${styles.heroContent} > *`, {
-      y: 40,
+      y: 16,
       opacity: 0,
-      duration: 1.2,
-      stagger: 0.15,
+      duration: .65,
+      stagger: 0.08,
       ease: "power4.out",
-      delay: 0.1
-    });
-
-    // 2. Stats Section Counter
-    const statElements = gsap.utils.toArray<HTMLElement>(`.${styles.statNumber}`);
-    statElements.forEach((el) => {
-      const text = el.innerText;
-      const numMatch = text.match(/[\d,]+/);
-      if (!numMatch) return;
-      
-      const targetNum = parseInt(numMatch[0].replace(/,/g, ''), 10);
-      const prefix = text.substring(0, text.indexOf(numMatch[0]));
-      const suffix = text.substring(text.indexOf(numMatch[0]) + numMatch[0].length);
-      
-      const counter = { val: 0 };
-      
-      gsap.to(counter, {
-        val: targetNum,
-        duration: 2,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: `.${styles.statsSection}`,
-          start: "top 90%",
-        },
-        onUpdate: () => {
-          el.innerText = prefix + Math.floor(counter.val).toLocaleString() + suffix;
-        }
-      });
+      delay: 0.1, clearProps: "transform,opacity"
     });
 
     gsap.from(`.${styles.statsGrid}`, {
       scrollTrigger: { trigger: `.${styles.statsSection}`, start: "top 90%" },
-      y: 40,
+      y: 16,
       opacity: 0,
-      duration: 1,
-      ease: "power4.out"
+      duration: .65,
+      ease: "power4.out", clearProps: "transform,opacity"
     });
 
     // Generic section header and grid animations
@@ -123,20 +138,20 @@ export default function LandingClient({
     
     sections.forEach(section => {
       gsap.fromTo(`${section} .${styles.sectionHeader}`, 
-        { opacity: 0, y: 30 },
+        { opacity: 0, y: 16 },
         {
           scrollTrigger: { trigger: section, start: "top 85%" },
-          opacity: 1, y: 0, duration: 0.8
+          opacity: 1, y: 0, duration: 0.65, clearProps: "transform,opacity"
         }
       );
       
-      const gridItems = gsap.utils.toArray(`${section} [class*="Card"], ${section} [class*="Item"], ${section} [class*="gallery"]`);
+      const gridItems = gsap.utils.toArray(`${section} [class*="Grid"] > *, ${section} .${styles.timelineItem}`);
       if (gridItems.length > 0) {
         gsap.fromTo(gridItems,
-          { opacity: 0, y: 40 },
+          { opacity: 0, y: 16 },
           {
             scrollTrigger: { trigger: section, start: "top 80%" },
-            opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: "power4.out"
+            opacity: 1, y: 0, stagger: 0.08, duration: 0.65, ease: "power3.out", clearProps: "transform,opacity"
           }
         );
       }
@@ -144,47 +159,56 @@ export default function LandingClient({
 
     // CTA
     gsap.fromTo(`.${styles.ctaSection} .container > *`, 
-      { y: 40, opacity: 0 },
+      { y: 16, opacity: 0 },
       {
         scrollTrigger: { trigger: `.${styles.ctaSection}`, start: "top 85%" },
-        y: 0, opacity: 1, duration: 1, stagger: 0.15, ease: "power4.out"
+        y: 0, opacity: 1, duration: .65, stagger: 0.08, ease: "power3.out", clearProps: "transform,opacity"
       }
     );
 
-  }, { scope: containerRef, dependencies: [activeNewsTab] });
+    });
+    return () => media.revert();
+  }, { scope: containerRef, dependencies: [effectsEnabled, seasonalTheme], revertOnUpdate: true });
+
+  useGSAP(() => {
+    if (!effectsEnabled) return;
+    const media = gsap.matchMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      gsap.fromTo(`.${styles.newsGrid} > *`, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: .5, stagger: .08, clearProps: "transform,opacity" });
+    });
+    return () => media.revert();
+  }, { scope: containerRef, dependencies: [activeNewsTab, effectsEnabled], revertOnUpdate: true });
 
   // Get active items based on tab
   const activeItems = activeNewsTab === 'news' ? news : activeNewsTab === 'events' ? events : posts;
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className={styles.landing}>
       {/* 1. Hero Section */}
       <section className={styles.hero}>
-        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: -1 }}>
-          <Image src="/images/hero_demo.png" alt="Academy Hero" fill style={{ objectFit: 'cover' }} priority />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(240, 240, 248, 0.95) 0%, rgba(240, 240, 248, 0.6) 100%)" }}></div>
+        <div className={styles.heroBackground} aria-hidden="true">
+          <Image src="/images/academy-team.png" alt="" fill sizes="100vw" className={styles.heroImage} priority />
         </div>
         <div className={`container ${styles.heroContainer}`}>
           <div className={styles.heroContent}>
+            <span className={styles.seasonLabel}>HALLOWEEN TẠI ACADEMY <span aria-hidden="true">✦</span> Học hỏi & khám phá</span>
             <h1>
               <span className={styles.heroHighlight}>Academy</span><br />
-              Hơn 25 Năm Đồng Hành<br />
+              {yearsOfExperience} Năm Đồng Hành<br />
               Cùng <span className={styles.heroHighlight}>Giáo Dục Ngoại Ngữ</span>
             </h1>
-            <p style={{ color: "var(--color-navy)", fontWeight: 500, fontSize: "1.15rem", marginBottom: "40px", opacity: 0.85 }}>Từ tiền thân Hồng Đức năm 2001, thương hiệu Academy English Center từ 2006. Tự hào mang đến nền tảng ngôn ngữ vững chắc cho các thế hệ học viên.</p>
+            <p>Từ tiền thân Hồng Đức năm 2001, thương hiệu Academy English Center từ 2006. Tự hào mang đến nền tảng ngôn ngữ vững chắc cho các thế hệ học viên.</p>
             <div className={styles.heroButtons}>
               <Link href="/contact#register" className="btn-primary" style={{ boxShadow: "0 8px 20px rgba(239, 106, 55, 0.3)" }}>Đăng ký học thử</Link>
-              <Link href="/contact#test" className="btn-secondary" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: "blur(10px)", border: "1px solid rgba(255, 255, 255, 0.5)" }}>Kiểm tra trình độ</Link>
+              <Link href="/contact#register" className="btn-secondary" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: "blur(10px)", border: "1px solid rgba(255, 255, 255, 0.5)" }}>Kiểm tra trình độ</Link>
             </div>
           </div>
           <div className={styles.heroVisual}>
-            <div className={styles.visualShape1}></div>
-            <div className={styles.visualShape2}></div>
-            <div className={styles.visualShape3}></div>
+            <HalloweenScene />
             
             <div className={`${styles.glassCard} ${styles.glassCard1}`}>
               <div className={styles.glassCardIcon}>
-                <LucideIcons.Trophy size={24} />
+                <Trophy size={24} />
               </div>
               <div>
                 <div style={{ fontSize: '12px', color: '#5f607a', fontWeight: 'normal' }}>Founded in</div>
@@ -192,15 +216,6 @@ export default function LandingClient({
               </div>
             </div>
             
-            <div className={`${styles.glassCard} ${styles.glassCard2}`}>
-              <div className={styles.glassCardIcon}>
-                <LucideIcons.Star size={24} />
-              </div>
-              <div>
-                <div style={{ fontSize: '12px', color: '#5f607a', fontWeight: 'normal' }}>Top Rated</div>
-                <div style={{ fontWeight: 700, color: "var(--color-navy)" }}>English Center</div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -208,22 +223,22 @@ export default function LandingClient({
       {/* 2. Trust & Statistics Section */}
       <section className={styles.statsSection}>
         <div className="container">
-          <div className={styles.statsGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+          <div className={styles.statsGrid}>
             <div className={styles.statItem}>
-              <div className={styles.statNumber}>25+</div>
+              <div className={styles.statNumber}>{yearsOfExperience}</div>
               <div className={styles.statLabel}>Years of Experience</div>
             </div>
             <div className={styles.statItem}>
-              <div className={styles.statNumber}>800+</div>
-              <div className={styles.statLabel}>Learners Every Month</div>
+              <div className={styles.statNumber}>2006</div>
+              <div className={styles.statLabel}>Thương hiệu Academy</div>
             </div>
             <div className={styles.statItem}>
-              <div className={styles.statNumber}>6+</div>
-              <div className={styles.statLabel}>Chương trình từ Thiếu nhi đến Doanh nghiệp</div>
+              <div className={styles.statNumber}>{programs.length}</div>
+              <div className={styles.statLabel}>Chương trình đang công bố</div>
             </div>
             <div className={styles.statItem}>
-              <div className={styles.statNumber}>10+</div>
-              <div className={styles.statLabel}>Đối tác đào tạo trường học & doanh nghiệp</div>
+              <div className={styles.statNumber}>{sponsorCount}</div>
+              <div className={styles.statLabel}>Đối tác đang công bố</div>
             </div>
           </div>
         </div>
@@ -234,7 +249,7 @@ export default function LandingClient({
         <div className="container">
           <div className={styles.sectionHeader}>
             <h2>Our Journey</h2>
-            <p>25 Years of Educational Excellence</p>
+            <p>{yearsOfExperience} Years of Educational Excellence</p>
           </div>
           <div className={styles.timeline}>
             <div className={styles.timelineItem}>
@@ -250,9 +265,7 @@ export default function LandingClient({
               <div className={styles.timelineDesc}>Hệ thống đào tạo chuẩn quốc tế</div>
             </div>
           </div>
-          <div style={{ textAlign: "center", marginTop: "40px" }}>
-            <Link href="/about" className="btn-secondary">Xem hành trình</Link>
-          </div>
+
         </div>
       </section>
 
@@ -264,10 +277,9 @@ export default function LandingClient({
             <p>Lộ trình học tập toàn diện cho mọi độ tuổi và mục tiêu.</p>
           </div>
           <div className={styles.programsGrid}>
-            {HARDCODED_PROGRAMS.map((program) => {
-              // @ts-ignore
-              const LucideIcon = LucideIcons[program.icon];
-              const IconComponent = LucideIcon ? <LucideIcon size={48} strokeWidth={1.5} /> : <LucideIcons.FileQuestion size={48} strokeWidth={1.5} />;
+            {programs.map((program) => {
+              const Icon = (program.icon && ICON_MAP[program.icon]) || Award;
+              const IconComponent = <Icon size={44} strokeWidth={1.5} />;
 
               return (
                 <Link key={program.slug} href={`/programs/${program.slug}`} style={{ display: "block", textDecoration: "none" }}>
@@ -279,6 +291,7 @@ export default function LandingClient({
                 </Link>
               );
             })}
+            {programs.length === 0 ? <p className={styles.emptyState}>Chưa có chương trình nào được công bố.</p> : null}
           </div>
         </div>
       </section>
@@ -292,8 +305,7 @@ export default function LandingClient({
           </div>
           <div className={styles.whyGrid}>
             {WHY_ACADEMY_POINTS.map((point, i) => {
-              // @ts-ignore
-              const Icon = LucideIcons[point.icon];
+              const Icon = ICON_MAP[point.icon];
               return (
                 <div key={i} className={styles.whyCard}>
                   <div className={styles.whyIcon}>
@@ -317,8 +329,7 @@ export default function LandingClient({
           </div>
           <div className={styles.supportGrid}>
             {LEARNING_SUPPORT.map((support, i) => {
-              // @ts-ignore
-              const Icon = LucideIcons[support.icon];
+              const Icon = ICON_MAP[support.icon];
               return (
                 <div key={i} className={styles.supportCard}>
                   <div className={styles.supportIcon}>
@@ -358,29 +369,7 @@ export default function LandingClient({
                 );
               })
             ) : (
-              // Fallback default grid if empty
-              <>
-                <div className={`${styles.galleryCard} ${styles.galleryItem1}`}>
-                  <div className={styles.imagePlaceholder}>[ Summer Camp Image ]</div>
-                  <div className={styles.galleryLabel}>Summer Camp</div>
-                </div>
-                <div className={`${styles.galleryCard} ${styles.galleryItem2}`}>
-                  <div className={styles.imagePlaceholder}>[ Speaking Club Image ]</div>
-                  <div className={styles.galleryLabel}>Speaking Club</div>
-                </div>
-                <div className={`${styles.galleryCard} ${styles.galleryItem3}`}>
-                  <div className={styles.imagePlaceholder}>[ Graduation Image ]</div>
-                  <div className={styles.galleryLabel}>Graduation</div>
-                </div>
-                <div className={styles.galleryCard}>
-                  <div className={styles.imagePlaceholder}>[ Events Image ]</div>
-                  <div className={styles.galleryLabel}>Events</div>
-                </div>
-                <div className={styles.galleryCard}>
-                  <div className={styles.imagePlaceholder}>[ Workshop Image ]</div>
-                  <div className={styles.galleryLabel}>Workshop</div>
-                </div>
-              </>
+              <p className={styles.emptyState}>Chưa có hình ảnh hoạt động được đăng.</p>
             )}
           </div>
         </div>
@@ -411,15 +400,17 @@ export default function LandingClient({
             
             <div className={styles.newsGrid}>
               {activeItems.length > 0 ? (
-                activeItems.slice(0, 3).map((item) => (
-                  <Link key={item.slug} href={`/${activeNewsTab}/${item.slug}`} className={styles.newsCard}>
-                    {item.featuredImage ? (
+                activeItems.slice(0, 3).map((item) => {
+                  const itemHref = activeNewsTab === 'posts' ? `/posts/${item.slug}` : `/news/${item.slug}`;
+                  return (
+                    <Link key={item.slug} href={itemHref} className={styles.newsCard}>
+                      {item.featuredImage ? (
+                        <div className={styles.newsImageWrapper}>
+                          <Image src={item.featuredImage} alt={item.title} fill style={{ objectFit: 'cover' }} />
+                        </div>
+                      ) : (
                       <div className={styles.newsImageWrapper}>
-                        <Image src={item.featuredImage} alt={item.title} fill style={{ objectFit: 'cover' }} />
-                      </div>
-                    ) : (
-                      <div className={styles.newsImageWrapper}>
-                        <div className={styles.imagePlaceholder}>[ {item.title} ]</div>
+                        <div className={styles.imagePlaceholder} aria-hidden="true"><BookOpen size={28} /></div>
                       </div>
                     )}
                     <div className={styles.newsContent}>
@@ -430,8 +421,9 @@ export default function LandingClient({
                       {item.excerpt && <p>{item.excerpt}</p>}
                     </div>
                   </Link>
-                ))
-              ) : (
+                );
+              })
+            ) : (
                 <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
                   Hiện chưa có bài viết nào trong mục này.
                 </div>
@@ -453,7 +445,7 @@ export default function LandingClient({
               {testimonials.map((t) => (
                 <div key={t.id} className={styles.testimonialCard}>
                   <div className={styles.quoteIcon}>
-                    <LucideIcons.Quote size={40} color="var(--color-orange)" />
+                    <Quote size={40} color="var(--color-orange)" />
                   </div>
                   <p className={styles.testimonialContent}>"{t.content}"</p>
                   <div className={styles.testimonialAuthor}>
@@ -461,7 +453,7 @@ export default function LandingClient({
                       {t.avatarUrl ? (
                         <Image src={t.avatarUrl} alt={t.authorName} fill style={{ objectFit: 'cover' }} />
                       ) : (
-                        <LucideIcons.User size={32} color="#f0f0f8" />
+                        <User size={32} color="#f0f0f8" />
                       )}
                     </div>
                     <div className={styles.authorInfo}>
@@ -486,7 +478,7 @@ export default function LandingClient({
           <h2>Ready to Start Your English Journey?</h2>
           <p style={{ fontSize: "var(--text-xl)" }}>Đăng ký ngay để nhận tư vấn và lộ trình học tập miễn phí.</p>
           <div className={styles.ctaButtons}>
-            <Link href="/contact#consult" className="btn-secondary" style={{ backgroundColor: 'white', color: 'var(--color-navy)', border: 'none' }}>Đăng ký tư vấn</Link>
+            <Link href="/contact#register" className="btn-secondary" style={{ backgroundColor: 'white', color: 'var(--color-navy)', border: 'none' }}>Đăng ký tư vấn</Link>
             <Link href="/contact" className="btn-dark" style={{ backgroundColor: 'var(--color-navy-dark)', color: 'white', border: 'none' }}>Liên hệ Academy</Link>
           </div>
         </div>

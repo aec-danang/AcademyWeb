@@ -10,67 +10,65 @@ export const metadata: Metadata = {
 export const revalidate = 60; // Revalidate cache every 60 seconds
 
 export default async function LandingPage() {
-  const programs = await prisma.siteProgram.findMany({
-    where: { published: true },
-    orderBy: { order: 'asc' }
-  });
-  
-  const features: any[] = []; 
+  const [
+    programs,
+    events,
+    news,
+    dbTestimonials,
+    posts,
+    studentLifeEvents,
+    sponsorCount,
+  ] = await Promise.all([
+    prisma.siteProgram.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" },
+    }),
+    prisma.post.findMany({
+      where: { type: "event", published: true },
+      orderBy: { createdAt: "desc" },
+      take: 6,
+    }),
+    prisma.post.findMany({
+      where: { type: "news", published: true },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    }),
+    prisma.testimonial.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" },
+    }),
+    prisma.post.findMany({
+      where: { type: "post", published: true },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    }),
+    prisma.studentLifeEvent.findMany({
+      orderBy: { order: "asc" },
+    }),
+    prisma.sponsor.count({ where: { published: true } }),
+  ]);
 
-  const settingsArray = await prisma.siteSetting.findMany();
-  const settings = settingsArray.reduce((acc: Record<string, string>, curr: any) => {
-    acc[curr.key] = curr.value;
-    return acc;
-  }, {} as Record<string, string>);
-
-  const events = await prisma.post.findMany({
-    where: { type: 'event', published: true },
-    orderBy: { createdAt: 'desc' },
-    take: 6
-  });
-
-  const news = await prisma.post.findMany({
-    where: { type: 'news', published: true },
-    orderBy: { createdAt: 'desc' },
-    take: 3
-  });
-
-  const dbTestimonials = await prisma.testimonial.findMany({
-    where: { published: true },
-    orderBy: { order: 'asc' }
-  });
-
-  const testimonials = dbTestimonials.map(t => ({
+  const testimonials = dbTestimonials.map((t) => ({
     id: t.id,
     authorName: t.authorName,
     authorRole: t.authorRole,
     content: t.content,
     avatarUrl: t.avatarUrl,
     score: t.rating ? `${t.rating}/5` : null,
-    isHallOfFame: true,
-    isFeatured: true
+    isHallOfFame: t.isHallOfFame,
+    isFeatured: t.isFeatured,
   }));
-
-  const posts = await prisma.post.findMany({
-    where: { type: 'post', published: true },
-    orderBy: { createdAt: 'desc' },
-    take: 3
-  });
-
-  const studentLifeEvents = await prisma.studentLifeEvent.findMany({
-    orderBy: { order: 'asc' }
-  });
 
   return (
     <LandingClient 
       programs={programs} 
-      features={features} 
-      settings={settings}
       events={events}
       news={news}
       posts={posts}
       testimonials={testimonials}
       studentLifeEvents={studentLifeEvents}
+      sponsorCount={sponsorCount}
+      yearsOfExperience={new Date().getFullYear() - 2001}
     />
   );
 }
